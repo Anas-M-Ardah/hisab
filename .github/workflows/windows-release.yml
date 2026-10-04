@@ -2,7 +2,7 @@ name: Build Windows release
 on:
   push:
     branches: [main]
-    paths: ['source/**', '.github/workflows/windows-release.yml', 'release.ps1', 'Setup-Guide-Arabic.pdf', 'Start-Hisab.cmd', 'ThirdParty/**']
+    paths: ['.gitattributes', 'source/**', '.github/workflows/windows-release.yml', 'release.ps1', 'Setup-Guide-Arabic.pdf', 'Start-Hisab.cmd', 'ThirdParty/**']
   workflow_dispatch:
 permissions:
   contents: write

@@ -2,6 +2,10 @@
 
 برنامج حسابات مكتبي لويندوز، بالعربية مع خيار الإنجليزية. البيانات محفوظة محليًا، ولا تحتاج إلى تثبيت قاعدة بيانات أو إنشاء حساب للاستخدام الشخصي.
 
+**[تنزيل البرنامج لويندوز — اضغط هنا](https://github.com/Anas-M-Ardah/hisab/releases/latest/download/Hisab-Windows.zip)**
+
+**[دليل البدء بالعربية (PDF)](https://github.com/Anas-M-Ardah/hisab/releases/latest/download/Setup-Guide-Arabic.pdf)**
+
 ## تنزيل البرنامج وفتحه
 
 1. افتح **Releases**، ثم أحدث إصدار.

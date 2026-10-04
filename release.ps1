@@ -28,4 +28,5 @@ foreach($name in @('bin','obj')) {
   if(-not $full.StartsWith($expected,[StringComparison]::OrdinalIgnoreCase)){throw 'Unexpected cleanup path.'}
   if(Test-Path -LiteralPath $full){Remove-Item -LiteralPath $full -Recurse -Force}
 }
+Compress-Archive -Path (Join-Path $package 'source') -DestinationPath (Join-Path $package 'Source.zip') -Force
 Compress-Archive -Path (Join-Path $package '*') -DestinationPath (Join-Path $folder 'Hisab-Windows.zip') -Force
