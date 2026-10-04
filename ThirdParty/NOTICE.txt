@@ -1,0 +1,6 @@
+Redistributed components:
+.NET 10.0.9 / WPF — MIT, .NET Foundation and contributors.
+Microsoft.Data.Sqlite.Core 10.0.12 — MIT, Microsoft and .NET Foundation contributors.
+SQLitePCLRaw 3.0.5 — Apache-2.0, Copyright 2014–2026 SourceGear, LLC. https://github.com/ericsink/SQLitePCL.raw
+SQLite 3.53.4 — public domain. https://sqlite.org/copyright.html
+The bundled license texts and runtime third-party notices accompany these components.

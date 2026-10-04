@@ -1,0 +1,102 @@
+Hisab 0.3 validation
+
+91 automated checks passed on each packaged x64 and x86 executable; exits 0.
+Builds: win-x64, win-x86, win-arm64; version 0.3.0.0, no build warnings/errors.
+Personal setup requires no username/password. Tests cover explicit personal mode, optional 4-character lock, failed-attempt lockout, optional shared sign-in, transaction rollback and encrypted reopening, alongside accounting, returns, inventory, permissions, corrections, closing, tax, backup and encryption regressions.
+Arabic and English preview launches exited 0. Combo selection and calendar popup interaction checks passed in both languages. Home, navigation, forms, welcome, optional sign-in, accounting screens and extra-large text at 1024x768 were visually inspected. Native ARM execution, real screen-reader/high-contrast/DPI testing and another-PC tests remain unverified.
+Setup-Guide-Arabic.pdf: three A4 pages, native Arabic shaping, rendered by Poppler and all pages visually checked. QUICKSTART-AR.txt provides selectable Arabic instructions.
+Machine inventory: Windows build 26200 x64, .NET 10.0.9, Microsoft Print to PDF and OneNote only. No physical printer test. Executables remain unsigned; trusted signing requires a certificate. No tax-authority submission was tested or claimed.
+Normal startup imports source names only, without demo transactions. Test/preview data is excluded from the release.
+
+Automated check results (x64; x86 passed the same checks):
+PASS 17 source item names imported
+PASS Source chat text not imported
+PASS Sample invoice not posted
+PASS Arabic numeral parsing
+PASS Purchase increases stock and value
+PASS Cash purchase does not create supplier liability
+PASS Sale deducts stock at weighted average
+PASS Part-paid invoice posts remaining customer balance
+PASS Receipt clears customer balance
+PASS Payment clears supplier balance
+PASS Overselling rejected
+PASS Failed invoice rolls back number, document and stock
+PASS Repeated-item oversell rejected
+PASS Multi-line invoice failure fully rolls back
+PASS Unbalanced journal rejected
+PASS Unbalanced journal rolls back document
+PASS Backdated stock transaction rejected
+PASS Same cash and counterpart rejected
+PASS Money beyond 3 decimals rejected
+PASS Used account cannot be reclassified
+PASS Inclusive tax uses 3-decimal JOD rounding
+PASS Discount applied before tax
+PASS Invoice reversal restores stock and cost
+PASS Reversal preserves later receipts as customer credit
+PASS Duplicate reversal rejected
+PASS Opening stock posts value
+PASS Duplicate opening stock rejected
+PASS Weighted average across different purchase costs
+PASS Cancelling older purchase recalculates later sale costs
+PASS Service sale does not move inventory
+PASS Older inventory document can reverse after newer documents are cancelled
+PASS All posted journals balance
+PASS Inventory ledger equals stock valuation
+PASS Restore recovers database snapshot
+PASS Restore first creates safety backup
+PASS Unrelated SQLite database rejected
+PASS Database integrity check
+PASS Foreign key check
+PASS Historical invoice balance excludes later receipts
+PASS Partial receipt allocated to invoice
+PASS Voucher over-allocation rejected
+PASS Sales return reduces invoice outstanding
+PASS Excess returns rejected
+PASS Source with live returns cannot cancel
+PASS Past tax worksheet includes dated return despite later cancellation
+PASS Invoice amendment transfers allocations atomically
+PASS Amendments preserve reason and original snapshot
+PASS Backdated purchase replays subsequent weighted cost
+PASS Purchase returns reduce stock
+PASS Audited cost adjustment changes stock valuation
+PASS Bounced cheque releases allocations
+PASS Cheque reversal uses selected historical date
+PASS Terminal cheque cannot clear again
+PASS Optional negative stock supported
+PASS Receipt reconciles provisional negative-stock costing
+PASS Extended inventory ledger equals valuation
+PASS All extended journals balance
+PASS Closed period rejects posting
+PASS Closed invoice rejects amendment
+PASS Administrator reopens period with reversal
+PASS Attachment persisted within database
+PASS Editable bilingual account names
+PASS Incorrect password rejected
+PASS Viewer can authenticate
+PASS Viewer cannot post via accounting service
+PASS Viewer cannot change business settings
+PASS Administrator can authenticate
+PASS Wrong backup password rejected
+PASS Encrypted portable backup restores snapshot
+PASS Extended database integrity and foreign keys
+PASS Failed encrypted-file save rolls back in-memory change
+PASS Tampered encrypted backup rejected
+PASS Rejected backup preserves current data
+PASS Local data is encrypted at rest
+PASS Encrypted database survives process-style reopen
+PASS Portable backup restores under independent local encryption key
+PASS Legacy database migrates to encrypted schema v2
+PASS App-owned legacy plaintext database and backups replaced with encrypted files
+PASS Fresh database does not silently select an account before setup
+PASS Personal setup requires no username or password
+PASS Personal profile creates exactly one internal owner
+PASS Repeated personal setup reuses the owner
+PASS Optional lock prevents direct opening
+PASS Four-character optional lock authenticates without a username
+PASS Optional lock enforces failed-attempt lockout
+PASS Removing optional lock restores direct opening
+PASS Shared sign-in cannot lock out the only personal owner
+PASS Explicit shared mode requires named user sign-in
+PASS Accountant cannot bypass shared sign-in
+PASS Administrator can enter shared mode
+PASS Personal access survives encrypted reopen

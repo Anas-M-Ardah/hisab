@@ -1,0 +1,23 @@
+Hisab 0.3 architecture
+
+C# / .NET 10 / Windows Presentation Foundation. A single desktop process, no web server or cloud dependency. Lightweight MVVM presentation: MainViewModel/RelayCommand plus programmatic WPF views in partial MainWindow classes. AccountingService contains posting rules; Store contains persistence, migrations, security, master data and backup/restore.
+
+Money and quantity use integer thousandths; decimal intermediates round away from zero. Each invoice selects one tax rate and inclusive/exclusive mode. Balanced double-entry journals, document numbers, allocations, stock replay, revisions and audit records share a transaction. Nested service calls use SQLite savepoints.
+
+Stock replays active documents in date/id order, with moving weighted average. Backdated documents rebuild later costs and record changes in cost_history. Negative stock is optional; receipt-time variance reconciles provisional cost. VA documents adjust positive stock value against cost of sales. Historical printed invoices retain sales amounts; stock costs can be recalculated with audit history. Manual inventory ledger posting is blocked.
+
+Receipts/payments/cheques allocate to individual invoices. Effective allocation/removal dates and return/reversal dates determine historical positions. A full return after payment can leave customer credit. Amendments retain originals, reversals, replacements, reasons and serialized snapshots. Period closing transfers income/expense to retained earnings and locks on/before closing end; reopening is restricted to administrators and preserves audit/reversal evidence.
+
+Schema version 2. Microsoft.Data.Sqlite.Core 10.0.12 and SQLitePCLRaw.bundle_e_sqlite3 3.0.5. SQLite runs in memory for live use. Native sqlite3_serialize/deserialize produces snapshots; AES-256-GCM authenticates and encrypts them. Atomic file replacement and Flush(true) make the persisted commit. If persistence fails, the previous in-memory snapshot is restored. Plaintext preview/test databases are isolated developer fixtures, not live storage.
+
+Local random 256-bit key: Windows DPAPI CurrentUser. Portable .hisab backups: PBKDF2-SHA256 600,000 iterations, random salt, AES-GCM and independent password. Password hashes also use PBKDF2-SHA256 with per-user salts; constant-time comparison, lockout and roles. Roles enforce application operations, not isolation from a Windows administrator or software running as the same Windows user.
+
+Restore authenticates backups, checks schema, integrity, foreign keys and journal balance, upgrades known old schema, takes a safety backup and replaces contents. App-owned v0.1 databases/backups migrate to encryption. One process per Windows user via mutex. Local path remains outside the executable directory; updating binaries preserves data.
+
+Prints are WPF FlowDocuments using saved branding/name/address/images plus current allocation totals. Bilingual descriptions can be entered separately. Reports use SQL and dated invoice positions. Tax export is a historical transaction worksheet; it is not an implementation of every ISTD declaration classification or electronic-invoice submission.
+
+Self-contained single-file packages for win-x64, win-arm64, win-x86 include the runtime/native SQLite. Start-Hisab.cmd selects the native architecture. source/build.ps1 accepts -Runtime. source/sign-release.ps1 requires a real code-signing certificate in the Windows certificate store and SignTool. Sign and verify each architecture, then repackage.
+
+Diagnostics enumerate OS/runtime/architecture/printers without printing; an optional bilingual test page uses the printer dialog. Automated tests isolate databases under their output path; preview mode renders WPF forms and print pages. Native ARM hardware, another physical PC and physical printer output remain external validation work.
+
+UI: native WPF semantic Theme.xaml; ModernScreens.cs navigation and dashboard. WelcomeWindow and SessionGate select explicit personal, locked or shared opening mode. PersonalMode.cs retains internal owner auditing without compulsory credentials.
