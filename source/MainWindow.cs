@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -68,7 +68,7 @@ public sealed partial class MainWindow : Window
     WrapPanel Actions(params Button[] buttons){var p=new WrapPanel{Margin=new(0,10,0,6)};foreach(var b in buttons)p.Children.Add(b);return p;}
     DataGrid Grid(DataTable table,params(string Field,string Label,double Width)[] columns)
     {
-        var grid=new DataGrid{ItemsSource=table.DefaultView,MaxHeight=520,FontSize=Math.Max(14,FontSize*.9),MinColumnWidth=95,RowHeight=Math.Max(36,FontSize*2.2),ColumnHeaderHeight=double.NaN};
+        var grid=new DataGrid{ItemsSource=table.DefaultView,MaxHeight=520,FontSize=Math.Max(14,FontSize*.9),MinColumnWidth=95,RowHeight=Math.Max(48,FontSize*2.6),ColumnHeaderHeight=double.NaN};
         grid.Sorting+=(s,e)=>{string path=e.Column.SortMemberPath;if(path.EndsWith("_numeric")&&grid.ItemsSource is DataView view&&!view.Table!.Columns.Contains(path)){string field=path[..^8];view.Table.Columns.Add(path,typeof(decimal));foreach(DataRow row in view.Table.Rows)if(decimal.TryParse(row[field]?.ToString(),NumberStyles.Number,CultureInfo.InvariantCulture,out var value))row[path]=value;}};
         foreach(var c in columns) {
             string sort=c.Field;
@@ -76,9 +76,16 @@ public sealed partial class MainWindow : Window
             {
                 sort=c.Field+"_numeric";if(!table.Columns.Contains(sort)){table.Columns.Add(sort,typeof(decimal));foreach(DataRow row in table.Rows)if(decimal.TryParse(row[c.Field]?.ToString(),NumberStyles.Number,CultureInfo.InvariantCulture,out var value))row[sort]=value;}
             }
-            var style=new Style(typeof(TextBlock));style.Setters.Add(new Setter(TextBlock.TextTrimmingProperty,TextTrimming.CharacterEllipsis));style.Setters.Add(new Setter(TextBlock.ToolTipProperty,new Binding("["+c.Field+"]")));style.Setters.Add(new Setter(TextBlock.MarginProperty,new Thickness(10,6,10,6)));style.Setters.Add(new Setter(TextBlock.VerticalAlignmentProperty,VerticalAlignment.Center));
-            if(c.Field is "balance" or "own" or "amount" or "price" or "qty" or "incoming" or "outgoing" or "amount_text"){style.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,TextAlignment.Right));}
-            grid.Columns.Add(new DataGridTextColumn{Header=c.Label,Binding=new Binding("["+c.Field+"]"),SortMemberPath=sort,ElementStyle=style,Width=new DataGridLength(c.Width,DataGridLengthUnitType.Star)});
+            var style=new Style(typeof(TextBlock));style.Setters.Add(new Setter(TextBlock.TextTrimmingProperty,TextTrimming.CharacterEllipsis));style.Setters.Add(new Setter(TextBlock.ToolTipProperty,new Binding("["+c.Field+"]")));style.Setters.Add(new Setter(TextBlock.MarginProperty,new Thickness(16,8,16,8)));style.Setters.Add(new Setter(TextBlock.VerticalAlignmentProperty,VerticalAlignment.Center));
+            if(c.Field is "balance" or "own" or "amount" or "price" or "qty" or "incoming" or "outgoing" or "amount_text"){style.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,TextAlignment.Right));style.Setters.Add(new Setter(Typography.NumeralAlignmentProperty,FontNumeralAlignment.Tabular));if(c.Field is "balance" or "amount" or "qty" or "amount_text")style.Setters.Add(new Setter(TextBlock.FontWeightProperty,FontWeights.SemiBold));}
+            if(c.Field is "name" or "party" or "number")style.Setters.Add(new Setter(TextBlock.FontWeightProperty,FontWeights.SemiBold));
+            if(c.Field is "code" or "number" or "date"){style.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,vm.Arabic?TextAlignment.Right:TextAlignment.Left));}
+            var header=new Style(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader),(Style)FindResource(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader)));header.Setters.Add(new Setter(Control.FontSizeProperty,Math.Max(13,grid.FontSize*.85)));if(sort.EndsWith("_numeric")){header.Setters.Add(new Setter(FrameworkElement.FlowDirectionProperty,FlowDirection.LeftToRight));header.Setters.Add(new Setter(Control.HorizontalContentAlignmentProperty,HorizontalAlignment.Right));}
+            if(c.Field is "code" or "date" or "own"){
+                style.Setters.Add(new Setter(TextBlock.ForegroundProperty,muted));var selected=new DataTrigger{Binding=new Binding(nameof(DataGridRow.IsSelected)){RelativeSource=new RelativeSource(RelativeSourceMode.FindAncestor,typeof(DataGridRow),1)},Value=true};selected.Setters.Add(new Setter(TextBlock.ForegroundProperty,UiTheme.Brush(Resources,"Brush.SelectionText")));style.Triggers.Add(selected);
+            }
+            if(c.Field=="state"||(c.Field=="type"&&table.Columns.Contains("incoming")))grid.Columns.Add(TableBadgeColumn(c.Field,c.Label,c.Width,header));
+            else grid.Columns.Add(new DataGridTextColumn{Header=c.Label,HeaderStyle=header,Binding=new Binding("["+c.Field+"]"),SortMemberPath=sort,ElementStyle=style,Width=new DataGridLength(c.Width,DataGridLengthUnitType.Star)});
         }
         return grid;
     }

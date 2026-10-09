@@ -1,4 +1,4 @@
-# Hisab placement and interaction system
+﻿# Hisab placement and interaction system
 
 Hisab targets Windows WPF, with Arabic RTL and English LTR. Preserve the original Hisab palette. Improve element placement, hierarchy, grouping and interactions.
 
@@ -48,3 +48,9 @@ Outline-view guidance is macOS-specific; Hisab adapts its information organizati
 ## Verification
 
 Render actual Arabic and English WPF screens at small and large text settings. Check collapse/expand, expansion retention across navigation, move/undo, grouped statements and native popups. Run the 133 existing storage/accounting checks. Verify original brush colors against the hierarchy baseline. Target-device screen-reader, DPI and high-contrast usability remain to be reviewed.
+
+## Table refinement
+
+White rows with subtle horizontal rules replace alternating stripes. Primary names and final balances use semibold text; codes, dates and own balances are secondary. Numeric headings match right-aligned tabular figures. Compact labels distinguish item types and document statuses. Custom header chrome retains sort indicators and resize thumbs; scoped table scrollbars retain native tracks and paging commands. A live footer reports visible records and selection. Actual rounded clipping keeps headers and the footer within the table surface.
+
+Preview checks invoke the native header click handler, exercise resize-thumb events, scroll to the last record and verify selection counts in Arabic and English.

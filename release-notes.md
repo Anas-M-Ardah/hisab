@@ -1,4 +1,4 @@
-# حساب 0.4.1 — واجهة محسّنة وترتيب الحسابات بالسحب والإفلات
+﻿# حساب 0.4.1 — واجهة محسّنة وترتيب الحسابات بالسحب والإفلات
 
 ## تحسين إدارة الحسابات
 
@@ -9,12 +9,14 @@
 
 ## تحسين الواجهة
 
+- تصميم جديد للجداول: صفوف هادئة، محاذاة أوضح للأرقام، تسميات مختصرة للحالة، وعدّاد للسجلات والتحديد.
+
 - إعادة ترتيب الرئيسية والأصناف والمستندات والتقارير والإعدادات، مع منطقة واضحة للبحث والإجراءات ومساحة أكبر للجداول.
 - قائمة «المزيد» لإجراءات المستندات الثانوية، ورسالة واضحة عند عدم وجود نتائج.
 - تجميع إعدادات العرض والشركة، مع إبقاء زر الحفظ ظاهرًا. النماذج تعرض العنوان والإلغاء وإجراء الإكمال خارج منطقة التمرير.
 
 - الحفاظ على ألوان البرنامج الأصلية، مع تحسين ترتيب العناصر وتباعدها وتناسق أحجامها.
-- جداول أكثر كثافة مع تحديد واضح للصفوف وخط لا يقل عن ١٤ نقطة، مع الحفاظ على حجم الخط المحفوظ.
+- جداول أوضح مع تباعد مريح وتحديد واضح للصفوف وخط لا يقل عن ١٤ نقطة، مع الحفاظ على حجم الخط المحفوظ.
 - بطاقات أصغر للعمليات اليومية، وتسميات أوضح لدليل الحسابات.
 
 ## الجديد
@@ -39,3 +41,5 @@
 ---
 
 **Hisab 0.4.1:** the original color palette with improved control placement, a first-column account outline, retained expansion choices, scalable controls and drag-and-drop account grouping, a click-based Move account alternative, Undo, quick child creation and collapsible groups. Includes the stock In/Out, multi-cheque receipts, text settings and desktop icon introduced in 0.4.0. Existing data and text preferences are retained. Release builds require all 133 checks to pass on both x64 and x86.
+
+Table refinement: quieter white rows, aligned numeric headers and tabular figures, compact status labels, lighter scrollbars, and live record/selection counts. Original colors and saved font preferences are retained.
