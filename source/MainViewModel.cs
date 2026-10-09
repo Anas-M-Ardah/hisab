@@ -13,7 +13,8 @@ public sealed class MainViewModel(Store store) : INotifyPropertyChanged
 {
     public Store Store {get;}=store;
     public AccountingService Accounting {get;}=new(store);
-    public bool Arabic=>Store.Setting("language","ar")=="ar";
+    public bool Arabic { get; private set; }=store.Setting("language","ar")=="ar";
+    public void RefreshPreferences()=>Arabic=Store.Setting("language","ar")=="ar";
     string route="home",status="";
     public string Route {get=>route;set{route=value;OnChanged();}}
     public string Status {get=>status;set{status=value;OnChanged();}}
@@ -21,4 +22,3 @@ public sealed class MainViewModel(Store store) : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     void OnChanged([CallerMemberName]string? name=null)=>PropertyChanged?.Invoke(this,new(name));
 }
-

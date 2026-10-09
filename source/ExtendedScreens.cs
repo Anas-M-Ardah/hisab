@@ -8,8 +8,8 @@ using Microsoft.Win32;
 namespace Hisab;
 public sealed partial class MainWindow
 {
-    List<Account> UiAccounts()=>S.Accounts().Select(a=>a with{Name=S.LocalName("accounts",a.Id,vm.Arabic)}).ToList();
-    List<Item> UiItems()=>S.Items().Select(i=>i with{Name=S.LocalName("items",i.Id,vm.Arabic)}).ToList();
+    List<Account> UiAccounts()=>S.Accounts(vm.Arabic);
+    List<Item> UiItems()=>S.Items(vm.Arabic);
     record PositionChoice(long? Id,string Label){public override string ToString()=>Label;}
     void BilingualForm(string table,long id)
     {

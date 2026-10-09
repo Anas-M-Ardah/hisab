@@ -1,7 +1,9 @@
 Hisab 0.4 validation
 
-Release packaging requires all 133 automated checks to pass on each x64 and x86 executable. CHECKS-win-x64.txt and CHECKS-win-x86.txt in the package are the results from those actual binaries.
+Release packaging requires all 148 automated checks to pass on each x64 and x86 executable. CHECKS-win-x64.txt and CHECKS-win-x86.txt in the package are the results from those actual binaries.
 Local v0.4.1 Release build: zero warnings/errors. All 133 checks passed, including account hierarchy, stock In/Out reconciliation, multi-cheque receipts, encrypted persistence, migration and isolated Windows desktop shortcut tests.
 Arabic/English previews exercise dropdown/calendar controls and grouped statements at smaller and larger font sizes.
 ARM64 is built but native ARM execution remains unverified. Physical printing, another-PC testing and screen-reader/high-contrast/DPI acceptance remain manual checks. Executables are unsigned.
 Normal startup creates a Hisab desktop shortcut and imports source names only. Tests and previews do not create a shortcut on the real desktop; test/preview data is excluded from release packages.
+
+Local v0.4.2 review build: zero warnings/errors; 148 storage/accounting checks pass. Arabic and English organizer checks cover cached selection/disclosure, scoped drop events, move/undo, inline edit/undo and finite virtualized table layout. Rendering also covers 14/20/24-DIP fonts and a 1024x768 window. The real pointer drag gesture, DPI and screen-reader acceptance remain manual. No new release was published during this implementation.

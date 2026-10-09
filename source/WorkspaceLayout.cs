@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 namespace Hisab;
@@ -6,6 +6,7 @@ namespace Hisab;
 public sealed partial class MainWindow
 {
     ScrollViewer contentViewport=null!;
+    System.Windows.Controls.Grid workspaceViewport=null!;
     System.Windows.Controls.Grid? dataWorkspace;
     StackPanel? workspaceFooter;
     DataGrid? workspaceTable;
@@ -17,7 +18,7 @@ public sealed partial class MainWindow
         var save=body.Children.OfType<Button>().LastOrDefault();if(save==null)return;body.Children.Remove(save);
         var actions=Actions(save);actions.HorizontalAlignment=HorizontalAlignment.Right;
         pageActionFooter=new Border{BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new Thickness(0,1,0,0),Padding=new Thickness(24,4,24,4),Background=UiTheme.Brush(Resources,"Brush.Surface"),Child=actions};
-        DockPanel.SetDock(pageActionFooter,Dock.Bottom);workspaceHost.Children.Insert(workspaceHost.Children.IndexOf(contentViewport),pageActionFooter);
+        DockPanel.SetDock(pageActionFooter,Dock.Bottom);workspaceHost.Children.Insert(workspaceHost.Children.IndexOf(workspaceViewport),pageActionFooter);
     }
 
     void ArrangeDataWorkspace(string route)
@@ -39,15 +40,14 @@ public sealed partial class MainWindow
         contentViewport.Content=null;body.Margin=new Thickness(0);footer.Margin=new Thickness(0,10,0,0);
         var layout=new System.Windows.Controls.Grid{Margin=new Thickness(24,12,24,20)};
         layout.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});layout.RowDefinitions.Add(new RowDefinition{Height=new GridLength(1,GridUnitType.Star)});layout.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});
-        layout.Children.Add(body);table.MaxHeight=double.PositiveInfinity;table.MinHeight=160;
+        layout.Children.Add(body);table.MaxHeight=double.PositiveInfinity;table.MinHeight=0;
         var content=new System.Windows.Controls.Grid();content.Children.Add(table);
         var empty=new TextBlock{Text=T("لا توجد سجلات لعرضها. غيّر البحث أو أضف سجلًا.","No records to show. Change the search or add a record."),Foreground=muted,FontSize=Math.Max(14,FontSize*.9),TextWrapping=TextWrapping.Wrap,TextAlignment=TextAlignment.Center,HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(24),IsHitTestVisible=false};
         var emptyStyle=new Style(typeof(TextBlock));emptyStyle.Setters.Add(new Setter(VisibilityProperty,Visibility.Collapsed));var noRows=new DataTrigger{Binding=new System.Windows.Data.Binding(nameof(ItemsControl.HasItems)){Source=table},Value=false};noRows.Setters.Add(new Setter(VisibilityProperty,Visibility.Visible));emptyStyle.Triggers.Add(noRows);empty.Style=emptyStyle;content.Children.Add(empty);
         var surface=new Border{Background=UiTheme.Brush(Resources,"Brush.Surface"),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new Thickness(1),CornerRadius=new CornerRadius(10),ClipToBounds=true,Child=TableSurface(table,content)};
         surface.SizeChanged+=(s,e)=>surface.Clip=new RectangleGeometry(new Rect(0,0,surface.ActualWidth,surface.ActualHeight),10,10);
         System.Windows.Controls.Grid.SetRow(surface,1);layout.Children.Add(surface);System.Windows.Controls.Grid.SetRow(footer,2);layout.Children.Add(footer);
-        dataWorkspace=layout;workspaceFooter=footer;workspaceTable=table;contentViewport.Content=layout;
-        Dispatcher.BeginInvoke(UpdateDataWorkspaceLayout,System.Windows.Threading.DispatcherPriority.Loaded);
+        dataWorkspace=layout;workspaceFooter=footer;workspaceTable=table;workspaceViewport.Children.Clear();workspaceViewport.Children.Add(layout);
     }
     DataGridColumn TableBadgeColumn(string field,string label,double width,Style header)
     {
@@ -63,13 +63,7 @@ public sealed partial class MainWindow
         ((System.Collections.Specialized.INotifyCollectionChanged)table.Items).CollectionChanged+=(s,e)=>Refresh();table.SelectionChanged+=(s,e)=>Refresh();Refresh();
         var footer=new Border{Background=UiTheme.Brush(Resources,"Brush.Surface"),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new Thickness(0,1,0,0),Child=count};DockPanel.SetDock(footer,Dock.Bottom);layout.Children.Add(footer);layout.Children.Add(content);return layout;
     }
-    void UpdateDataWorkspaceLayout()
-    {
-        if(dataWorkspace==null||workspaceFooter==null)return;
-        double width=Math.Max(200,contentViewport.ActualWidth-48);
-        body.Measure(new Size(width,double.PositiveInfinity));workspaceFooter.Measure(new Size(width,double.PositiveInfinity));
-        dataWorkspace.Height=Math.Max(contentViewport.ActualHeight-32,body.DesiredSize.Height+workspaceFooter.DesiredSize.Height+160);
-    }
+
     DataGrid PageTable()=>workspaceTable??body.Children.OfType<DataGrid>().Single();
     FrameworkElement SearchActions(string label,TextBox search,params Button[] actions)
     {

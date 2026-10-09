@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -37,7 +37,7 @@ public sealed partial class MainWindow : Window
         BuildShell();
         SizeChanged+=(s,e)=>ApplyResponsiveLayout();
         PreviewKeyDown+=(s,e)=>{if(e.Key==Key.F1){Help();e.Handled=true;} if(Keyboard.Modifiers==ModifierKeys.Control&&e.Key==Key.N){InvoiceForm(true);e.Handled=true;} if(Keyboard.Modifiers==ModifierKeys.Control&&e.Key==Key.B){Backup();e.Handled=true;}};
-        Closing+=(s,e)=>{ try{ var dir=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(S.Path)!,"backups");Directory.CreateDirectory(dir);S.Backup(System.IO.Path.Combine(dir,"automatic-"+DateTime.Now.ToString("yyyyMMdd")+(S.Encrypted?".hdb":".db")));}catch(Exception ex){File.AppendAllText(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(S.Path)!,"errors.log"),ex+Environment.NewLine);} };
+        Closing+=(s,e)=>{if(leaveAccountEditor!=null&&!leaveAccountEditor()){e.Cancel=true;return;} try{ var dir=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(S.Path)!,"backups");Directory.CreateDirectory(dir);S.Backup(System.IO.Path.Combine(dir,"automatic-"+DateTime.Now.ToString("yyyyMMdd")+(S.Encrypted?".hdb":".db")));}catch(Exception ex){File.AppendAllText(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(S.Path)!,"errors.log"),ex+Environment.NewLine);} };
     }
     TextBlock Text(string text,double size=0,bool bold=false)=>new(){Text=text,FontSize=size==0?FontSize:size*FontSize/20,FontWeight=bold?FontWeights.SemiBold:FontWeights.Normal,TextWrapping=TextWrapping.Wrap,Margin=new(0,0,0,10)};
     Button Btn(string label,Action action,bool primary=false)
@@ -54,12 +54,13 @@ public sealed partial class MainWindow : Window
             MessageBox.Show(this,msg,T("تحقق من البيانات","Check the information"),MessageBoxButton.OK,MessageBoxImage.Information);
         }
     }
-    void BuildShell()=>BuildModernShell();
+    void BuildShell(){vm.RefreshPreferences();BuildModernShell();}
     public void Navigate(string route)
     {
-        if(pageActionFooter!=null){workspaceHost.Children.Remove(pageActionFooter);pageActionFooter=null;}vm.Route=route;dataWorkspace=null;workspaceTable=null;workspaceFooter=null;body=new StackPanel{Margin=new(24,12,24,20)};contentViewport.Content=body;
-        foreach(var b in navigation){bool selected=b.Key==route;b.Value.Background=selected?UiTheme.Brush(Resources,"Brush.NavSelected"):Brushes.Transparent;b.Value.Foreground=selected?UiTheme.Brush(Resources,"Brush.OnPrimary"):UiTheme.Brush(Resources,"Brush.NavText");b.Value.FontWeight=selected?FontWeights.SemiBold:FontWeights.Normal;}
-        switch(route){case "home":Home();break;case "tools":ToolsPage();break;case "invoices":Documents();break;case "receipt":VoucherForm(true);break;case "payment":VoucherForm(false);break;case "journal":JournalForm();break;case "accounts":AccountsPage();break;case "items":ItemsPage();break;case "reports":Reports();break;case "cheques":ChequesPage();break;case "periods":PeriodsPage();break;case "users":UsersPage();break;case "backup":BackupsPage();break;case "settings":Settings();break;}
+        if(leaveAccountEditor!=null&&!leaveAccountEditor())return;leaveAccountEditor=null;
+        if(pageActionFooter!=null){workspaceHost.Children.Remove(pageActionFooter);pageActionFooter=null;}vm.Route=route;dataWorkspace=null;workspaceTable=null;workspaceFooter=null;body=new StackPanel{Margin=new(24,12,24,20)};contentViewport.Content=body;workspaceViewport.Children.Clear();workspaceViewport.Children.Add(contentViewport);
+        foreach(var b in navigation){bool selected=b.Key==route||(route=="organize-accounts"&&b.Key=="accounts");b.Value.Background=selected?UiTheme.Brush(Resources,"Brush.NavSelected"):Brushes.Transparent;b.Value.Foreground=selected?UiTheme.Brush(Resources,"Brush.OnPrimary"):UiTheme.Brush(Resources,"Brush.NavText");b.Value.FontWeight=selected?FontWeights.SemiBold:FontWeights.Normal;}
+        switch(route){case "home":Home();break;case "tools":ToolsPage();break;case "invoices":Documents();break;case "receipt":VoucherForm(true);break;case "payment":VoucherForm(false);break;case "journal":JournalForm();break;case "accounts":AccountsPage();break;case "organize-accounts":HierarchyAccountsPage(true);break;case "items":ItemsPage();break;case "reports":Reports();break;case "cheques":ChequesPage();break;case "periods":PeriodsPage();break;case "users":UsersPage();break;case "backup":BackupsPage();break;case "settings":Settings();break;}
         ArrangeDataWorkspace(route);if(route=="settings")ArrangeSettingsFooter();
         if(route is "receipt" or "payment" or "journal") {vm.Route="home";Navigate("home");}
     }
@@ -68,7 +69,7 @@ public sealed partial class MainWindow : Window
     WrapPanel Actions(params Button[] buttons){var p=new WrapPanel{Margin=new(0,10,0,6)};foreach(var b in buttons)p.Children.Add(b);return p;}
     DataGrid Grid(DataTable table,params(string Field,string Label,double Width)[] columns)
     {
-        var grid=new DataGrid{ItemsSource=table.DefaultView,MaxHeight=520,FontSize=Math.Max(14,FontSize*.9),MinColumnWidth=95,RowHeight=Math.Max(48,FontSize*2.6),ColumnHeaderHeight=double.NaN};
+        var grid=new DataGrid{ItemsSource=table.DefaultView,MaxHeight=520,FontSize=Math.Max(14,FontSize*.9),MinColumnWidth=95,RowHeight=(double)Resources["Row.Height"],ColumnHeaderHeight=double.NaN};
         grid.Sorting+=(s,e)=>{string path=e.Column.SortMemberPath;if(path.EndsWith("_numeric")&&grid.ItemsSource is DataView view&&!view.Table!.Columns.Contains(path)){string field=path[..^8];view.Table.Columns.Add(path,typeof(decimal));foreach(DataRow row in view.Table.Rows)if(decimal.TryParse(row[field]?.ToString(),NumberStyles.Number,CultureInfo.InvariantCulture,out var value))row[path]=value;}};
         foreach(var c in columns) {
             string sort=c.Field;
@@ -185,11 +186,11 @@ public sealed partial class MainWindow : Window
     }
     public record JournalRow(long Account,string Name,long Debit,long Credit){public string DebitText=>Store.Money(Debit);public string CreditText=>Store.Money(Credit);}
     void AccountsPage()=>HierarchyAccountsPage();
-    void AccountForm(Account? a,long? defaultParent=null)
+    void AccountForm(Account? a,long? defaultParent=null,string returnRoute="accounts")
     {
         var (w,p,finish)=Dialog(T(a==null?"حساب جديد":"تعديل الحساب",a==null?"New account":"Edit account"),700);var code=Input(a?.Code??"");var name=Input(a?.Name??"");var kinds=new[]{"Unclassified","Customer","Supplier","Cash","Asset","Liability","Equity","Income","Expense"};var type=new ComboBox{ItemsSource=kinds.Select(k=>new Choice(k,AccountKind(k))).ToList(),DisplayMemberPath="Label",SelectedValuePath="Key",SelectedValue=a?.Kind??(defaultParent==null?"Unclassified":S.Accounts().Single(x=>x.Id==defaultParent).Kind)};
         var parent=new ComboBox{DisplayMemberPath="Label",SelectedValuePath="Id"};var excluded=a==null?new List<long>():S.AccountFamily(a.Id);void Parents(){parent.ItemsSource=new[]{new PositionChoice(null,T("حساب رئيسي — بدون أب","Top level — no parent"))}.Concat(UiAccounts().Where(x=>!excluded.Contains(x.Id)&&x.Kind==type.SelectedValue?.ToString()).Select(x=>new PositionChoice(x.Id,x.ToString()))).ToList();parent.SelectedValue=a?.ParentId??defaultParent;if(parent.SelectedIndex<0)parent.SelectedIndex=0;}type.SelectionChanged+=(s,e)=>Parents();Parents();
-        p.Children.Add(Field(T("كود الحساب","Account code"),code));p.Children.Add(Field(T("اسم الحساب","Account name"),name));p.Children.Add(Field(T("نوع الحساب","Account type"),type));p.Children.Add(Field(T("الحساب الرئيسي (اختياري)","Parent account (optional)"),parent));p.Children.Add(Text(T("مثال: المصروفات ← المياه، المواصلات. يجب أن يكون الأب والفروع من نفس النوع.","Example: Expenses → Water, Transportation. Parent and children must share the same type."),18));p.Children.Add(Btn(T("حفظ الحساب","Save account"),()=>{S.SaveAccount(a?.Id,code.Text,name.Text,type.SelectedValue?.ToString()??"Unclassified",(parent.SelectedItem as PositionChoice)?.Id);finish();Navigate("accounts");},true));w.ShowDialog();
+        p.Children.Add(Field(T("كود الحساب","Account code"),code));p.Children.Add(Field(T("اسم الحساب","Account name"),name));p.Children.Add(Field(T("نوع الحساب","Account type"),type));p.Children.Add(Field(T("الحساب الرئيسي (اختياري)","Parent account (optional)"),parent));p.Children.Add(Text(T("مثال: المصروفات ← المياه، المواصلات. يجب أن يكون الأب والفروع من نفس النوع.","Example: Expenses → Water, Transportation. Parent and children must share the same type."),18));p.Children.Add(Btn(T("حفظ الحساب","Save account"),()=>{S.SaveAccount(a?.Id,code.Text,name.Text,type.SelectedValue?.ToString()??"Unclassified",(parent.SelectedItem as PositionChoice)?.Id);finish();Navigate(returnRoute);},true));w.ShowDialog();
     }
     public record Choice(string Key,string Label);
     void ItemsPage()
@@ -243,7 +244,7 @@ public sealed partial class MainWindow : Window
         WelcomeWindow.Show(S,this,System.IO.Path.Combine(path,"welcome.png"));LoginWindow.Show(S,this,System.IO.Path.Combine(path,"sign-in.png"),false);
         foreach(var lang in new[]{"ar","en"}) {
             S.Set("language",lang); BuildShell();previewDialog=0;
-            foreach(var route in new[]{"home","accounts","items","reports","backup","settings","invoices","cheques","periods","users"}) {
+            foreach(var route in new[]{"home","accounts","organize-accounts","items","reports","backup","settings","invoices","cheques","periods","users"}) {
                 Navigate(route);Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,System.IO.Path.Combine(path,lang+"-"+route+".png"));
             }
             PreviewDialog("multiple-cheques",ChequeReceiptForm);VoucherForm(true);VoucherForm(false);InvoiceForm(true);JournalForm();AccountForm(null);ItemForm(null);ChequeForm(true);UserForm(null);Navigate("reports");Reports("aging");Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,System.IO.Path.Combine(path,lang+"-aging.png"));Reports("tax");Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,System.IO.Path.Combine(path,lang+"-tax.png"));ShowDocumentIfAvailable();if(Convert.ToInt64(S.Scalar("SELECT count(*) FROM documents WHERE kind=\u0027SI\u0027"))>0){long invoice=Convert.ToInt64(S.Scalar("SELECT max(id) FROM documents WHERE kind=\u0027SI\u0027"));Settlements(invoice);ReturnForm(invoice);Attachments(invoice);DocumentTranslations(invoice);InvoiceForm(true,invoice);}
@@ -254,7 +255,3 @@ public sealed partial class MainWindow : Window
     void ShowDocumentIfAvailable(){if(Convert.ToInt64(S.Scalar("SELECT count(*) FROM documents"))>0)ShowDocument(Convert.ToInt64(S.Scalar("SELECT max(id) FROM documents WHERE kind='SI'")));}
     static void Capture(Window window,string path){var bitmap=new RenderTargetBitmap((int)window.ActualWidth,(int)window.ActualHeight,96,96,PixelFormats.Pbgra32);bitmap.Render(window);var encoder=new PngBitmapEncoder();encoder.Frames.Add(BitmapFrame.Create(bitmap));using var f=File.Create(path);encoder.Save(f);}
 }
-
-
-
-

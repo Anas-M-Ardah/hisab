@@ -1,4 +1,4 @@
-﻿# Hisab placement and interaction system
+# Hisab placement and interaction system
 
 Hisab targets Windows WPF, with Arabic RTL and English LTR. Preserve the original Hisab palette. Improve element placement, hierarchy, grouping and interactions.
 
@@ -47,10 +47,18 @@ Outline-view guidance is macOS-specific; Hisab adapts its information organizati
 
 ## Verification
 
-Render actual Arabic and English WPF screens at small and large text settings. Check collapse/expand, expansion retention across navigation, move/undo, grouped statements and native popups. Run the 133 existing storage/accounting checks. Verify original brush colors against the hierarchy baseline. Target-device screen-reader, DPI and high-contrast usability remain to be reviewed.
+Render actual Arabic and English WPF screens at small and large text settings. Check collapse/expand, expansion retention across navigation, move/undo, grouped statements and native popups. Run the 148 storage/accounting checks. Verify original brush colors against the hierarchy baseline. Target-device screen-reader, DPI and high-contrast usability remain to be reviewed.
 
 ## Table refinement
 
 White rows with subtle horizontal rules replace alternating stripes. Primary names and final balances use semibold text; codes, dates and own balances are secondary. Numeric headings match right-aligned tabular figures. Compact labels distinguish item types and document statuses. Custom header chrome retains sort indicators and resize thumbs; scoped table scrollbars retain native tracks and paging commands. A live footer reports visible records and selection. Actual rounded clipping keeps headers and the footer within the table surface.
 
 Preview checks invoke the native header click handler, exercise resize-thumb events, scroll to the last record and verify selection counts in Arabic and English.
+
+## Account organizer
+
+Accounts uses a tree and details view. Organize accounts opens a dedicated editor with explicit drag handles, 18-DIP vector chevrons inside 44-DIP controls, a top-level drop zone, a parent chooser, inline name/code editing and Undo. Dropping commits the move immediately. New child creation preselects its parent. Invalid cycles and cross-type moves are rejected by both UI and storage. Unsaved edits are guarded when selecting, leaving, changing language or closing.
+
+The tree loads localized names and posted balances in one query and computes descendant totals once. Selection, disclosure and drag-over use the cached snapshot. Account and item pickers load translations in bulk. Language is cached until preferences change. Tables receive finite space directly from the workspace grid, preserving row virtualization and eliminating outer scrolling around tables. Scrollbar tracks have explicit orientations and a minimum thumb size.
+
+Buttons, fields, pickers and checkboxes use one shared control-height token (at least 44 DIP). Rows use one shared row-height token (at least 52 DIP). Both scale with the saved font size. Multiline fields remain taller. Preview checks cover Arabic/English, 14/20/24-DIP text and smaller windows, native drop events, save/undo, finite table layout, sort/resize/scroll and popups. Native mouse gestures and target-device DPI/accessibility still require manual acceptance.
