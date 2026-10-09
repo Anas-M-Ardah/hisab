@@ -18,7 +18,7 @@ public sealed partial class MainWindow
     readonly HashSet<long> collapsedAccountGroups=[];
     sealed class AccountIndent:IValueConverter
     {
-        public object Convert(object value,Type targetType,object parameter,System.Globalization.CultureInfo culture){int depth=System.Convert.ToInt32(value);return new Thickness(10+depth*20,6,10,6);}
+        public object Convert(object value,Type targetType,object parameter,System.Globalization.CultureInfo culture){int depth=System.Convert.ToInt32(value);return new Thickness(10+depth*20,0,10,0);}
         public object ConvertBack(object value,Type targetType,object parameter,System.Globalization.CultureInfo culture)=>throw new NotSupportedException();
     }
     static IEnumerable<TElement> Descendants<TElement>(DependencyObject parent) where TElement:DependencyObject

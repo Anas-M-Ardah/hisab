@@ -7,3 +7,5 @@ ARM64 is built but native ARM execution remains unverified. Physical printing, a
 Normal startup creates a Hisab desktop shortcut and imports source names only. Tests and previews do not create a shortcut on the real desktop; test/preview data is excluded from release packages.
 
 Local v0.4.2 review build: zero warnings/errors; 148 storage/accounting checks pass. Arabic and English organizer checks cover cached selection/disclosure, scoped drop events, move/undo, inline edit/undo and finite virtualized table layout. Rendering also covers 14/20/24-DIP fonts and a 1024x768 window. The real pointer drag gesture, DPI and screen-reader acceptance remain manual. No new release was published during this implementation.
+
+Organizer visual acceptance also checks that name/code/parent/Save are wholly inside their viewport, that at least three tree rows fit, and that the compact editor dialog is reachable. Both languages are checked at 14/20/24-DIP font sizes. These layout checks catch overflow independently of the accounting and interaction checks.

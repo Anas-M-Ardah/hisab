@@ -253,5 +253,5 @@ public sealed partial class MainWindow : Window
         previewDirectory=null;
     }
     void ShowDocumentIfAvailable(){if(Convert.ToInt64(S.Scalar("SELECT count(*) FROM documents"))>0)ShowDocument(Convert.ToInt64(S.Scalar("SELECT max(id) FROM documents WHERE kind='SI'")));}
-    static void Capture(Window window,string path){var bitmap=new RenderTargetBitmap((int)window.ActualWidth,(int)window.ActualHeight,96,96,PixelFormats.Pbgra32);bitmap.Render(window);var encoder=new PngBitmapEncoder();encoder.Frames.Add(BitmapFrame.Create(bitmap));using var f=File.Create(path);encoder.Save(f);}
+    static void Capture(Window window,string path){var visual=window.Content as FrameworkElement??window;var bitmap=new RenderTargetBitmap((int)Math.Ceiling(visual.ActualWidth),(int)Math.Ceiling(visual.ActualHeight),96,96,PixelFormats.Pbgra32);bitmap.Render(window);var encoder=new PngBitmapEncoder();encoder.Frames.Add(BitmapFrame.Create(bitmap));using var f=File.Create(path);encoder.Save(f);}
 }
