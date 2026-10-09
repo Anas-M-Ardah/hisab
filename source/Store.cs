@@ -20,6 +20,7 @@ public sealed partial class Store : IDisposable
     public const int SchemaVersion = 2;
     public string Path { get; }
     public SqliteConnection Db { get; }
+    internal long CommandCount { get; private set; }
     public Store(string path,bool encrypted=false,bool memoryOnly=false)
     {
         Path = path;
@@ -54,7 +55,7 @@ public sealed partial class Store : IDisposable
     }
     public SqliteCommand Command(string sql, params object?[] values)
     {
-        var cmd = Db.CreateCommand(); cmd.CommandText=sql;
+        CommandCount++;var cmd = Db.CreateCommand(); cmd.CommandText=sql;
         for (int i=0;i<values.Length;i++) cmd.Parameters.AddWithValue("@p"+i,values[i] ?? DBNull.Value);
         return cmd;
     }
@@ -96,8 +97,9 @@ public sealed partial class Store : IDisposable
         Set("language","ar"); Set("vat","16"); Set("company","نظام المحاسبة"); Set("terms",""); Set("warranty",""); Set("shipping",""); Set("bank",""); Set("font","20");
         tx.Commit();
     }
-    public List<Account> Accounts() => Table("SELECT * FROM accounts ORDER BY code").Rows.Cast<DataRow>().Select(r=>new Account((long)r["id"],(string)r["code"],(string)r["name"],(string)r["kind"],(long)r["system"]==1,r["parent_id"]==DBNull.Value?null:(long)r["parent_id"])).ToList();
-    public List<Item> Items() => Table("SELECT * FROM items ORDER BY code").Rows.Cast<DataRow>().Select(r=>new Item((long)r["id"],(string)r["code"],(string)r["name"],(long)r["stock"]==1,(long)r["price"],(long)r["qty"],(long)r["value"])).ToList();
+    static string DisplayName(DataRow row,bool? arabic) { string name=arabic is bool language?row[language?"name_ar":"name_en"].ToString()??"":"";return string.IsNullOrWhiteSpace(name)?(string)row["name"]:name; }
+    public List<Account> Accounts(bool? arabic=null) => Table("SELECT * FROM accounts ORDER BY code").Rows.Cast<DataRow>().Select(r=>new Account((long)r["id"],(string)r["code"],DisplayName(r,arabic),(string)r["kind"],(long)r["system"]==1,r["parent_id"]==DBNull.Value?null:(long)r["parent_id"])).ToList();
+    public List<Item> Items(bool? arabic=null) => Table("SELECT * FROM items ORDER BY code").Rows.Cast<DataRow>().Select(r=>new Item((long)r["id"],(string)r["code"],DisplayName(r,arabic),(long)r["stock"]==1,(long)r["price"],(long)r["qty"],(long)r["value"])).ToList();
     public long AccountId(string code)=>Convert.ToInt64(Scalar("SELECT id FROM accounts WHERE code=@p0",code) ?? throw new InvalidOperationException("Account missing"));
     public void SaveAccount(long? id,string code,string name,string kind,long? parentId=null)
     {
@@ -149,4 +151,3 @@ public sealed partial class Store : IDisposable
     }
     public void Dispose(){Db.Dispose();}
 }
-

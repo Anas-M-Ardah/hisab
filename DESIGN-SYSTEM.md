@@ -1,4 +1,4 @@
-﻿# Hisab placement and interaction system
+# Hisab placement and interaction system
 
 Hisab targets Windows WPF, with Arabic RTL and English LTR. Preserve the original Hisab palette. Improve element placement, hierarchy, grouping and interactions.
 
@@ -47,10 +47,28 @@ Outline-view guidance is macOS-specific; Hisab adapts its information organizati
 
 ## Verification
 
-Render actual Arabic and English WPF screens at small and large text settings. Check collapse/expand, expansion retention across navigation, move/undo, grouped statements and native popups. Run the 133 existing storage/accounting checks. Verify original brush colors against the hierarchy baseline. Target-device screen-reader, DPI and high-contrast usability remain to be reviewed.
+Render actual Arabic and English WPF screens at small and large text settings. Check collapse/expand, expansion retention across navigation, move/undo, grouped statements and native popups. Run the 148 storage/accounting checks. Verify original brush colors against the hierarchy baseline. Target-device screen-reader, DPI and high-contrast usability remain to be reviewed.
 
 ## Table refinement
 
 White rows with subtle horizontal rules replace alternating stripes. Primary names and final balances use semibold text; codes, dates and own balances are secondary. Numeric headings match right-aligned tabular figures. Compact labels distinguish item types and document statuses. Custom header chrome retains sort indicators and resize thumbs; scoped table scrollbars retain native tracks and paging commands. A live footer reports visible records and selection. Actual rounded clipping keeps headers and the footer within the table surface.
 
 Preview checks invoke the native header click handler, exercise resize-thumb events, scroll to the last record and verify selection counts in Arabic and English.
+
+## Account organizer
+
+Accounts uses a tree and details view. Organize accounts opens a dedicated editor with explicit drag handles, 18-DIP vector chevrons inside 44-DIP controls, a top-level drop zone, a parent chooser, inline name/code editing and Undo. Dropping commits the move immediately. New child creation preselects its parent. Invalid cycles and cross-type moves are rejected by both UI and storage. Unsaved edits are guarded when selecting, leaving, changing language or closing.
+
+The tree loads localized names and posted balances in one query and computes descendant totals once. Selection, disclosure and drag-over use the cached snapshot. Account and item pickers load translations in bulk. Language is cached until preferences change. Tables receive finite space directly from the workspace grid, preserving row virtualization and eliminating outer scrolling around tables. Scrollbar tracks have explicit orientations and a minimum thumb size.
+
+Buttons, fields, pickers and checkboxes use one shared control-height token (at least 44 DIP). Rows use one shared row-height token (at least 52 DIP). Both scale with the saved font size. Multiline fields remain taller. Preview checks cover Arabic/English, 14/20/24-DIP text and smaller windows, native drop events, save/undo, finite table layout, sort/resize/scroll and popups. Native mouse gestures and target-device DPI/accessibility still require manual acceptance.
+
+## Usability review and adaptive organizer
+
+Applied the community [UX Designer skill](https://github.com/szilu/ux-designer-skill/blob/main/SKILL.md), including its [form](https://github.com/szilu/ux-designer-skill/blob/main/references/07-forms-and-inputs.md), [table](https://github.com/szilu/ux-designer-skill/blob/main/references/21-data-tables.md) and [localization](https://github.com/szilu/ux-designer-skill/blob/main/references/23-internationalization.md) references. The user's existing palette and saved font preference take precedence over suggested defaults.
+
+The organizer has one compact title/action toolbar. Search belongs inside the tree; record counts appear once. The editor reserves at least 360 DIP, uses compact labelled name/code/parent fields and keeps Save outside its scroll area. Secondary balance information stays in the normal account details view. Add account opens a main/child choice rather than adding another permanent toolbar button. The drag grip uses vector dots and the disclosure uses vector chevrons.
+
+When the available width or height cannot accommodate both useful tree space and the full form, the tree keeps the workspace and Edit account opens an owner-centred dialog. Name, code, parent and Save remain visible in the dialog; Escape closes it with the same unsaved-edit guard. The sidebar scrollbar stays within the navigation rail and uses the original navigation colors. Empty status chrome collapses.
+
+Visual acceptance checks now require three or more tree rows and verify the name, code, parent selector and Save bounds against their actual viewport. They run in Arabic and English at 14/20/24 DIP, including 1024x768. The isolated --preview --preview-accounts mode renders these screens and exercises drop/undo and edit/undo without touching the user's ledger. Screenshot capture retains the Window's RTL rendering and records client dimensions, avoiding mirrored content or an empty nonclient strip.
