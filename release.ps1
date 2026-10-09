@@ -12,7 +12,7 @@ foreach($runtime in @('win-x64','win-x86','win-arm64')) {
     $proc=Start-Process -FilePath (Join-Path $target 'Hisab.exe') -ArgumentList '--self-test',('"'+$tests+'"') -WindowStyle Hidden -Wait -PassThru
     if($proc.ExitCode -ne 0){throw "Self-test failed: $runtime"}
     $results=Get-Content (Join-Path $tests 'test-results.txt')
-    if(($results | Where-Object {$_ -like 'PASS *'}).Count -ne 91){throw 'Expected 91 passed checks.'}
+    if(($results | Where-Object {$_ -like 'PASS *'}).Count -ne 116){throw 'Expected 116 passed checks.'}
     $results | Out-File (Join-Path $package ('CHECKS-'+$runtime+'.txt')) -Encoding utf8
   }
 }
