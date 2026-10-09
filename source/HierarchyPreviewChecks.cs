@@ -8,12 +8,12 @@ public sealed partial class MainWindow
     void HierarchyPreviewChecks(string path,string language)
     {
         if(Convert.ToInt64(S.Scalar("SELECT count(*) FROM accounts WHERE code='EXP'"))==0)return;
-        long root=S.AccountId("EXP"),water=S.AccountId("EXP-W");Navigate("accounts");var grid=body.Children.OfType<DataGrid>().Single();
+        long root=S.AccountId("EXP"),water=S.AccountId("EXP-W");Navigate("accounts");var grid=PageTable();
         var rootRow=((DataView)grid.ItemsSource).Cast<DataRowView>().Single(r=>(long)r["id"]==root);grid.ScrollIntoView(rootRow);grid.UpdateLayout();Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);
         int expanded=((DataView)grid.ItemsSource).Count;
         var collapse=Descendants<Button>(grid).First(b=>b.DataContext is DataRowView r&&(long)r["id"]==root&&b.Visibility==Visibility.Visible);collapse.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));grid.UpdateLayout();
         bool collapsed=((DataView)grid.ItemsSource).Count==expanded-2;
-        Navigate("items");Navigate("accounts");grid=body.Children.OfType<DataGrid>().Single();grid.ScrollIntoView(((DataView)grid.ItemsSource).Cast<DataRowView>().Single(r=>(long)r["id"]==root));grid.UpdateLayout();Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);
+        Navigate("items");Navigate("accounts");grid=PageTable();grid.ScrollIntoView(((DataView)grid.ItemsSource).Cast<DataRowView>().Single(r=>(long)r["id"]==root));grid.UpdateLayout();Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);
         bool retained=((DataView)grid.ItemsSource).Count==expanded-2;
         var expand=Descendants<Button>(grid).First(b=>b.DataContext is DataRowView r&&(long)r["id"]==root&&b.Visibility==Visibility.Visible);expand.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));grid.UpdateLayout();bool expandedAgain=((DataView)grid.ItemsSource).Count==expanded;
         grid.SelectedItem=((DataView)grid.ItemsSource).Cast<DataRowView>().Single(r=>(long)r["id"]==water);

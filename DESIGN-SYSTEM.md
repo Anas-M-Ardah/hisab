@@ -16,6 +16,16 @@ Hisab targets Windows WPF, with Arabic RTL and English LTR. Preserve the origina
 
 **Accessibility:** preserve visible labels, meaningful disclosure-button names, keyboard focus, 14–28 saved text preferences and high-contrast resources. Reading order mirrors in Arabic. Layout dimensions below are Hisab decisions, not Apple HIG measurements.
 
+## App-wide composition
+
+Home separates balance summaries, everyday transaction actions and recent activity. Tables in Accounts, stock, Documents, Cheques and user administration use a bounded content area with controls above, rather than a table embedded deep in a long scrolling page. On short windows, the outer page can scroll while keeping a usable minimum table area.
+
+Documents prioritizes Open/print, Amend and Return, with allocation, attachments, translations and cancellation in More. Commands require a selected row. Stock creation sits beside search; selected-item actions form a separate group.
+
+Report filters group report type and date range horizontally when space permits. Account and child-account options appear only for statements. Settings groups Appearance/language and Company/printing into cards, places protection and branding options in expandable sections, and keeps Save visible below scrolling content.
+
+Shared forms have a persistent title and Cancel action. Standalone completion actions remain visible in a footer; the invoice retains its existing totals/review footer. Form commands, validation and unsaved-change guards are retained. These are Windows adaptations of Apple layout, toolbar and scoped-task principles.
+
 ## Shared layout tokens
 
 - Preserve every original semantic brush color from the hierarchy baseline. Additional selection aliases use existing Primary and OnPrimary colors.
