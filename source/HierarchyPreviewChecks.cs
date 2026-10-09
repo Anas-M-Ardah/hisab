@@ -13,11 +13,13 @@ public sealed partial class MainWindow
         int expanded=((DataView)grid.ItemsSource).Count;
         var collapse=Descendants<Button>(grid).First(b=>b.DataContext is DataRowView r&&(long)r["id"]==root&&b.Visibility==Visibility.Visible);collapse.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));grid.UpdateLayout();
         bool collapsed=((DataView)grid.ItemsSource).Count==expanded-2;
+        Navigate("items");Navigate("accounts");grid=body.Children.OfType<DataGrid>().Single();grid.ScrollIntoView(((DataView)grid.ItemsSource).Cast<DataRowView>().Single(r=>(long)r["id"]==root));grid.UpdateLayout();Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);
+        bool retained=((DataView)grid.ItemsSource).Count==expanded-2;
         var expand=Descendants<Button>(grid).First(b=>b.DataContext is DataRowView r&&(long)r["id"]==root&&b.Visibility==Visibility.Visible);expand.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));grid.UpdateLayout();bool expandedAgain=((DataView)grid.ItemsSource).Count==expanded;
         grid.SelectedItem=((DataView)grid.ItemsSource).Cast<DataRowView>().Single(r=>(long)r["id"]==water);
         var move=Descendants<Button>(body).Single(b=>b.Content?.ToString()==T("إلى المستوى الرئيسي","Move to top level"));move.Command.Execute(null);bool moved=S.Accounts().Single(a=>a.Id==water).ParentId==null;
         var undo=Descendants<Button>(body).Single(b=>b.Content?.ToString()==T("تراجع عن النقل","Undo move"));undo.Command.Execute(null);bool undone=S.Accounts().Single(a=>a.Id==water).ParentId==root;
-        File.AppendAllText(Path.Combine(path,"ui-checks.txt"),language+": hierarchy collapse="+collapsed+", expand="+expandedAgain+", move="+moved+", undo="+undone+Environment.NewLine);
-        if(!collapsed||!expandedAgain||!moved||!undone)throw new InvalidOperationException("Hierarchy UI interactions failed");
+        File.AppendAllText(Path.Combine(path,"ui-checks.txt"),language+": hierarchy collapse="+collapsed+", retained="+retained+", expand="+expandedAgain+", move="+moved+", undo="+undone+Environment.NewLine);
+        if(!collapsed||!retained||!expandedAgain||!moved||!undone)throw new InvalidOperationException("Hierarchy UI interactions failed");
     }
 }

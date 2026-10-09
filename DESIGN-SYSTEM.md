@@ -1,28 +1,40 @@
-# Hisab interface direction
+# Hisab placement and interaction system
 
-Hisab is an Arabic-first Windows accounting application used by both older users and users who prefer compact layouts. The design should feel quiet, precise and dependable. Transactions, names and balances are the primary content.
+Hisab targets Windows WPF, with Arabic RTL and English LTR. Preserve the original Hisab palette. Improve element placement, hierarchy, grouping and interactions.
 
-## Visual system
+## Accounts screen
 
-- Neutral light canvas and sidebar; white content surfaces; blue reserved for the current location and primary actions.
-- Semantic brushes in `Theme.xaml`, with Windows high-contrast overrides in `UiTheme.cs`.
-- Consistent outline icons, restrained borders, 8-DIP control corners and 12-DIP content corners.
-- Segoe UI for locally available English and Arabic rendering, with no network font dependency.
-- Page title 28 DIP at the standard text setting, field labels 16, table text 18 and navigation 17. Small settings keep table text and field labels at least 14 DIP.
-- Text preferences remain 14–28. Control height and table rows scale with the saved text size; no forced change to existing preferences.
-- Selected navigation uses weight and background as well as color. Table selection retains readable text and keyboard focus.
+**Purpose:** find, create, edit and arrange accounting groups while keeping balances visible.
 
-## Interaction
+**Navigation shell:** retain the original dark blue sidebar, white navigation text and blue active item. Navigation and everyday task colors remain those of v0.4.0.
 
-Keep familiar native WPF keyboard, dropdown and calendar behavior. Dragging accounts has a Move account alternative and Undo. Preserve visible field labels and keep the everyday tasks reachable from Home. Account navigation must describe the full chart of accounts, including expenses.
+**Primary content:** an outline-style table. Put account names, indentation and disclosure controls together in the first column; follow with code, type and balances. Emphasize parent labels. Keep columns resizable and use the existing alternating backgrounds. Flat sorting stays disabled to prevent separating children from parents.
 
-## Sources reviewed
+**Supporting patterns:** search and account creation share the upper control region. On narrow windows, creation actions move below search. Selected-account editing and arrangement actions sit above the table, with Undo nearby. The top-level drop target sits immediately before the outline. Instructions and total interpretation sit below the content.
 
-- [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill): applied specific WPF DPI/layout and list virtualization guidance, and UX guidance for drag alternatives, text scaling and interaction states. Reviewed a local checkout; no global skill installation or new runtime dependency.
-- [Apple Design Skill](https://github.com/NutshellEngineering/apple-design-skill): reviewed as an unofficial HIG reference candidate. It targets Apple platforms and is not an implementation recipe for WPF.
+**States:** edit, move, child creation and names actions enable when a row is selected, respecting permissions. Disclosure controls reveal children; expansion choices survive navigation within the session. Drag targets provide feedback; Move account remains a click and keyboard alternative. Undo restores the latest move.
 
-The automatic design-system generator returned marketing-page compositions on both queries. Those compositions, font choices and effect prescriptions were not applied. The native accounting layout above is a product-specific design decision, supported by the relevant targeted guidance.
+**Accessibility:** preserve visible labels, meaningful disclosure-button names, keyboard focus, 14–28 saved text preferences and high-contrast resources. Reading order mirrors in Arabic. Layout dimensions below are Hisab decisions, not Apple HIG measurements.
+
+## Shared layout tokens
+
+- Preserve every original semantic brush color from the hierarchy baseline. Additional selection aliases use existing Primary and OnPrimary colors.
+- Use locally available Segoe UI for English and Arabic.
+- Standard setting: page title 28 DIP, field label 16, table text 18, navigation 17. Table text and field labels remain at least 14 DIP.
+- Control and row heights scale with saved text size; existing preferences are retained.
+- Consistent outline icons, 8-DIP control corners and 12-DIP content corners.
+
+## Apple design skill applied
+
+Read [Apple Design Skill](https://github.com/NutshellEngineering/apple-design-skill), an unofficial mirror of Apple's HIG. Applied these design-intent references:
+
+- [Layout](https://developer.apple.com/design/human-interface-guidelines/layout): group related controls, align content, respect reading order and adapt to window/text sizes.
+- [Toolbars](https://developer.apple.com/design/human-interface-guidelines/toolbars): prioritize frequent actions and group commands by function.
+- [Outline views](https://developer.apple.com/design/human-interface-guidelines/outline-views): express hierarchy in the first column, use disclosure controls and retain expansion choices.
+- [Lists and tables](https://developer.apple.com/design/human-interface-guidelines/lists-and-tables): provide clear headings, selection feedback and resizable columns.
+
+Outline-view guidance is macOS-specific; Hisab adapts its information organization to WPF. Apple APIs, materials and platform-only toolbar behavior are not prescribed for Windows. No global skill installation or runtime UI dependency.
 
 ## Verification
 
-Render real WPF screens in Arabic and English, including 14-point table views and 24-point text at 1024×768. Check native popups and account collapse/expand, move and undo. Run the existing accounting and storage self-tests. Screen-reader, physical high-DPI and Windows high-contrast usability still require target-device review; semantic high-contrast colors are preserved in code.
+Render actual Arabic and English WPF screens at small and large text settings. Check collapse/expand, expansion retention across navigation, move/undo, grouped statements and native popups. Run the 133 existing storage/accounting checks. Verify original brush colors against the hierarchy baseline. Target-device screen-reader, DPI and high-contrast usability remain to be reviewed.

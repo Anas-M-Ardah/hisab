@@ -13,9 +13,10 @@ public sealed partial class MainWindow
     const string AccountDragFormat="Hisab.AccountHierarchy";
     sealed record AccountMove(long Id,long? Before,long? After);
     AccountMove? lastAccountMove;
-    sealed class AccountIndent(bool arabic):IValueConverter
+    readonly HashSet<long> collapsedAccountGroups=[];
+    sealed class AccountIndent:IValueConverter
     {
-        public object Convert(object value,Type targetType,object parameter,System.Globalization.CultureInfo culture){int depth=System.Convert.ToInt32(value);return new Thickness(arabic?10:10+depth*20,6,arabic?10+depth*20:10,6);}
+        public object Convert(object value,Type targetType,object parameter,System.Globalization.CultureInfo culture){int depth=System.Convert.ToInt32(value);return new Thickness(10+depth*20,6,10,6);}
         public object ConvertBack(object value,Type targetType,object parameter,System.Globalization.CultureInfo culture)=>throw new NotSupportedException();
     }
     static IEnumerable<TElement> Descendants<TElement>(DependencyObject parent) where TElement:DependencyObject
@@ -29,10 +30,9 @@ public sealed partial class MainWindow
     void HierarchyAccountsPage()
     {
         Heading(T("دليل الحسابات","Accounts"),T("اسحب حسابًا إلى حساب رئيسي لترتيبه، أو استخدم زر «نقل الحساب».","Drag an account onto its parent, or use Move account."));
-        bool editable=S.User.Role is "Admin" or "Accountant";var collapsed=new HashSet<long>();var scope=Guid.NewGuid();
-        var search=Input();body.Children.Add(Field(T("بحث بالاسم أو الكود","Search name or code"),search));
+        bool editable=S.User.Role is "Admin" or "Accountant";var collapsed=collapsedAccountGroups;var scope=Guid.NewGuid();
+        var search=Input();
         var hint=Text(T("نقل الحساب ينقل جميع فروعه معه. يمكنك التراجع عن آخر نقل.","Moving an account moves its children too. You can undo the last move."),18);
-        body.Children.Add(hint);
         DataTable Rows()
         {
             var table=new DataTable();foreach(var col in new[]{"id","code","name","type","own","balance","toggle"})table.Columns.Add(col,col=="id"?typeof(long):typeof(string));table.Columns.Add("expand",typeof(bool));table.Columns.Add("depth",typeof(int));
@@ -42,19 +42,25 @@ public sealed partial class MainWindow
             void Add(Account account,int depth)
             {
                 if(search.Text.Length>0&&!matching.Contains(account.Id))return;
-                bool hasChildren=all.Any(a=>a.ParentId==account.Id);table.Rows.Add(account.Id,account.Code,account.Name,AccountKind(account.Kind),Store.Money(S.Balance(account.Id)),Store.Money(S.GroupBalance(account.Id)),collapsed.Contains(account.Id)?"+":"−",hasChildren,depth);
+                bool hasChildren=all.Any(a=>a.ParentId==account.Id);table.Rows.Add(account.Id,account.Code,account.Name,AccountKind(account.Kind),Store.Money(S.Balance(account.Id)),Store.Money(S.GroupBalance(account.Id)),collapsed.Contains(account.Id)?(vm.Arabic?"◂":"▸"):"▾",hasChildren,depth);
                 if(!collapsed.Contains(account.Id))foreach(var child in all.Where(a=>a.ParentId==account.Id))Add(child,depth+1);
             }
             foreach(var root in all.Where(a=>a.ParentId==null))Add(root,0);return table;
         }
-        var grid=Grid(Rows(),("code",T("الكود","Code"),1),("name",T("الحساب / الفروع","Account / children"),3),("type",T("النوع","Type"),1.4),("own",T("رصيد الحساب","Own balance"),1.5),("balance",T("مع الفروع","Including children"),1.5));
+        var grid=Grid(Rows(),("name",T("الحساب / الفروع","Account / children"),3),("code",T("الكود","Code"),1),("type",T("النوع","Type"),1.4),("own",T("رصيد الحساب","Own balance"),1.5),("balance",T("مع الفروع","Including children"),1.5));
         // Sorting flat rows would separate children from their parents.
         grid.CanUserSortColumns=false;grid.AllowDrop=editable;
-        var nameColumn=(DataGridTextColumn)grid.Columns[1];var nameStyle=new Style(typeof(TextBlock),nameColumn.ElementStyle);nameStyle.Setters.Add(new Setter(TextBlock.MarginProperty,new Binding("[depth]"){Converter=new AccountIndent(vm.Arabic)}));nameColumn.ElementStyle=nameStyle;
         void Refresh(long? selected=null){grid.ItemsSource=Rows().DefaultView;if(selected!=null){foreach(DataRowView row in (DataView)grid.ItemsSource)if((long)row["id"]==selected){grid.SelectedItem=row;grid.ScrollIntoView(row);break;}}}
         var toggle=new FrameworkElementFactory(typeof(Button));toggle.SetBinding(Button.ContentProperty,new Binding("[toggle]"));toggle.SetBinding(Button.VisibilityProperty,new Binding("[expand]"){Converter=new BooleanToVisibilityConverter()});toggle.SetValue(Button.MinWidthProperty,30.0);toggle.SetValue(Button.MinHeightProperty,30.0);toggle.SetValue(Button.PaddingProperty,new Thickness(4));toggle.SetValue(Button.MarginProperty,new Thickness(4));toggle.SetValue(Button.ToolTipProperty,T("طي / فتح الفروع","Collapse / expand children"));
         toggle.AddHandler(Button.ClickEvent,new RoutedEventHandler((s,e)=>{if(((Button)s).DataContext is DataRowView row){long id=(long)row["id"];if(!collapsed.Add(id))collapsed.Remove(id);Refresh(id);e.Handled=true;}}));
-        grid.Columns.Insert(0,new DataGridTemplateColumn{Header="",Width=44,MinWidth=44,MaxWidth=44,CellTemplate=new DataTemplate{VisualTree=toggle}});
+        // Keep disclosure, indentation and name together in the primary outline column.
+        var outline=new FrameworkElementFactory(typeof(System.Windows.Controls.Grid));
+        outline.SetBinding(FrameworkElement.MarginProperty,new Binding("[depth]"){Converter=new AccountIndent()});
+        var name=new FrameworkElementFactory(typeof(TextBlock));name.SetBinding(TextBlock.TextProperty,new Binding("[name]"));name.SetBinding(TextBlock.ToolTipProperty,new Binding("[name]"));name.SetValue(TextBlock.MarginProperty,new Thickness(36,0,0,0));name.SetValue(TextBlock.VerticalAlignmentProperty,VerticalAlignment.Center);name.SetValue(TextBlock.TextTrimmingProperty,TextTrimming.CharacterEllipsis);
+        var nameStyle=new Style(typeof(TextBlock));var parent=new DataTrigger{Binding=new Binding("[expand]"),Value=true};parent.Setters.Add(new Setter(TextBlock.FontWeightProperty,FontWeights.SemiBold));nameStyle.Triggers.Add(parent);name.SetValue(FrameworkElement.StyleProperty,nameStyle);
+        toggle.SetValue(FrameworkElement.WidthProperty,30.0);toggle.SetValue(FrameworkElement.HorizontalAlignmentProperty,HorizontalAlignment.Left);toggle.SetValue(Control.BorderThicknessProperty,new Thickness(0));toggle.SetValue(Control.BackgroundProperty,Brushes.Transparent);toggle.SetValue(System.Windows.Automation.AutomationProperties.NameProperty,T("طي / فتح الفروع","Collapse / expand children"));
+        outline.AppendChild(name);outline.AppendChild(toggle);
+        grid.Columns[0]=new DataGridTemplateColumn{Header=T("الحساب / الفروع","Account / children"),Width=new DataGridLength(3,DataGridLengthUnitType.Star),CellTemplate=new DataTemplate{VisualTree=outline}};
         var undo=Btn(T("تراجع عن النقل","Undo move"),()=>{});undo.IsEnabled=editable&&lastAccountMove!=null;
         void Move(long id,long? parent)
         {
@@ -73,9 +79,16 @@ public sealed partial class MainWindow
         }
         var moveButton=Btn(T("نقل الحساب…","Move account…"),MoveDialog);var rootButton=Btn(T("إلى المستوى الرئيسي","Move to top level"),()=>Move(Selected(grid),null));var childButton=Btn(T("+ حساب فرعي","+ Child account"),()=>AccountForm(null,Selected(grid)));
         foreach(var button in new[]{moveButton,rootButton,childButton})button.IsEnabled=editable;
-        body.Children.Add(Actions(Btn(T("+ حساب جديد","+ New account"),()=>AccountForm(null),true),childButton,moveButton,rootButton,undo));
-        var topLevel=Card(Text(T("⬆ اسحب هنا لجعل الحساب رئيسيًا","⬆ Drop here to move an account to the top level"),18,true));topLevel.Padding=new Thickness(14,8,14,0);topLevel.AllowDrop=editable;body.Children.Add(topLevel);
-        body.Children.Add(grid);body.Children.Add(Actions(Btn(T("تعديل المحدد","Edit selected"),()=>AccountForm(UiAccounts().Single(a=>a.Id==Selected(grid)))),Btn(T("الأسماء والعناوين باللغتين","Bilingual names & addresses"),()=>BilingualForm("accounts",Selected(grid)))));
+        var creation=Actions(Btn(T("+ حساب جديد","+ New account"),()=>AccountForm(null),true),childButton);creation.Margin=new Thickness(20,0,0,8);creation.VerticalAlignment=VerticalAlignment.Bottom;
+        var searchBar=new DockPanel();DockPanel.SetDock(creation,Dock.Right);searchBar.Children.Add(creation);searchBar.Children.Add(Field(T("بحث بالاسم أو الكود","Search name or code"),search));body.Children.Add(searchBar);
+        searchBar.SizeChanged+=(s,e)=>{bool narrow=searchBar.ActualWidth<760;DockPanel.SetDock(creation,narrow?Dock.Bottom:Dock.Right);creation.Margin=narrow?new Thickness(0,0,0,8):new Thickness(20,0,0,8);};
+        var edit=Btn(T("تعديل المحدد","Edit selected"),()=>AccountForm(UiAccounts().Single(a=>a.Id==Selected(grid))));
+        var names=Btn(T("الأسماء والعناوين","Names & addresses"),()=>BilingualForm("accounts",Selected(grid)));
+        body.Children.Add(Actions(edit,moveButton,rootButton,undo,names));
+        void SelectionChanged(){bool selected=grid.SelectedItem is DataRowView;foreach(var button in new[]{moveButton,rootButton,childButton,edit})button.IsEnabled=editable&&selected;names.IsEnabled=selected;}
+        grid.SelectionChanged+=(s,e)=>SelectionChanged();SelectionChanged();
+        var topLevel=Card(Text(T("اسحب هنا لجعل الحساب رئيسيًا","Drop here to move an account to the top level"),18,true));topLevel.Padding=new Thickness(14,8,14,0);topLevel.AllowDrop=editable;body.Children.Add(topLevel);
+        body.Children.Add(grid);hint.Foreground=muted;body.Children.Add(hint);
         body.Children.Add(Text(T("الرصيد مع الفروع يشمل جميع الحسابات الفرعية. لا تجمع هذا العمود لتجنب التكرار.","Including children totals all descendants. Do not sum this column, as totals overlap."),18));
         search.TextChanged+=(s,e)=>{collapsed.Clear();Refresh();};grid.MouseDoubleClick+=(s,e)=>{if(Ancestor<Button>(e.OriginalSource as DependencyObject)==null)Guard(()=>AccountForm(UiAccounts().Single(a=>a.Id==Selected(grid))));};
         Point start=default;long? dragging=null;DataGridRow? highlighted=null;DateTime lastScroll=DateTime.MinValue;

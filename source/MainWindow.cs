@@ -58,7 +58,7 @@ public sealed partial class MainWindow : Window
     public void Navigate(string route)
     {
         vm.Route=route; body.Children.Clear();
-        foreach(var b in navigation){bool selected=b.Key==route;b.Value.Background=selected?UiTheme.Brush(Resources,"Brush.NavSelected"):Brushes.Transparent;b.Value.Foreground=selected?(SystemParameters.HighContrast?SystemColors.HighlightTextBrush:accent):UiTheme.Brush(Resources,"Brush.NavText");b.Value.FontWeight=selected?FontWeights.SemiBold:FontWeights.Normal;}
+        foreach(var b in navigation){bool selected=b.Key==route;b.Value.Background=selected?UiTheme.Brush(Resources,"Brush.NavSelected"):Brushes.Transparent;b.Value.Foreground=selected?UiTheme.Brush(Resources,"Brush.OnPrimary"):UiTheme.Brush(Resources,"Brush.NavText");b.Value.FontWeight=selected?FontWeights.SemiBold:FontWeights.Normal;}
         switch(route){case "home":Home();break;case "tools":ToolsPage();break;case "invoices":Documents();break;case "receipt":VoucherForm(true);break;case "payment":VoucherForm(false);break;case "journal":JournalForm();break;case "accounts":AccountsPage();break;case "items":ItemsPage();break;case "reports":Reports();break;case "cheques":ChequesPage();break;case "periods":PeriodsPage();break;case "users":UsersPage();break;case "backup":BackupsPage();break;case "settings":Settings();break;}
         if(route is "receipt" or "payment" or "journal") {vm.Route="home";Navigate("home");}
     }

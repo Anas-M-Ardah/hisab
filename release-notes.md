@@ -9,7 +9,7 @@
 
 ## تحسين الواجهة
 
-- تصميم أهدأ مع شريط جانبي فاتح وألوان محايدة، وتباعد وأحجام متناسقة.
+- الحفاظ على ألوان البرنامج الأصلية، مع تحسين ترتيب العناصر وتباعدها وتناسق أحجامها.
 - جداول أكثر كثافة مع تحديد واضح للصفوف وخط لا يقل عن ١٤ نقطة، مع الحفاظ على حجم الخط المحفوظ.
 - بطاقات أصغر للعمليات اليومية، وتسميات أوضح لدليل الحسابات.
 
@@ -34,4 +34,4 @@
 
 ---
 
-**Hisab 0.4.1:** a refined light interface, scalable controls, denser tables with clear selection, and drag-and-drop account grouping, a click-based Move account alternative, Undo, quick child creation and collapsible groups. Includes the stock In/Out, multi-cheque receipts, text settings and desktop icon introduced in 0.4.0. Existing data and text preferences are retained. Release builds require all 133 checks to pass on both x64 and x86.
+**Hisab 0.4.1:** the original color palette with improved control placement, a first-column account outline, retained expansion choices, scalable controls and drag-and-drop account grouping, a click-based Move account alternative, Undo, quick child creation and collapsible groups. Includes the stock In/Out, multi-cheque receipts, text settings and desktop icon introduced in 0.4.0. Existing data and text preferences are retained. Release builds require all 133 checks to pass on both x64 and x86.
