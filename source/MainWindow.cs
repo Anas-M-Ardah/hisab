@@ -31,6 +31,7 @@ public sealed partial class MainWindow : Window
     public MainWindow(MainViewModel model)
     {
         vm=model; DataContext=vm; Title="Hisab · حساب"; Width=Math.Min(1320,SystemParameters.WorkArea.Width-24); Height=Math.Min(880,SystemParameters.WorkArea.Height-24); MinWidth=640; MinHeight=480; WindowStartupLocation=WindowStartupLocation.CenterScreen;
+        Icon=BitmapFrame.Create(new Uri("pack://application:,,,/Hisab;component/Assets/Hisab.ico",UriKind.Absolute));
         Background=new SolidColorBrush(Color.FromRgb(243,246,245)); FontFamily=new FontFamily("Segoe UI"); Foreground=ink;
         Resources=UiTheme.Create(); ink=UiTheme.Brush(Resources,"Brush.Text"); muted=UiTheme.Brush(Resources,"Brush.Secondary"); accent=UiTheme.Brush(Resources,"Brush.Primary"); Background=UiTheme.Brush(Resources,"Brush.Window"); Foreground=ink;
         BuildShell();

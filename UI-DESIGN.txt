@@ -1,4 +1,4 @@
-Hisab 0.3 — UI and setup revision
+Hisab 0.4 — UI and setup revision
 Online skills reviewed and applied as design guidance (no global skill installation or UI framework dependency):
 https://github.com/KrickmanC/ui-ux-pro-max/blob/main/SKILL.md
 https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md

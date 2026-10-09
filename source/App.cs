@@ -17,6 +17,7 @@ public static class AppEntry
         using var single=new Mutex(true,preview?"HisabPreview":"HisabDesktop-"+Environment.UserName,out bool owns);
         if(!owns) { MessageBox.Show("البرنامج مفتوح بالفعل.\nHisab is already open.","Hisab"); return 0; }
         try {
+            if(!preview&&Environment.ProcessPath is string executable){try{DesktopIntegration.CreateShortcut(executable);}catch(Exception ex){File.AppendAllText(System.IO.Path.Combine(root,"errors.log"),"Desktop shortcut: "+ex+Environment.NewLine);}}
             using var store=new Store(System.IO.Path.Combine(root,preview?"accounting.db":"accounting.hdb"),encrypted:!preview);
             if(preview&&args.Contains("--preview-demo"))PreviewData.Seed(store);
             var app=new Application{ShutdownMode=ShutdownMode.OnExplicitShutdown};

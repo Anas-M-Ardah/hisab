@@ -2,7 +2,7 @@ name: Build Windows release
 on:
   push:
     branches: [main]
-    paths: ['.gitattributes', 'source/**', '.github/workflows/windows-release.yml', 'release.ps1', 'Setup-Guide-Arabic.pdf', 'Start-Hisab.cmd', 'ThirdParty/**']
+    paths: ['.gitattributes', 'source/**', '.github/workflows/windows-release.yml', 'release.ps1', 'release-notes.md', 'Setup-Guide-Arabic.pdf', 'Start-Hisab.cmd', 'ThirdParty/**']
   workflow_dispatch:
 permissions:
   contents: write
@@ -26,11 +26,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = 'v0.3.0'
-          gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
-          if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'حساب ٠٫٣ — Windows' --notes-file release-notes.md
+          [xml]$project = Get-Content source/Hisab.csproj -Raw
+          $version = $project.SelectSingleNode('/Project/PropertyGroup/Version').InnerText.Trim()
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Set a valid release version in source/Hisab.csproj.' }
+          $tag = "v$version"
+          $existing = gh release view $tag --repo $env:GITHUB_REPOSITORY --json isDraft 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            if (-not ($existing | ConvertFrom-Json).isDraft) { throw "Release $tag is already published. Bump the project version before publishing another release." }
+          } else {
+            gh release create $tag --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "حساب $version — Windows" --notes-file release-notes.md --draft
             if ($LASTEXITCODE -ne 0) { throw 'Could not create release.' }
           }
           gh release upload $tag release/Hisab-Windows.zip Setup-Guide-Arabic.pdf --repo $env:GITHUB_REPOSITORY --clobber
           if ($LASTEXITCODE -ne 0) { throw 'Release upload failed.' }
+          gh release edit $tag --repo $env:GITHUB_REPOSITORY --draft=false --latest --title "حساب $version — Windows" --notes-file release-notes.md
+          if ($LASTEXITCODE -ne 0) { throw 'Could not publish release.' }

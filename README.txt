@@ -1,6 +1,7 @@
-HISAB / حساب — Windows desktop accounting, version 0.3
+HISAB / حساب — Windows desktop accounting, version 0.4
 
 START
+Opening the app automatically creates a Hisab desktop shortcut with the custom ledger icon. Keep the extracted app folder: the shortcut points to its executable. Opening a newer extracted version refreshes the shortcut. Preview and test modes never create a shortcut on your real desktop.
 Extract the complete ZIP. Double-click Start-Hisab.cmd; it selects x64, ARM64 or x86 automatically. On ordinary 64-bit Intel/AMD PCs, app/Hisab.exe also runs directly. The app includes its .NET runtime and SQLite; no database server or Python installation is required. Target: supported Windows 10/11 configurations. ARM64 is built but has not been run on ARM hardware.
 First launch asks only for an optional business name and large text size. Personal use requires no username or password. Optional unlock code: 4+ characters. Shared named accounts are optional and use 8+ character passwords. Portable backup passwords still require 10+ characters because they protect a transferable encrypted file. Arabic is the default; English is available. The refreshed interface uses a short navigation menu, four everyday actions, modern controls, large text and visible keyboard focus. See Setup-Guide-Arabic.pdf for an illustrated three-page setup sheet.
 Your original 75 account names and 17 item names are imported. Ambiguous accounts require classification. There are no demonstration transactions in normal use.

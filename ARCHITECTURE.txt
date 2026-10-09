@@ -1,4 +1,4 @@
-Hisab 0.3 architecture
+Hisab 0.4 architecture
 
 C# / .NET 10 / Windows Presentation Foundation. A single desktop process, no web server or cloud dependency. Lightweight MVVM presentation: MainViewModel/RelayCommand plus programmatic WPF views in partial MainWindow classes. AccountingService contains posting rules; Store contains persistence, migrations, security, master data and backup/restore.
 
