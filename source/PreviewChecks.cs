@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -10,10 +10,11 @@ public sealed partial class MainWindow
     void PreviewDialog(string name,Action action){previewCaptureName=name;try{action();}finally{previewCaptureName=null;}}
     void ExtraPreviews(string path,string language)
     {
+        TablePreviewChecks(path,language);RedesignPreviewChecks(path,language);HierarchyPreviewChecks(path,language);
         var customer=UiAccounts().FirstOrDefault(a=>a.Kind=="Customer");var item=UiItems().FirstOrDefault();
         if(Convert.ToInt64(S.Scalar("SELECT count(*) FROM accounts WHERE code='EXP'"))>0){long root=S.AccountId("EXP");var grouped=ReportData("ledger",DateTime.Today,DateTime.Today,root,true);var own=ReportData("ledger",DateTime.Today,DateTime.Today,root,false);bool valid=grouped.Rows.Count==3&&own.Rows.Count==1&&grouped.Rows[2][5].ToString()=="15.000";File.AppendAllText(Path.Combine(path,"ui-checks.txt"),language+": grouped statement="+valid+Environment.NewLine);if(!valid)throw new InvalidOperationException("Grouped statement failed");}
-        string originalFont=S.Setting("font","20");S.Set("font","14");vm.Route="accounts";BuildShell();Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,Path.Combine(path,language+"-small-text-accounts.png"));Navigate("items");Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,Path.Combine(path,language+"-small-text-items.png"));PreviewDialog("small-text-cheques",ChequeReceiptForm);S.Set("font",originalFont);BuildShell();
-        if(Convert.ToInt64(S.Scalar("SELECT count(*) FROM accounts WHERE code='EXP'"))>0){Navigate("accounts");var search=body.Children.OfType<StackPanel>().SelectMany(panel=>panel.Children.OfType<TextBox>()).First();search.Text=S.LocalName("accounts",S.AccountId("EXP"),vm.Arabic);Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,Path.Combine(path,language+"-account-hierarchy.png"));}
+        string originalFont=S.Setting("font","20");S.Set("font","14");vm.Route="accounts";BuildShell();Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,Path.Combine(path,language+"-small-text-accounts.png"));Navigate("home");Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,Path.Combine(path,language+"-small-text-home.png"));Navigate("items");Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,Path.Combine(path,language+"-small-text-items.png"));PreviewDialog("small-text-cheques",ChequeReceiptForm);S.Set("font",originalFont);BuildShell();
+        if(Convert.ToInt64(S.Scalar("SELECT count(*) FROM accounts WHERE code='EXP'"))>0){Navigate("accounts");var search=Descendants<TextBox>(body).First();search.Text=S.LocalName("accounts",S.AccountId("EXP"),vm.Arabic);Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,Path.Combine(path,language+"-account-hierarchy.png"));}
         if(customer!=null)PreviewDialog("customer-edit",()=>AccountForm(customer));
         if(item!=null){PreviewDialog("item-edit",()=>ItemForm(item));PreviewDialog("opening-stock",()=>OpeningForm(item));}
         Navigate("tools");Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);UpdateLayout();Capture(this,Path.Combine(path,language+"-tools.png"));

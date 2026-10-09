@@ -1,4 +1,23 @@
-# حساب ٠٫٤ — حسابات فرعية وشيكات متعددة
+﻿# حساب 0.4.1 — واجهة محسّنة وترتيب الحسابات بالسحب والإفلات
+
+## تحسين إدارة الحسابات
+
+- اسحب الحساب إلى حساب رئيسي لنقله مع جميع فروعه، أو إلى المنطقة المخصصة للمستوى الرئيسي.
+- زر «نقل الحساب» يوفر بديلًا للسحب، وزر «تراجع عن النقل» يعيد آخر تغيير.
+- زر «حساب فرعي» يختار الأب والنوع تلقائيًا، ويمكن طي المجموعات وفتحها.
+- يمنع البرنامج الحلقات والنقل بين أنواع مختلفة. تبقى الأسماء والترجمات والقيود والأرصدة الأصلية محفوظة.
+
+## تحسين الواجهة
+
+- تصميم جديد للجداول: صفوف هادئة، محاذاة أوضح للأرقام، تسميات مختصرة للحالة، وعدّاد للسجلات والتحديد.
+
+- إعادة ترتيب الرئيسية والأصناف والمستندات والتقارير والإعدادات، مع منطقة واضحة للبحث والإجراءات ومساحة أكبر للجداول.
+- قائمة «المزيد» لإجراءات المستندات الثانوية، ورسالة واضحة عند عدم وجود نتائج.
+- تجميع إعدادات العرض والشركة، مع إبقاء زر الحفظ ظاهرًا. النماذج تعرض العنوان والإلغاء وإجراء الإكمال خارج منطقة التمرير.
+
+- الحفاظ على ألوان البرنامج الأصلية، مع تحسين ترتيب العناصر وتباعدها وتناسق أحجامها.
+- جداول أوضح مع تباعد مريح وتحديد واضح للصفوف وخط لا يقل عن ١٤ نقطة، مع الحفاظ على حجم الخط المحفوظ.
+- بطاقات أصغر للعمليات اليومية، وتسميات أوضح لدليل الحسابات.
 
 ## الجديد
 
@@ -11,14 +30,16 @@
 
 ## التنزيل والتحديث
 
-اضغط **Hisab-Windows.zip** تحت Assets، وفك الضغط كاملًا ثم افتح **Start-Hisab.cmd**. هذا إصدار مستقل برقم **0.4.0**.
+اضغط **Hisab-Windows.zip** تحت Assets، وفك الضغط كاملًا ثم افتح **Start-Hisab.cmd**. هذا إصدار مستقل برقم **0.4.1**.
 
 للمستخدم الحالي: احفظ نسخة احتياطية، وأغلق البرنامج القديم قبل فتح النسخة الجديدة. تبقى البيانات المحلية في مكانها، وتُضاف إمكانية الحسابات الفرعية تلقائيًا. يحتفظ البرنامج بحجم الخط المحفوظ.
 
 ## التحقق
 
-يتطلب النشر نجاح **١٢١ فحصًا** لكل من x64 وx86، بما فيها اختصار سطح المكتب. يشمل الإصدار ARM64؛ لم يُختبر على جهاز ARM. اجتازت معاينات العربية والإنجليزية فحوص كشف الحساب المجمع والقوائم والتقويم. الطباعة على طابعة فعلية واستخدام جهاز آخر يحتاجان إلى تحقق. الملفات التنفيذية غير موقعة.
+يتطلب النشر نجاح **١٣٣ فحصًا** لكل من x64 وx86، بما فيها نقل الحسابات واختصار سطح المكتب. يشمل الإصدار ARM64؛ لم يُختبر على جهاز ARM. فحوص المعاينة تشمل طي المجموعات وفتحها ونقل الحساب والتراجع بالعربية والإنجليزية. الطباعة على طابعة فعلية واستخدام جهاز آخر يحتاجان إلى تحقق. الملفات التنفيذية غير موقعة.
 
 ---
 
-**Hisab 0.4.0:** nested accounts and consolidated statements; stock In/Out columns; atomic multi-cheque receipts with individual due dates and settlement; 14–28 point text and clearer tables; a custom app icon and an automatically created desktop shortcut. Existing data and text preferences are retained. Release builds require all 121 checks to pass on both x64 and x86.
+**Hisab 0.4.1:** the original color palette with improved control placement, a first-column account outline, retained expansion choices, scalable controls and drag-and-drop account grouping, a click-based Move account alternative, Undo, quick child creation and collapsible groups. Includes the stock In/Out, multi-cheque receipts, text settings and desktop icon introduced in 0.4.0. Existing data and text preferences are retained. Release builds require all 133 checks to pass on both x64 and x86.
+
+Table refinement: quieter white rows, aligned numeric headers and tabular figures, compact status labels, lighter scrollbars, and live record/selection counts. Original colors and saved font preferences are retained.

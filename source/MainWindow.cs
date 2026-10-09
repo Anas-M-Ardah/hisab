@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -32,7 +32,7 @@ public sealed partial class MainWindow : Window
     {
         vm=model; DataContext=vm; Title="Hisab · حساب"; Width=Math.Min(1320,SystemParameters.WorkArea.Width-24); Height=Math.Min(880,SystemParameters.WorkArea.Height-24); MinWidth=640; MinHeight=480; WindowStartupLocation=WindowStartupLocation.CenterScreen;
         Icon=BitmapFrame.Create(new Uri("pack://application:,,,/Hisab;component/Assets/Hisab.ico",UriKind.Absolute));
-        Background=new SolidColorBrush(Color.FromRgb(243,246,245)); FontFamily=new FontFamily("Segoe UI"); Foreground=ink;
+        Background=new SolidColorBrush(Color.FromRgb(243,246,245)); FontFamily=new FontFamily("Segoe UI"); Foreground=ink;UseLayoutRounding=true;SnapsToDevicePixels=true;
         Resources=UiTheme.Create(); ink=UiTheme.Brush(Resources,"Brush.Text"); muted=UiTheme.Brush(Resources,"Brush.Secondary"); accent=UiTheme.Brush(Resources,"Brush.Primary"); Background=UiTheme.Brush(Resources,"Brush.Window"); Foreground=ink;
         BuildShell();
         SizeChanged+=(s,e)=>ApplyResponsiveLayout();
@@ -57,17 +57,18 @@ public sealed partial class MainWindow : Window
     void BuildShell()=>BuildModernShell();
     public void Navigate(string route)
     {
-        vm.Route=route; body.Children.Clear();
-        foreach(var b in navigation){b.Value.Background=b.Key==route?accent:Brushes.Transparent;b.Value.Foreground=UiTheme.Brush(Resources,"Brush.NavText");}
+        if(pageActionFooter!=null){workspaceHost.Children.Remove(pageActionFooter);pageActionFooter=null;}vm.Route=route;dataWorkspace=null;workspaceTable=null;workspaceFooter=null;body=new StackPanel{Margin=new(24,12,24,20)};contentViewport.Content=body;
+        foreach(var b in navigation){bool selected=b.Key==route;b.Value.Background=selected?UiTheme.Brush(Resources,"Brush.NavSelected"):Brushes.Transparent;b.Value.Foreground=selected?UiTheme.Brush(Resources,"Brush.OnPrimary"):UiTheme.Brush(Resources,"Brush.NavText");b.Value.FontWeight=selected?FontWeights.SemiBold:FontWeights.Normal;}
         switch(route){case "home":Home();break;case "tools":ToolsPage();break;case "invoices":Documents();break;case "receipt":VoucherForm(true);break;case "payment":VoucherForm(false);break;case "journal":JournalForm();break;case "accounts":AccountsPage();break;case "items":ItemsPage();break;case "reports":Reports();break;case "cheques":ChequesPage();break;case "periods":PeriodsPage();break;case "users":UsersPage();break;case "backup":BackupsPage();break;case "settings":Settings();break;}
+        ArrangeDataWorkspace(route);if(route=="settings")ArrangeSettingsFooter();
         if(route is "receipt" or "payment" or "journal") {vm.Route="home";Navigate("home");}
     }
-    void Heading(string title,string subtitle){body.Children.Add(Text(title,32,true));var t=Text(subtitle,18);t.Foreground=muted;body.Children.Add(t);}
-    Border Card(UIElement content)=>new(){Background=UiTheme.Brush(Resources,"Brush.Surface"),CornerRadius=new(16),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new(1),Padding=new(22),Margin=new(0,6,0,16),Child=content};
+    void Heading(string title,string subtitle){body.Children.Add(Text(title,28,true));var t=Text(subtitle,18);t.Foreground=muted;body.Children.Add(t);}
+    Border Card(UIElement content)=>new(){Background=UiTheme.Brush(Resources,"Brush.Surface"),CornerRadius=new(12),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new(1),Padding=new(20),Margin=new(0,6,0,16),Child=content};
     WrapPanel Actions(params Button[] buttons){var p=new WrapPanel{Margin=new(0,10,0,6)};foreach(var b in buttons)p.Children.Add(b);return p;}
     DataGrid Grid(DataTable table,params(string Field,string Label,double Width)[] columns)
     {
-        var grid=new DataGrid{ItemsSource=table.DefaultView,MaxHeight=520,FontSize=FontSize*.9,MinColumnWidth=95,RowHeight=Math.Max(42,FontSize*2.6),ColumnHeaderHeight=double.NaN};
+        var grid=new DataGrid{ItemsSource=table.DefaultView,MaxHeight=520,FontSize=Math.Max(14,FontSize*.9),MinColumnWidth=95,RowHeight=Math.Max(48,FontSize*2.6),ColumnHeaderHeight=double.NaN};
         grid.Sorting+=(s,e)=>{string path=e.Column.SortMemberPath;if(path.EndsWith("_numeric")&&grid.ItemsSource is DataView view&&!view.Table!.Columns.Contains(path)){string field=path[..^8];view.Table.Columns.Add(path,typeof(decimal));foreach(DataRow row in view.Table.Rows)if(decimal.TryParse(row[field]?.ToString(),NumberStyles.Number,CultureInfo.InvariantCulture,out var value))row[path]=value;}};
         foreach(var c in columns) {
             string sort=c.Field;
@@ -75,9 +76,16 @@ public sealed partial class MainWindow : Window
             {
                 sort=c.Field+"_numeric";if(!table.Columns.Contains(sort)){table.Columns.Add(sort,typeof(decimal));foreach(DataRow row in table.Rows)if(decimal.TryParse(row[c.Field]?.ToString(),NumberStyles.Number,CultureInfo.InvariantCulture,out var value))row[sort]=value;}
             }
-            var style=new Style(typeof(TextBlock));style.Setters.Add(new Setter(TextBlock.TextTrimmingProperty,TextTrimming.CharacterEllipsis));style.Setters.Add(new Setter(TextBlock.ToolTipProperty,new Binding("["+c.Field+"]")));style.Setters.Add(new Setter(TextBlock.MarginProperty,new Thickness(10,6,10,6)));style.Setters.Add(new Setter(TextBlock.VerticalAlignmentProperty,VerticalAlignment.Center));
-            if(c.Field is "balance" or "own" or "amount" or "price" or "qty" or "incoming" or "outgoing" or "amount_text"){style.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,TextAlignment.Right));}
-            grid.Columns.Add(new DataGridTextColumn{Header=c.Label,Binding=new Binding("["+c.Field+"]"),SortMemberPath=sort,ElementStyle=style,Width=new DataGridLength(c.Width,DataGridLengthUnitType.Star)});
+            var style=new Style(typeof(TextBlock));style.Setters.Add(new Setter(TextBlock.TextTrimmingProperty,TextTrimming.CharacterEllipsis));style.Setters.Add(new Setter(TextBlock.ToolTipProperty,new Binding("["+c.Field+"]")));style.Setters.Add(new Setter(TextBlock.MarginProperty,new Thickness(16,8,16,8)));style.Setters.Add(new Setter(TextBlock.VerticalAlignmentProperty,VerticalAlignment.Center));
+            if(c.Field is "balance" or "own" or "amount" or "price" or "qty" or "incoming" or "outgoing" or "amount_text"){style.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,TextAlignment.Right));style.Setters.Add(new Setter(Typography.NumeralAlignmentProperty,FontNumeralAlignment.Tabular));if(c.Field is "balance" or "amount" or "qty" or "amount_text")style.Setters.Add(new Setter(TextBlock.FontWeightProperty,FontWeights.SemiBold));}
+            if(c.Field is "name" or "party" or "number")style.Setters.Add(new Setter(TextBlock.FontWeightProperty,FontWeights.SemiBold));
+            if(c.Field is "code" or "number" or "date"){style.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,vm.Arabic?TextAlignment.Right:TextAlignment.Left));}
+            var header=new Style(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader),(Style)FindResource(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader)));header.Setters.Add(new Setter(Control.FontSizeProperty,Math.Max(13,grid.FontSize*.85)));if(sort.EndsWith("_numeric")){header.Setters.Add(new Setter(FrameworkElement.FlowDirectionProperty,FlowDirection.LeftToRight));header.Setters.Add(new Setter(Control.HorizontalContentAlignmentProperty,HorizontalAlignment.Right));}
+            if(c.Field is "code" or "date" or "own"){
+                style.Setters.Add(new Setter(TextBlock.ForegroundProperty,muted));var selected=new DataTrigger{Binding=new Binding(nameof(DataGridRow.IsSelected)){RelativeSource=new RelativeSource(RelativeSourceMode.FindAncestor,typeof(DataGridRow),1)},Value=true};selected.Setters.Add(new Setter(TextBlock.ForegroundProperty,UiTheme.Brush(Resources,"Brush.SelectionText")));style.Triggers.Add(selected);
+            }
+            if(c.Field=="state"||(c.Field=="type"&&table.Columns.Contains("incoming")))grid.Columns.Add(TableBadgeColumn(c.Field,c.Label,c.Width,header));
+            else grid.Columns.Add(new DataGridTextColumn{Header=c.Label,HeaderStyle=header,Binding=new Binding("["+c.Field+"]"),SortMemberPath=sort,ElementStyle=style,Width=new DataGridLength(c.Width,DataGridLengthUnitType.Star)});
         }
         return grid;
     }
@@ -95,8 +103,8 @@ public sealed partial class MainWindow : Window
     void Documents()
     {
         Heading(T("الفواتير والمستندات","Invoices & documents"),T("ابحث برقم المستند أو اسم الحساب، ثم افتحه أو اطبعه.","Search by document number or account name, then open or print it."));
-        body.Children.Add(Actions(Btn(T("+ فاتورة مبيعات","+ Sales invoice"),()=>InvoiceForm(true),true),Btn(T("+ فاتورة مشتريات","+ Purchase invoice"),()=>InvoiceForm(false))));
-        var search=new TextBox();body.Children.Add(Field(T("بحث","Search"),search));var grid=DocumentGrid(DocumentTable(""));body.Children.Add(grid);search.TextChanged+=(s,e)=>grid.ItemsSource=DocumentTable(search.Text).DefaultView;
+        var search=Input();body.Children.Add(SearchActions(T("بحث برقم المستند أو الحساب","Search document number or account"),search,Btn(T("+ فاتورة مبيعات","+ Sales invoice"),()=>InvoiceForm(true),true),Btn(T("+ فاتورة مشتريات","+ Purchase invoice"),()=>InvoiceForm(false))));
+        var grid=DocumentGrid(DocumentTable(""));body.Children.Add(grid);search.TextChanged+=(s,e)=>grid.ItemsSource=DocumentTable(search.Text).DefaultView;
         grid.MouseDoubleClick+=(s,e)=>Guard(()=>OpenSelected(grid));
         body.Children.Add(Actions(Btn(T("تعديل المستند","Amend document"),()=>{long id=Selected(grid);var d=S.Table("SELECT kind FROM documents WHERE id=@p0",id).Rows[0];if(d["kind"].ToString() is "SI" or "PI")InvoiceForm(d["kind"].ToString()=="SI",id);else AmendOtherDocument(id);}),Btn(T("مرتجع","Return"),()=>ReturnForm(Selected(grid))),Btn(T("توزيع الدفعات","Payment allocations"),()=>Settlements(Selected(grid))),Btn(T("المرفقات","Attachments"),()=>Attachments(Selected(grid))),Btn(T("وصف باللغتين","Bilingual descriptions"),()=>DocumentTranslations(Selected(grid)))));
         body.Children.Add(Actions(Btn(T("فتح / طباعة","Open / print"),()=>OpenSelected(grid)),Btn(T("إلغاء المستند المحدد","Cancel selected document"),()=>{
@@ -105,7 +113,7 @@ public sealed partial class MainWindow : Window
     }
     FrameworkElement Field(string name,FrameworkElement control)
     {
-        var p=new StackPanel{Margin=new(0,0,0,16)};var label=Text(name,18,true);p.Children.Add(label);p.Children.Add(control);System.Windows.Automation.AutomationProperties.SetName(control,name);System.Windows.Automation.AutomationProperties.SetLabeledBy(control,label);return p;
+        var p=new StackPanel{Margin=new(0,0,0,16)};var label=Text(name,16,true);label.FontSize=Math.Max(14,label.FontSize);label.Margin=new(0,0,0,6);p.Children.Add(label);p.Children.Add(control);System.Windows.Automation.AutomationProperties.SetName(control,name);System.Windows.Automation.AutomationProperties.SetLabeledBy(control,label);return p;
     }
     TextBox Input(string value="",bool numeric=false)=>new(){Text=value,FlowDirection=numeric?FlowDirection.LeftToRight:FlowDirection,HorizontalContentAlignment=numeric?HorizontalAlignment.Left:HorizontalAlignment.Stretch};
     ComboBox Choose<TItem>(IEnumerable<TItem> values)=>new(){ItemsSource=values.ToList(),IsEditable=false,IsTextSearchEnabled=true};
@@ -121,6 +129,7 @@ public sealed partial class MainWindow : Window
         w.Closing+=(s,e)=>{if(draft&&dirty&&!done&&!Confirm(T("توجد بيانات لم تحفظ. هل تريد إغلاق الشاشة؟","You have unsaved information. Close this screen?")))e.Cancel=true;};
         w.PreviewKeyDown+=(s,e)=>{if(e.Key==Key.Escape){w.Close();e.Handled=true;}};
         void Finish(){done=true;w.Close();}
+        w.Loaded+=(s,e)=>ArrangeDialog(w,p,title);
         if(previewDirectory!=null)w.Loaded+=(s,e)=>w.Dispatcher.BeginInvoke(()=>{w.Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);w.UpdateLayout();Capture(w,System.IO.Path.Combine(previewDirectory,(vm.Arabic?"ar":"en")+"-"+(previewCaptureName??("dialog-"+(++previewDialog)))+".png"));Finish();},System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         return(w,p,Finish);
     }
@@ -175,31 +184,22 @@ public sealed partial class MainWindow : Window
         p.Children.Add(Btn(T("مراجعة وحفظ القيد","Review & save journal"),()=>{if(lines.Count<2||lines.Sum(l=>l.Debit)!=lines.Sum(l=>l.Credit))throw new InvalidOperationException(T("مجموع المدين يجب أن يساوي مجموع الدائن","Total debit must equal total credit"));if(Confirm(summary.Text+"\n"+string.Join("\n",lines.Select(l=>$"{l.Name}: {l.DebitText} / {l.CreditText}"))))Saved(journalToEdit==null?A.Manual(GetDate(date),note.Text,lines.Select(l=>new EntryLine(l.Account,l.Debit,l.Credit)).ToList()):A.AmendSimple(journalToEdit.Value,GetDate(date),null,null,0,note.Text,lines.Select(l=>new EntryLine(l.Account,l.Debit,l.Credit)).ToList(),amendmentReason.Text),finish);},true));if(journalToEdit!=null){var original=S.Table("SELECT * FROM documents WHERE id=@p0",journalToEdit).Rows[0];date.SelectedDate=DateTime.Parse((string)original["date"]);note.Text=(string)original["note"];foreach(DataRow line in S.Table("SELECT * FROM entries WHERE doc=@p0",journalToEdit).Rows)lines.Add(new((long)line["account"],S.LocalName("accounts",(long)line["account"],vm.Arabic),(long)line["debit"],(long)line["credit"]));Refresh();}w.ShowDialog();
     }
     public record JournalRow(long Account,string Name,long Debit,long Credit){public string DebitText=>Store.Money(Debit);public string CreditText=>Store.Money(Credit);}
-    void AccountsPage()
+    void AccountsPage()=>HierarchyAccountsPage();
+    void AccountForm(Account? a,long? defaultParent=null)
     {
-        Heading(T("دليل الحسابات","Accounts"),T("صنّف الأسماء المستوردة قبل استخدامها. الأرصدة تأتي من القيود والسندات.","Classify imported names before use. Balances come from posted journals and vouchers."));
-        var search=Input();body.Children.Add(Field(T("بحث بالاسم أو الكود","Search name or code"),search));
-        DataTable Rows(){var t=new DataTable();foreach(var col in new[]{"id","code","name","type","own","balance"})t.Columns.Add(col,col=="id"?typeof(long):typeof(string));var all=UiAccounts();void Add(Account a,int depth,string path){string full=path+a.Name;if((full+a.Code).Contains(search.Text,StringComparison.OrdinalIgnoreCase))t.Rows.Add(a.Id,a.Code,new string(' ',depth*4)+(depth>0?"↳ ":"")+a.Name,AccountKind(a.Kind),Store.Money(S.Balance(a.Id)),Store.Money(S.GroupBalance(a.Id)));foreach(var child in all.Where(c=>c.ParentId==a.Id))Add(child,depth+1,full+" / ");}foreach(var root in all.Where(a=>a.ParentId==null))Add(root,0,"");return t;}
-        var grid=Grid(Rows(),("code",T("الكود","Code"),1),("name",T("الحساب / الحسابات الفرعية","Account / children"),3),("type",T("النوع","Type"),1.4),("own",T("رصيد الحساب","Own balance"),1.5),("balance",T("مع الحسابات الفرعية","Including children"),1.7));search.TextChanged+=(s,e)=>grid.ItemsSource=Rows().DefaultView;
-        body.Children.Add(Text(T("الرصيد مع الحسابات الفرعية يشمل الحساب وكل فروعه. لا تجمع هذا العمود لتجنب التكرار.","Including children totals each account and its descendants. Do not sum this column, as totals overlap."),18));
-        body.Children.Add(Actions(Btn(T("+ حساب جديد","+ New account"),()=>AccountForm(null),true),Btn(T("تعديل الحساب المحدد","Edit selected account"),()=>AccountForm(UiAccounts().Single(a=>a.Id==Selected(grid))))));body.Children.Add(Btn(T("الأسماء والعناوين باللغتين","Bilingual names & addresses"),()=>BilingualForm("accounts",Selected(grid))));body.Children.Add(grid);grid.MouseDoubleClick+=(s,e)=>Guard(()=>AccountForm(UiAccounts().Single(a=>a.Id==Selected(grid))));
-        body.Children.Add(Text(T("للأرصدة الافتتاحية: استخدم سند قيد مقابل حساب «رصيد افتتاحي». أدخل المخزون من شاشة الأصناف.","For opening account balances, use a journal against Opening balance. Enter opening stock in Items & stock."),18));
-    }
-    void AccountForm(Account? a)
-    {
-        var (w,p,finish)=Dialog(T(a==null?"حساب جديد":"تعديل الحساب",a==null?"New account":"Edit account"),700);var code=Input(a?.Code??"");var name=Input(a?.Name??"");var kinds=new[]{"Unclassified","Customer","Supplier","Cash","Asset","Liability","Equity","Income","Expense"};var type=new ComboBox{ItemsSource=kinds.Select(k=>new Choice(k,AccountKind(k))).ToList(),DisplayMemberPath="Label",SelectedValuePath="Key",SelectedValue=a?.Kind??"Unclassified"};
-        var parent=new ComboBox{DisplayMemberPath="Label",SelectedValuePath="Id"};var excluded=a==null?new List<long>():S.AccountFamily(a.Id);void Parents(){parent.ItemsSource=new[]{new PositionChoice(null,T("حساب رئيسي — بدون أب","Top level — no parent"))}.Concat(UiAccounts().Where(x=>!excluded.Contains(x.Id)&&x.Kind==type.SelectedValue?.ToString()).Select(x=>new PositionChoice(x.Id,x.ToString()))).ToList();parent.SelectedValue=a?.ParentId;if(parent.SelectedIndex<0)parent.SelectedIndex=0;}type.SelectionChanged+=(s,e)=>Parents();Parents();
+        var (w,p,finish)=Dialog(T(a==null?"حساب جديد":"تعديل الحساب",a==null?"New account":"Edit account"),700);var code=Input(a?.Code??"");var name=Input(a?.Name??"");var kinds=new[]{"Unclassified","Customer","Supplier","Cash","Asset","Liability","Equity","Income","Expense"};var type=new ComboBox{ItemsSource=kinds.Select(k=>new Choice(k,AccountKind(k))).ToList(),DisplayMemberPath="Label",SelectedValuePath="Key",SelectedValue=a?.Kind??(defaultParent==null?"Unclassified":S.Accounts().Single(x=>x.Id==defaultParent).Kind)};
+        var parent=new ComboBox{DisplayMemberPath="Label",SelectedValuePath="Id"};var excluded=a==null?new List<long>():S.AccountFamily(a.Id);void Parents(){parent.ItemsSource=new[]{new PositionChoice(null,T("حساب رئيسي — بدون أب","Top level — no parent"))}.Concat(UiAccounts().Where(x=>!excluded.Contains(x.Id)&&x.Kind==type.SelectedValue?.ToString()).Select(x=>new PositionChoice(x.Id,x.ToString()))).ToList();parent.SelectedValue=a?.ParentId??defaultParent;if(parent.SelectedIndex<0)parent.SelectedIndex=0;}type.SelectionChanged+=(s,e)=>Parents();Parents();
         p.Children.Add(Field(T("كود الحساب","Account code"),code));p.Children.Add(Field(T("اسم الحساب","Account name"),name));p.Children.Add(Field(T("نوع الحساب","Account type"),type));p.Children.Add(Field(T("الحساب الرئيسي (اختياري)","Parent account (optional)"),parent));p.Children.Add(Text(T("مثال: المصروفات ← المياه، المواصلات. يجب أن يكون الأب والفروع من نفس النوع.","Example: Expenses → Water, Transportation. Parent and children must share the same type."),18));p.Children.Add(Btn(T("حفظ الحساب","Save account"),()=>{S.SaveAccount(a?.Id,code.Text,name.Text,type.SelectedValue?.ToString()??"Unclassified",(parent.SelectedItem as PositionChoice)?.Id);finish();Navigate("accounts");},true));w.ShowDialog();
     }
     public record Choice(string Key,string Label);
     void ItemsPage()
     {
         Heading(T("الأصناف والمخزون","Items & stock"),T("أسعار البيع والكميات تبدأ بصفر. اختر مخزنيًا أو خدمة لكل صنف.","Selling prices and quantities start at zero. Choose stock item or service for each item."));
-        var search=Input();body.Children.Add(Field(T("بحث بالاسم أو الكود","Search name or code"),search));
+        var search=Input();body.Children.Add(SearchActions(T("بحث بالاسم أو الكود","Search name or code"),search,Btn(T("+ صنف جديد","+ New item"),()=>ItemForm(null),true)));
         DataTable Rows(){var t=new DataTable();foreach(var c in new[]{"id","code","name","type","price","incoming","outgoing","qty"})t.Columns.Add(c,c=="id"?typeof(long):typeof(string));var flows=S.StockFlows();foreach(var i in UiItems().Where(i=>(i.Name+i.Code).Contains(search.Text,StringComparison.OrdinalIgnoreCase))){var f=flows.GetValueOrDefault(i.Id);t.Rows.Add(i.Id,i.Code,i.Name,i.Stock?T("مخزني","Stock"):T("خدمة","Service"),Store.Money(i.Price),i.Stock?Store.D(f.In).ToString("0.###"):"—",i.Stock?Store.D(f.Out).ToString("0.###"):"—",i.Stock?Store.D(i.Qty).ToString("0.###"):"—");}return t;}
         var grid=Grid(Rows(),("code",T("الكود","Code"),1),("name",T("الصنف","Item"),3),("type",T("النوع","Type"),1),("price",T("سعر البيع","Sale price"),1.2),("incoming",T("الوارد","In"),1),("outgoing",T("الصادر","Out"),1),("qty",T("المتاح","Available"),1));search.TextChanged+=(s,e)=>grid.ItemsSource=Rows().DefaultView;
-        body.Children.Add(Text(T("الوارد والصادر: جميع الحركات منذ البداية، بما فيها الرصيد الافتتاحي والمرتجعات والإلغاءات. المتاح = الوارد − الصادر.","In and Out: all movements, including opening stock, returns and reversals. Available = In − Out."),18));
-        body.Children.Add(Actions(Btn(T("+ صنف جديد","+ New item"),()=>ItemForm(null),true),Btn(T("تعديل المحدد","Edit selected"),()=>ItemForm(UiItems().Single(i=>i.Id==Selected(grid)))),Btn(T("رصيد مخزون افتتاحي","Opening stock"),()=>OpeningForm(UiItems().Single(i=>i.Id==Selected(grid)))),Btn(T("الأسماء باللغتين","Bilingual names"),()=>BilingualForm("items",Selected(grid))),Btn(T("تعديل تكلفة المخزون","Adjust stock cost"),()=>StockRevaluationForm(Selected(grid)))));body.Children.Add(grid);
+        var stockInfo=Text(T("الوارد والصادر: جميع الحركات منذ البداية، بما فيها الرصيد الافتتاحي والمرتجعات والإلغاءات. المتاح = الوارد − الصادر.","In and Out: all movements, including opening stock, returns and reversals. Available = In − Out."),16);
+        body.Children.Add(Actions(Btn(T("تعديل المحدد","Edit selected"),()=>ItemForm(UiItems().Single(i=>i.Id==Selected(grid)))),Btn(T("رصيد مخزون افتتاحي","Opening stock"),()=>OpeningForm(UiItems().Single(i=>i.Id==Selected(grid)))),Btn(T("الأسماء باللغتين","Bilingual names"),()=>BilingualForm("items",Selected(grid))),Btn(T("تعديل تكلفة المخزون","Adjust stock cost"),()=>StockRevaluationForm(Selected(grid)))));body.Children.Add(grid);body.Children.Add(stockInfo);
         body.Children.Add(Text(T("الكميات تتحدث من الفواتير. يعاد احتساب التكلفة عند التعديل أو التأريخ السابق. يمكن تفعيل المخزون السالب من الإعدادات.","Invoices update stock. Costs recalculate for amendments and backdated documents. Negative stock can be enabled in Settings."),18));
     }
     void ItemForm(Item? i)
@@ -214,12 +214,12 @@ public sealed partial class MainWindow : Window
     void Settings()
     {
         Heading(T("الإعدادات","Settings"),T("اختر اللغة وحجم الخط، وأكمل بيانات الشركة للطباعة.","Choose language and text size, and complete company details for printing."));
-        PersonalProtectionSettings(); body.Children.Add(Btn(T("فحص الجهاز والطباعة","Machine & printer check"),MachineCheck)); var lang=new ComboBox{ItemsSource=new[]{new Choice("ar","العربية"),new Choice("en","English")},DisplayMemberPath="Label",SelectedValuePath="Key",SelectedValue=S.Setting("language","ar")};
-        var font=new ComboBox{ItemsSource=Enumerable.Range(14,15).Select(size=>new Choice(size.ToString(),size.ToString()+T(" نقطة"," pt"))).ToList(),DisplayMemberPath="Label",SelectedValuePath="Key",SelectedValue=S.Setting("font","20")};body.Children.Add(Field(T("لغة الواجهة","Interface language"),lang));body.Children.Add(Field(T("حجم الخط — من 14 إلى 28","Text size — 14 to 28"),font));
-        var sample=new TextBlock{Text=T("معاينة: المياه والمواصلات — 125.500 دينار","Preview: Water and transportation — 125.500 JOD"),TextWrapping=TextWrapping.Wrap,Margin=new(0,0,0,18),FontSize=FontSize};font.SelectionChanged+=(s,e)=>{if(double.TryParse(font.SelectedValue?.ToString(),out var size))sample.FontSize=size;};body.Children.Add(Card(sample));
-        if(S.User.Role!="Admin"){body.Children.Add(Btn(T("حفظ التفضيلات","Save preferences"),()=>{using var tx=S.BeginTransaction();S.Set("language",lang.SelectedValue?.ToString()??"ar");S.Set("font",font.SelectedValue?.ToString()??"20");tx.Commit();BuildShell();},true));return;}var fields=new Dictionary<string,TextBox>();foreach(var entry in new[]{("company",T("اسم الشركة","Company name")),("vat",T("نسبة الضريبة الافتراضية %","Default tax rate %")),("terms",T("شروط الدفع","Payment terms")),("warranty",T("الضمان","Warranty")),("shipping",T("الشحن والتركيب","Shipping and installation")),("bank",T("بيانات التحويل البنكي للطباعة","Bank payment details for printing"))}){var box=Input(S.Setting(entry.Item1),entry.Item1=="vat");if(entry.Item1!="vat"){box.AcceptsReturn=true;box.TextWrapping=TextWrapping.Wrap;box.MinHeight=65;}fields[entry.Item1]=box;body.Children.Add(Field(entry.Item2,box));}
+        var appearance=Section(T("العرض واللغة","Appearance & language"));var preferences=FormColumns();var lang=new ComboBox{ItemsSource=new[]{new Choice("ar","العربية"),new Choice("en","English")},DisplayMemberPath="Label",SelectedValuePath="Key",SelectedValue=S.Setting("language","ar")};
+        var font=new ComboBox{ItemsSource=Enumerable.Range(14,15).Select(size=>new Choice(size.ToString(),size.ToString()+T(" نقطة"," pt"))).ToList(),DisplayMemberPath="Label",SelectedValuePath="Key",SelectedValue=S.Setting("font","20")};var languageField=Field(T("لغة الواجهة","Interface language"),lang);languageField.Margin=new(0,0,16,16);preferences.Children.Add(languageField);preferences.Children.Add(Field(T("حجم الخط — من 14 إلى 28","Text size — 14 to 28"),font));appearance.Children.Add(preferences);
+        var sample=new TextBlock{Text=T("معاينة: المياه والمواصلات — 125.500 دينار","Preview: Water and transportation — 125.500 JOD"),TextWrapping=TextWrapping.Wrap,Margin=new(0,0,0,18),FontSize=FontSize};font.SelectionChanged+=(s,e)=>{if(double.TryParse(font.SelectedValue?.ToString(),out var size))sample.FontSize=size;};appearance.Children.Add(sample);body.Children.Add(Card(appearance));
+        if(S.User.Role!="Admin"){body.Children.Add(Btn(T("حفظ التفضيلات","Save preferences"),()=>{using var tx=S.BeginTransaction();S.Set("language",lang.SelectedValue?.ToString()??"ar");S.Set("font",font.SelectedValue?.ToString()??"20");tx.Commit();BuildShell();},true));return;}var company=Section(T("بيانات الشركة والطباعة","Company & printing"));var companyFields=FormColumns();company.Children.Add(companyFields);var fields=new Dictionary<string,TextBox>();foreach(var entry in new[]{("company",T("اسم الشركة","Company name")),("vat",T("نسبة الضريبة الافتراضية %","Default tax rate %")),("terms",T("شروط الدفع","Payment terms")),("warranty",T("الضمان","Warranty")),("shipping",T("الشحن والتركيب","Shipping and installation")),("bank",T("بيانات التحويل البنكي للطباعة","Bank payment details for printing"))}){var box=Input(S.Setting(entry.Item1),entry.Item1=="vat");if(entry.Item1!="vat"){box.AcceptsReturn=true;box.TextWrapping=TextWrapping.Wrap;box.MinHeight=65;}fields[entry.Item1]=box;var field=Field(entry.Item2,box);field.Margin=new(0,0,16,16);companyFields.Children.Add(field);}body.Children.Add(Card(company));
         body.Children.Add(Btn(T("حفظ الإعدادات","Save settings"),()=>{decimal vat=Store.Parse(fields["vat"].Text);if(vat<0||vat>100)throw new InvalidOperationException(T("الضريبة من 0 إلى 100","Tax must be 0–100"));using var tx=S.BeginTransaction();foreach(var f in fields)S.Set(f.Key,f.Value.Text);S.Set("language",lang.SelectedValue?.ToString()??"ar");S.Set("font",font.SelectedValue?.ToString()??"20");tx.Commit();vm.Status=T("تم حفظ الإعدادات","Settings saved");BuildShell();},true));
-        if(S.User.Role=="Admin")BrandingSettings(body);
+        if(S.User.Role=="Admin"){FoldSection(T("الدخول والحماية","Access & protection"),()=>{PersonalProtectionSettings();body.Children.Add(Btn(T("فحص الجهاز والطباعة","Machine & printer check"),MachineCheck));});FoldSection(T("هوية المستندات وخيارات إضافية","Document branding & advanced options"),()=>BrandingSettings(body));}
     }
     void BackupsPage()
     {
