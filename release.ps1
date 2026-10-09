@@ -16,7 +16,7 @@ foreach($runtime in @('win-x64','win-x86','win-arm64')) {
     $results | Out-File (Join-Path $package ('CHECKS-'+$runtime+'.txt')) -Encoding utf8
   }
 }
-foreach($file in @('Start-Hisab.cmd','Setup-Guide-Arabic.pdf','QUICKSTART-AR.txt','README.txt','ARCHITECTURE.txt','VALIDATION.txt','UI-DESIGN.txt','CLIENT-FEEDBACK.md','release-notes.md')) {
+foreach($file in @('Start-Hisab.cmd','Setup-Guide-Arabic.pdf','QUICKSTART-AR.txt','README.txt','ARCHITECTURE.txt','VALIDATION.txt','UI-DESIGN.txt','DESIGN-SYSTEM.md','CLIENT-FEEDBACK.md','release-notes.md')) {
   Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination $package
 }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ThirdParty') -Destination $package -Recurse

@@ -32,7 +32,7 @@ public sealed partial class MainWindow : Window
     {
         vm=model; DataContext=vm; Title="Hisab · حساب"; Width=Math.Min(1320,SystemParameters.WorkArea.Width-24); Height=Math.Min(880,SystemParameters.WorkArea.Height-24); MinWidth=640; MinHeight=480; WindowStartupLocation=WindowStartupLocation.CenterScreen;
         Icon=BitmapFrame.Create(new Uri("pack://application:,,,/Hisab;component/Assets/Hisab.ico",UriKind.Absolute));
-        Background=new SolidColorBrush(Color.FromRgb(243,246,245)); FontFamily=new FontFamily("Segoe UI"); Foreground=ink;
+        Background=new SolidColorBrush(Color.FromRgb(243,246,245)); FontFamily=new FontFamily("Segoe UI"); Foreground=ink;UseLayoutRounding=true;SnapsToDevicePixels=true;
         Resources=UiTheme.Create(); ink=UiTheme.Brush(Resources,"Brush.Text"); muted=UiTheme.Brush(Resources,"Brush.Secondary"); accent=UiTheme.Brush(Resources,"Brush.Primary"); Background=UiTheme.Brush(Resources,"Brush.Window"); Foreground=ink;
         BuildShell();
         SizeChanged+=(s,e)=>ApplyResponsiveLayout();
@@ -58,16 +58,16 @@ public sealed partial class MainWindow : Window
     public void Navigate(string route)
     {
         vm.Route=route; body.Children.Clear();
-        foreach(var b in navigation){b.Value.Background=b.Key==route?accent:Brushes.Transparent;b.Value.Foreground=UiTheme.Brush(Resources,"Brush.NavText");}
+        foreach(var b in navigation){bool selected=b.Key==route;b.Value.Background=selected?UiTheme.Brush(Resources,"Brush.NavSelected"):Brushes.Transparent;b.Value.Foreground=selected?(SystemParameters.HighContrast?SystemColors.HighlightTextBrush:accent):UiTheme.Brush(Resources,"Brush.NavText");b.Value.FontWeight=selected?FontWeights.SemiBold:FontWeights.Normal;}
         switch(route){case "home":Home();break;case "tools":ToolsPage();break;case "invoices":Documents();break;case "receipt":VoucherForm(true);break;case "payment":VoucherForm(false);break;case "journal":JournalForm();break;case "accounts":AccountsPage();break;case "items":ItemsPage();break;case "reports":Reports();break;case "cheques":ChequesPage();break;case "periods":PeriodsPage();break;case "users":UsersPage();break;case "backup":BackupsPage();break;case "settings":Settings();break;}
         if(route is "receipt" or "payment" or "journal") {vm.Route="home";Navigate("home");}
     }
-    void Heading(string title,string subtitle){body.Children.Add(Text(title,32,true));var t=Text(subtitle,18);t.Foreground=muted;body.Children.Add(t);}
-    Border Card(UIElement content)=>new(){Background=UiTheme.Brush(Resources,"Brush.Surface"),CornerRadius=new(16),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new(1),Padding=new(22),Margin=new(0,6,0,16),Child=content};
+    void Heading(string title,string subtitle){body.Children.Add(Text(title,28,true));var t=Text(subtitle,18);t.Foreground=muted;body.Children.Add(t);}
+    Border Card(UIElement content)=>new(){Background=UiTheme.Brush(Resources,"Brush.Surface"),CornerRadius=new(12),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new(1),Padding=new(20),Margin=new(0,6,0,16),Child=content};
     WrapPanel Actions(params Button[] buttons){var p=new WrapPanel{Margin=new(0,10,0,6)};foreach(var b in buttons)p.Children.Add(b);return p;}
     DataGrid Grid(DataTable table,params(string Field,string Label,double Width)[] columns)
     {
-        var grid=new DataGrid{ItemsSource=table.DefaultView,MaxHeight=520,FontSize=FontSize*.9,MinColumnWidth=95,RowHeight=Math.Max(42,FontSize*2.6),ColumnHeaderHeight=double.NaN};
+        var grid=new DataGrid{ItemsSource=table.DefaultView,MaxHeight=520,FontSize=Math.Max(14,FontSize*.9),MinColumnWidth=95,RowHeight=Math.Max(36,FontSize*2.2),ColumnHeaderHeight=double.NaN};
         grid.Sorting+=(s,e)=>{string path=e.Column.SortMemberPath;if(path.EndsWith("_numeric")&&grid.ItemsSource is DataView view&&!view.Table!.Columns.Contains(path)){string field=path[..^8];view.Table.Columns.Add(path,typeof(decimal));foreach(DataRow row in view.Table.Rows)if(decimal.TryParse(row[field]?.ToString(),NumberStyles.Number,CultureInfo.InvariantCulture,out var value))row[path]=value;}};
         foreach(var c in columns) {
             string sort=c.Field;
@@ -105,7 +105,7 @@ public sealed partial class MainWindow : Window
     }
     FrameworkElement Field(string name,FrameworkElement control)
     {
-        var p=new StackPanel{Margin=new(0,0,0,16)};var label=Text(name,18,true);p.Children.Add(label);p.Children.Add(control);System.Windows.Automation.AutomationProperties.SetName(control,name);System.Windows.Automation.AutomationProperties.SetLabeledBy(control,label);return p;
+        var p=new StackPanel{Margin=new(0,0,0,16)};var label=Text(name,16,true);label.FontSize=Math.Max(14,label.FontSize);label.Margin=new(0,0,0,6);p.Children.Add(label);p.Children.Add(control);System.Windows.Automation.AutomationProperties.SetName(control,name);System.Windows.Automation.AutomationProperties.SetLabeledBy(control,label);return p;
     }
     TextBox Input(string value="",bool numeric=false)=>new(){Text=value,FlowDirection=numeric?FlowDirection.LeftToRight:FlowDirection,HorizontalContentAlignment=numeric?HorizontalAlignment.Left:HorizontalAlignment.Stretch};
     ComboBox Choose<TItem>(IEnumerable<TItem> values)=>new(){ItemsSource=values.ToList(),IsEditable=false,IsTextSearchEnabled=true};

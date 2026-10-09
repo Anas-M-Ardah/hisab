@@ -1,4 +1,4 @@
-# حساب 0.4.1 — ترتيب الحسابات بالسحب والإفلات
+# حساب 0.4.1 — واجهة محسّنة وترتيب الحسابات بالسحب والإفلات
 
 ## تحسين إدارة الحسابات
 
@@ -6,6 +6,12 @@
 - زر «نقل الحساب» يوفر بديلًا للسحب، وزر «تراجع عن النقل» يعيد آخر تغيير.
 - زر «حساب فرعي» يختار الأب والنوع تلقائيًا، ويمكن طي المجموعات وفتحها.
 - يمنع البرنامج الحلقات والنقل بين أنواع مختلفة. تبقى الأسماء والترجمات والقيود والأرصدة الأصلية محفوظة.
+
+## تحسين الواجهة
+
+- تصميم أهدأ مع شريط جانبي فاتح وألوان محايدة، وتباعد وأحجام متناسقة.
+- جداول أكثر كثافة مع تحديد واضح للصفوف وخط لا يقل عن ١٤ نقطة، مع الحفاظ على حجم الخط المحفوظ.
+- بطاقات أصغر للعمليات اليومية، وتسميات أوضح لدليل الحسابات.
 
 ## الجديد
 
@@ -28,4 +34,4 @@
 
 ---
 
-**Hisab 0.4.1:** drag-and-drop account grouping, a click-based Move account alternative, Undo, quick child creation and collapsible groups. Includes the stock In/Out, multi-cheque receipts, text settings and desktop icon introduced in 0.4.0. Existing data and text preferences are retained. Release builds require all 133 checks to pass on both x64 and x86.
+**Hisab 0.4.1:** a refined light interface, scalable controls, denser tables with clear selection, and drag-and-drop account grouping, a click-based Move account alternative, Undo, quick child creation and collapsible groups. Includes the stock In/Out, multi-cheque receipts, text settings and desktop icon introduced in 0.4.0. Existing data and text preferences are retained. Release builds require all 133 checks to pass on both x64 and x86.
