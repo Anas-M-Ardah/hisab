@@ -4,6 +4,21 @@ namespace Hisab;
 
 public sealed partial class Store
 {
+    public bool CanMoveAccount(long id,long? parentId,out string reason)
+    {
+        var account=Accounts().SingleOrDefault(a=>a.Id==id);
+        if(account==null){reason="الحساب غير موجود / Account no longer exists";return false;}
+        if(account.ParentId==parentId){reason="الحساب موجود هنا بالفعل / Account is already here";return false;}
+        try{ValidateAccountParent(id,account.Kind,parentId);reason="";return true;}catch(InvalidOperationException ex){reason=ex.Message;return false;}
+    }
+    public void MoveAccount(long id,long? parentId)
+    {
+        Require("master");using var tx=BeginTransaction();
+        var account=Accounts().SingleOrDefault(a=>a.Id==id)??throw new InvalidOperationException("الحساب غير موجود / Account no longer exists");
+        ValidateAccountParent(id,account.Kind,parentId);
+        if(account.ParentId!=parentId){Exec("UPDATE accounts SET parent_id=@p0 WHERE id=@p1",parentId,id);Audit("account-move",id+" → "+(parentId?.ToString()??"root"));}
+        tx.Commit();
+    }
     void ValidateAccountParent(long? id,string kind,long? parentId)
     {
         var accounts=Accounts().ToDictionary(a=>a.Id);
