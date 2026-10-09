@@ -42,7 +42,7 @@ public static class SelfTest
             var backup=Path.Combine(directory,"backup.db");s.Backup(backup);var before=Convert.ToInt64(s.Scalar("SELECT count(*) FROM documents"));accounting.Voucher(true,today,customer.Id,cash,5,"After backup");s.Restore(backup);Check(Convert.ToInt64(s.Scalar("SELECT count(*) FROM documents"))==before,"Restore recovers database snapshot");Check(Directory.GetFiles(Path.Combine(directory,"backups"),"before-restore-*.db").Length>0,"Restore first creates safety backup");
             var bad=Path.Combine(directory,"unrelated.db");using(var unrelated=new Microsoft.Data.Sqlite.SqliteConnection("Data Source="+bad)){unrelated.Open();}Reject(()=>s.Restore(bad),"Unrelated SQLite database rejected");
             Check(s.Scalar("PRAGMA integrity_check")?.ToString()=="ok","Database integrity check");Check(s.Table("PRAGMA foreign_key_check").Rows.Count==0,"Foreign key check");
-            V2Tests.Run(directory,results);PersonalModeTests.Run(directory,results);File.WriteAllLines(Path.Combine(directory,"test-results.txt"),results);return 0;
+            V2Tests.Run(directory,results);PersonalModeTests.Run(directory,results);ClientFeedbackTests.Run(directory,results);File.WriteAllLines(Path.Combine(directory,"test-results.txt"),results);return 0;
         }catch(Exception ex){results.Add("FAIL "+ex);File.WriteAllLines(Path.Combine(directory,"test-results.txt"),results);return 1;}
     }
 }

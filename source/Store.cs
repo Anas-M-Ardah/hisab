@@ -7,7 +7,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Hisab;
 
-public record Account(long Id, string Code, string Name, string Kind, bool System)
+public record Account(long Id, string Code, string Name, string Kind, bool System, long? ParentId=null)
 { public override string ToString() => $"{Name} · {Code}"; }
 public record Item(long Id, string Code, string Name, bool Stock, long Price, long Qty, long Value)
 { public override string ToString() => $"{Name} · {Code}"; }
@@ -96,20 +96,21 @@ public sealed partial class Store : IDisposable
         Set("language","ar"); Set("vat","16"); Set("company","نظام المحاسبة"); Set("terms",""); Set("warranty",""); Set("shipping",""); Set("bank",""); Set("font","20");
         tx.Commit();
     }
-    public List<Account> Accounts() => Table("SELECT * FROM accounts ORDER BY code").Rows.Cast<DataRow>().Select(r=>new Account((long)r["id"],(string)r["code"],(string)r["name"],(string)r["kind"],(long)r["system"]==1)).ToList();
+    public List<Account> Accounts() => Table("SELECT * FROM accounts ORDER BY code").Rows.Cast<DataRow>().Select(r=>new Account((long)r["id"],(string)r["code"],(string)r["name"],(string)r["kind"],(long)r["system"]==1,r["parent_id"]==DBNull.Value?null:(long)r["parent_id"])).ToList();
     public List<Item> Items() => Table("SELECT * FROM items ORDER BY code").Rows.Cast<DataRow>().Select(r=>new Item((long)r["id"],(string)r["code"],(string)r["name"],(long)r["stock"]==1,(long)r["price"],(long)r["qty"],(long)r["value"])).ToList();
     public long AccountId(string code)=>Convert.ToInt64(Scalar("SELECT id FROM accounts WHERE code=@p0",code) ?? throw new InvalidOperationException("Account missing"));
-    public void SaveAccount(long? id,string code,string name,string kind)
+    public void SaveAccount(long? id,string code,string name,string kind,long? parentId=null)
     {
         Require("master");
         if(string.IsNullOrWhiteSpace(name)||string.IsNullOrWhiteSpace(code)) throw new InvalidOperationException("اسم الحساب وكوده مطلوبان / Account name and code are required");
         using var tx=BeginTransaction();
+        ValidateAccountParent(id,kind,parentId);
         if(id!=null) {
             var a=Accounts().Single(x=>x.Id==id);
             if(a.System && (a.Kind!=kind||a.Code!=code)) throw new InvalidOperationException("لا يمكن تغيير نوع أو كود الحساب الأساسي / Core account type and code cannot change");
             if(a.Kind!=kind && Convert.ToInt64(Scalar("SELECT count(*) FROM entries WHERE account=@p0",id))>0) throw new InvalidOperationException("لا يمكن تغيير نوع حساب مستخدم / Used account type cannot change");
-            Exec("UPDATE accounts SET code=@p0,name=@p1,kind=@p2 WHERE id=@p3",code.Trim(),name.Trim(),kind,id);
-        } else Exec("INSERT INTO accounts(code,name,kind) VALUES(@p0,@p1,@p2)",code.Trim(),name.Trim(),kind);
+            Exec("UPDATE accounts SET code=@p0,name=@p1,kind=@p2,parent_id=@p4 WHERE id=@p3",code.Trim(),name.Trim(),kind,id,parentId);
+        } else Exec("INSERT INTO accounts(code,name,kind,parent_id) VALUES(@p0,@p1,@p2,@p3)",code.Trim(),name.Trim(),kind,parentId);
         Audit("account",name); tx.Commit();
     }
     public void SaveItem(long? id,string code,string name,bool stock,decimal price)
@@ -144,7 +145,7 @@ public sealed partial class Store : IDisposable
         check.CommandText="PRAGMA foreign_key_check"; using(var r=check.ExecuteReader()) if(r.Read()) throw new InvalidOperationException("Backup has invalid references");
         check.CommandText="SELECT count(*) FROM (SELECT doc FROM entries GROUP BY doc HAVING sum(debit)!=sum(credit))"; if(Convert.ToInt64(check.ExecuteScalar())!=0) throw new InvalidOperationException("Backup has unbalanced journals");
         var safe=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path)!,"backups"); Directory.CreateDirectory(safe); Backup(System.IO.Path.Combine(safe,"before-restore-"+DateTime.Now.ToString("yyyyMMdd-HHmmss-fff")+".db"));
-        candidate.BackupDatabase(Db); Audit("restore",System.IO.Path.GetFileName(source));
+        candidate.BackupDatabase(Db); Upgrade(); Audit("restore",System.IO.Path.GetFileName(source));
     }
     public void Dispose(){Db.Dispose();}
 }
