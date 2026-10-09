@@ -128,6 +128,7 @@ public sealed partial class AccountingService
         if(party==AccountId("1301"))throw new InvalidOperationException("Use invoices for inventory");
         long value=M(amount);if(value<=0||D(value)!=amount||string.IsNullOrWhiteSpace(number)||string.IsNullOrWhiteSpace(bank)||due.Date<issue.Date)throw new InvalidOperationException("أكمل بيانات الشيك والمبلغ والتاريخ / Complete cheque number, bank, amount and dates");
         using var tx=store.BeginTransaction();long id=NewDoc(incoming?"CR":"CP",issue,party,null,number+" · "+bank,new(value,0,value));Journal(id,incoming?[new(AccountId("1104"),value,0),new(party,0,value)]:[new(party,value,0),new(AccountId("2190"),0,value)]);
+        Exec("UPDATE documents SET due_date=@p0 WHERE id=@p1",due.ToString("yyyy-MM-dd"),id);
         Exec("INSERT INTO cheques(number,bank,direction,party,amount,issue_date,due_date,issue_doc) VALUES(@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7)",number.Trim(),bank.Trim(),incoming?"Incoming":"Outgoing",party,value,issue.ToString("yyyy-MM-dd"),due.ToString("yyyy-MM-dd"),id);if(invoice!=null)AllocateInternal(id,invoice.Value,Math.Min(value,Positions(DateTime.Today).Single(p=>p.Invoice==invoice).Outstanding),issue);tx.Commit();return id;
     }
     public long SettleCheque(long cheque,string state,long bankAccount,DateTime date,string reason)

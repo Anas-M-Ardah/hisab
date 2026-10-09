@@ -24,6 +24,8 @@ public sealed partial class Store
     {
         void Column(string table,string field,string definition){if(!Table("PRAGMA table_info("+table+")").Rows.Cast<DataRow>().Any(r=>r["name"].ToString()==field))Exec($"ALTER TABLE {table} ADD COLUMN {field} {definition}");}
         Column("accounts","name_ar","TEXT NOT NULL DEFAULT ''");Column("accounts","name_en","TEXT NOT NULL DEFAULT ''");Column("accounts","address_ar","TEXT NOT NULL DEFAULT ''");Column("accounts","address_en","TEXT NOT NULL DEFAULT ''");
+        Column("accounts","parent_id","INTEGER REFERENCES accounts(id)");
+        Exec("CREATE INDEX IF NOT EXISTS ix_accounts_parent ON accounts(parent_id)");
         Column("items","name_ar","TEXT NOT NULL DEFAULT ''");Column("items","name_en","TEXT NOT NULL DEFAULT ''");Column("items","last_cost","INTEGER NOT NULL DEFAULT 0");
         Column("documents","due_date","TEXT NOT NULL DEFAULT ''");Column("documents","reversal_date","TEXT");Column("documents","branding","TEXT NOT NULL DEFAULT '{}'");Column("documents","logo","BLOB");Column("documents","seal","BLOB");Column("documents","replaced_by","INTEGER REFERENCES documents(id)");
         Column("invoice_lines","source_line","INTEGER REFERENCES invoice_lines(id)");Column("audit","username","TEXT NOT NULL DEFAULT 'System'");
