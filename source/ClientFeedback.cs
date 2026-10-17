@@ -69,6 +69,7 @@ public sealed partial class AccountingService
             if(invoice!=null){long outstanding=Positions(DateTime.Today).Single(p=>p.Invoice==invoice).Outstanding;if(outstanding>0)AllocateInternal(id,invoice.Value,Math.Min(M(c.Amount),outstanding),date);}
             documents.Add(id);
         }
+        foreach(long document in documents)Exec("UPDATE documents SET receipt_group=@p0 WHERE id=@p1",documents[0],document);
         Audit("cheque-receipt",string.Join(",",documents));tx.Commit();return documents;
     }
 }

@@ -23,7 +23,7 @@ public sealed partial class MainWindow
         p.Children.Add(Btn(T("مراجعة وحفظ جميع الشيكات","Review & save all cheques"),()=>{
             if(!string.IsNullOrWhiteSpace(number.Text)||!string.IsNullOrWhiteSpace(amount.Text))throw new InvalidOperationException(T("أضف الشيك الجاري أولًا أو امسح رقمه ومبلغه","Add the current cheque first or clear its number and amount"));
             var account=GetAccount(party);decimal value=Store.Parse(total.Text);if(drafts.Count==0||drafts.Sum(d=>d.Cheque.Amount)!=value)throw new InvalidOperationException(T("مجموع الشيكات يجب أن يساوي مبلغ القبض","Cheque total must equal the receipt amount"));
-            if(Confirm(account.Name+"\n"+summary.Text+"\n"+string.Join("\n",drafts.Select(d=>d.Number+" · "+d.Bank+" · "+d.Amount+" · "+d.Due)))){var ids=A.ReceiveCheques(GetDate(date),account.Id,value,note.Text,drafts.Select(d=>d.Cheque).ToList(),(allocation.SelectedItem as PositionChoice)?.Id);finish();Navigate("cheques");vm.Status=T("تم حفظ الشيكات: ","Cheques saved: ")+ids.Count;}
+            if(Confirm(account.Name+"\n"+summary.Text+"\n"+string.Join("\n",drafts.Select(d=>d.Number+" · "+d.Bank+" · "+d.Amount+" · "+d.Due)))){var ids=A.ReceiveCheques(GetDate(date),account.Id,value,note.Text,drafts.Select(d=>d.Cheque).ToList(),(allocation.SelectedItem as PositionChoice)?.Id);finish();Navigate("cheques");vm.Status=T("تم حفظ الشيكات: ","Cheques saved: ")+ids.Count;ShowDocument(ids[0]);}
         },true));w.ShowDialog();
     }
 }

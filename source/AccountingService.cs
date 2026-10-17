@@ -34,7 +34,7 @@ public sealed partial class AccountingService(Store store)
         if(lines.Count<2 || lines.Any(x=>x.Debit<0||x.Credit<0||(x.Debit>0&&x.Credit>0))||lines.Sum(x=>x.Debit)==0||lines.Sum(x=>x.Debit)!=lines.Sum(x=>x.Credit)) throw new InvalidOperationException("القيد غير متوازن أو غير صالح / Journal must have equal positive debits and credits");
         foreach(var l in lines) {
             if(Accounts().Single(x=>x.Id==l.Account).Kind=="Unclassified") throw new InvalidOperationException("صنّف الحساب أولًا في دليل الحسابات / Classify the account first");
-            Exec("INSERT INTO entries(doc,account,debit,credit) VALUES(@p0,@p1,@p2,@p3)",doc,l.Account,l.Debit,l.Credit);
+            Exec("INSERT INTO entries(doc,account,debit,credit,description) VALUES(@p0,@p1,@p2,@p3,@p4)",doc,l.Account,l.Debit,l.Credit,l.Description);
         }
     }
     public long Voucher(bool receipt,DateTime date,long party,long cash,decimal amount,string note)
@@ -109,7 +109,7 @@ public sealed partial class AccountingService(Store store)
         EnsureOpen(DateTime.Parse((string)doc["date"]));
         long reversal=NewDoc("RV",effectiveDate,null,null,reason,new((long)doc["total"],0,(long)doc["total"]));
         Exec("UPDATE documents SET original=@p0 WHERE id=@p1",id,reversal);
-        var original=Table("SELECT * FROM entries WHERE doc=@p0",id).Rows.Cast<DataRow>().Select(r=>new EntryLine((long)r["account"],(long)r["credit"],(long)r["debit"])); Journal(reversal,original);
+        var original=Table("SELECT * FROM entries WHERE doc=@p0",id).Rows.Cast<DataRow>().Select(r=>new EntryLine((long)r["account"],(long)r["credit"],(long)r["debit"],(string)r["description"])); Journal(reversal,original);
         Exec("UPDATE documents SET reversed=1,reversal_date=@p0 WHERE id=@p1",effectiveDate.ToString("yyyy-MM-dd"),id);Exec("UPDATE allocations SET revoked=@p0 WHERE (invoice=@p1 OR voucher=@p1) AND revoked IS NULL",effectiveDate.ToString("yyyy-MM-dd"),id);foreach(DataRow m in moves.Rows)Exec("INSERT INTO stock_moves(doc,item,qty,value) VALUES(@p0,@p1,@p2,@p3)",reversal,m["item"],-(long)m["qty"],-(long)m["value"]);RebuildInventory("reverse "+id);Audit("reverse",$"{doc["number"]}: {reason}");tx.Commit();return reversal;
     }
 }
