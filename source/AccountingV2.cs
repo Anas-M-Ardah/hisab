@@ -75,10 +75,10 @@ public sealed partial class AccountingService
     {
         if(deferredRebuild>0)return;
         var states=Items().Where(i=>i.Stock).ToDictionary(i=>i.Id,i=>new StockState());
-        var docs=Table("SELECT * FROM documents WHERE kind IN ('SI','PI','SR','PR','OB','VA') AND reversed=0 ORDER BY date,id");
+        var docs=Table("SELECT * FROM documents WHERE kind IN ('SI','PI','SR','PR','OB','VA','OT') AND reversed=0 ORDER BY date,id");
         foreach(DataRow doc in docs.Rows){long id=(long)doc["id"];string kind=(string)doc["kind"];long goods=0,services=0,cost=0,variance=0,oldCost=Convert.ToInt64(Scalar("SELECT coalesce(sum(cost),0) FROM invoice_lines WHERE doc=@p0",id));
-            if(kind is "OB" or "VA"){
-                foreach(DataRow move in Table("SELECT * FROM stock_moves WHERE doc=@p0",id).Rows){var st=states[(long)move["item"]];st.Qty+=(long)move["qty"];st.Value+=(long)move["value"];if(st.Qty>0)st.LastCost=D(st.Value)*1000/st.Qty;}continue;
+            if(kind is "OB" or "VA" or "OT"){
+                foreach(DataRow move in Table("SELECT * FROM stock_moves WHERE doc=@p0",id).Rows){var st=states[(long)move["item"]];if(kind=="OT"&&st.Qty<0)throw new InvalidOperationException("سوّ الكمية السالبة قبل تحويل الطلبية / Resolve negative stock before transferring an order");st.Qty+=(long)move["qty"];st.Value+=(long)move["value"];if(st.Qty>0)st.LastCost=D(st.Value)*1000/st.Qty;}continue;
             }
             Exec("DELETE FROM stock_moves WHERE doc=@p0",id);
             foreach(DataRow line in Table("SELECT * FROM invoice_lines WHERE doc=@p0 ORDER BY id",id).Rows){long item=(long)line["item"],q=(long)line["qty"],n=(long)line["net"],lc=0;bool stock=states.TryGetValue(item,out var st);
@@ -153,7 +153,7 @@ public sealed partial class AccountingService
     }
     public long AmendSimple(long original,DateTime date,long? party,long? cash,decimal amount,string note,List<EntryLine>? lines,string reason)
     {
-        if(string.IsNullOrWhiteSpace(reason))throw new InvalidOperationException("سبب التعديل مطلوب / Reason required");using var tx=store.BeginTransaction();var source=Table("SELECT * FROM documents WHERE id=@p0",original).Rows[0];string kind=(string)source["kind"];if(kind is not("RC" or "PV" or "JV"))throw new InvalidOperationException("Unsupported document amendment");
+        if(string.IsNullOrWhiteSpace(reason))throw new InvalidOperationException("سبب التعديل مطلوب / Reason required");using var tx=store.BeginTransaction();var source=Table("SELECT * FROM documents WHERE id=@p0",original).Rows[0];string kind=(string)source["kind"];if(kind is "RC" or "PV" && source["party"]==DBNull.Value)throw new InvalidOperationException("Use the split voucher editor");if(kind is not("RC" or "PV" or "JV"))throw new InvalidOperationException("Unsupported document amendment");
         string snapshot=JsonSerializer.Serialize(source.Table.Columns.Cast<DataColumn>().ToDictionary(c=>c.ColumnName,c=>source[c]==DBNull.Value?null:source[c]));var allocations=Table("SELECT * FROM allocations WHERE voucher=@p0 AND revoked IS NULL",original);Reverse(original,reason,DateTime.Parse((string)source["date"]));long replacement=kind=="JV"?Manual(date,note,lines!):Voucher(kind=="RC",date,party!.Value,cash!.Value,amount,note);
         foreach(DataRow allocation in allocations.Rows){long available=(long)Table("SELECT total FROM documents WHERE id=@p0",replacement).Rows[0]["total"]-Convert.ToInt64(Scalar("SELECT coalesce(sum(amount),0) FROM allocations WHERE voucher=@p0 AND revoked IS NULL",replacement));var pos=Positions(DateTime.Today).FirstOrDefault(p=>p.Invoice==(long)allocation["invoice"]);if(pos!=null&&party?.ToString()==source["party"].ToString()){long value=Math.Min((long)allocation["amount"],Math.Min(available,Math.Max(0,pos.Outstanding)));if(value>0)AllocateInternal(replacement,pos.Invoice,value,DateTime.Parse((string)allocation["date"])<date?date:DateTime.Parse((string)allocation["date"]));}}
         Exec("UPDATE documents SET replaced_by=@p0 WHERE id=@p1",replacement,original);Exec("INSERT INTO revisions(doc,replacement,reason,snapshot,username) VALUES(@p0,@p1,@p2,@p3,@p4)",original,replacement,reason,snapshot,store.User.Username);tx.Commit();return replacement;

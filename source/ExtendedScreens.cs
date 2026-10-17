@@ -21,6 +21,7 @@ public sealed partial class MainWindow
     void Settlements(long id)
     {
         var doc=S.Table("SELECT * FROM documents WHERE id=@p0",id).Rows[0];string kind=(string)doc["kind"];bool invoice=kind is "SI" or "PI";
+        if(kind is "RC" or "PV" && doc["party"]==DBNull.Value)throw new InvalidOperationException(T("سند موزع على حسابات. استخدم سندًا لحساب واحد لتخصيص فاتورة.","This voucher is split across accounts. Use a single-account voucher for invoice allocation."));
         if(!invoice&&kind is not("RC" or "PV" or "CR" or "CP"))throw new InvalidOperationException(T("اختر فاتورة أو سند قبض/صرف أو شيكًا","Choose an invoice, voucher or cheque document"));
         var (w,p,_)=Dialog(T("توزيع الدفعات على الفواتير","Invoice payment allocation"),950,false);p.Children.Add(Text(doc["number"].ToString()!,24,true));var summary=Text("",21,true);p.Children.Add(summary);
         var grid=new DataGrid{Height=210};var selector=new ComboBox();var amount=Input("0",true);var date=Date();

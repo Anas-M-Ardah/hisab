@@ -9,6 +9,7 @@ public sealed partial class MainWindow
     {
         var source=S.Table("SELECT * FROM documents WHERE id=@p0",id).Rows[0];string kind=(string)source["kind"];if((long)source["reversed"]==1)throw new InvalidOperationException(T("المستند ملغى","Document is cancelled"));
         if(kind=="JV"){JournalForm(id);return;}
+        if(kind is "RC" or "PV" && source["party"]==DBNull.Value){SplitVoucherForm(kind=="RC",id);return;}
         if(kind is not("RC" or "PV"))throw new InvalidOperationException(T("للشيكات استخدم سجل الشيكات. لتكلفة المخزون استخدم إعادة التقييم.","Use the cheque register for cheque corrections, or stock revaluation for inventory costs."));
         var (w,p,finish)=Dialog(T("تعديل السند","Amend voucher"),850);var date=Date();date.SelectedDate=DateTime.Parse((string)source["date"]);var party=Choose(UiAccounts().Where(a=>a.Kind!="Unclassified"));party.SelectedItem=party.Items.Cast<Account>().Single(a=>a.Id==(long)source["party"]);var cash=Choose(UiAccounts().Where(a=>a.Kind=="Cash"));cash.SelectedItem=cash.Items.Cast<Account>().Single(a=>a.Id==(long)source["cash"]);var amount=Input(Store.D((long)source["total"]).ToString(CultureInfo.InvariantCulture),true);var note=Input((string)source["note"]);var reason=Input();
         foreach(var f in new[]{Field(T("التاريخ","Date"),date),Field(T("الحساب","Account"),party),Field(T("الصندوق / البنك","Cash / bank"),cash),Field(T("المبلغ","Amount"),amount),Field(T("البيان","Description"),note),Field(T("سبب التعديل","Amendment reason"),reason)})p.Children.Add(f);

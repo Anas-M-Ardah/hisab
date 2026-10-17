@@ -24,6 +24,8 @@ public sealed partial class Store
     {
         void Column(string table,string field,string definition){if(!Table("PRAGMA table_info("+table+")").Rows.Cast<DataRow>().Any(r=>r["name"].ToString()==field))Exec($"ALTER TABLE {table} ADD COLUMN {field} {definition}");}
         Column("accounts","name_ar","TEXT NOT NULL DEFAULT ''");Column("accounts","name_en","TEXT NOT NULL DEFAULT ''");Column("accounts","address_ar","TEXT NOT NULL DEFAULT ''");Column("accounts","address_en","TEXT NOT NULL DEFAULT ''");
+        Column("entries","description","TEXT NOT NULL DEFAULT ''");
+        Column("documents","receipt_group","INTEGER REFERENCES documents(id)");
         Column("accounts","parent_id","INTEGER REFERENCES accounts(id)");
         Exec("CREATE INDEX IF NOT EXISTS ix_accounts_parent ON accounts(parent_id)");
         Column("items","name_ar","TEXT NOT NULL DEFAULT ''");Column("items","name_en","TEXT NOT NULL DEFAULT ''");Column("items","last_cost","INTEGER NOT NULL DEFAULT 0");
@@ -50,6 +52,7 @@ public sealed partial class Store
             PRAGMA user_version=2;
             """);Exec("PRAGMA foreign_keys=ON");
         }
+        Exec("PRAGMA user_version=3");
         Exec("UPDATE documents SET due_date=date WHERE due_date=''");
         Exec("UPDATE documents SET reversal_date=(SELECT date FROM documents rv WHERE rv.original=documents.id AND rv.kind='RV' LIMIT 1) WHERE reversed=1 AND reversal_date IS NULL");
         Exec("INSERT OR IGNORE INTO accounts(code,name,kind,system) VALUES('2190','شيكات صادرة','Liability',1),('3301','أرباح محتجزة','Equity',1)");

@@ -11,13 +11,13 @@ public record Account(long Id, string Code, string Name, string Kind, bool Syste
 { public override string ToString() => $"{Name} · {Code}"; }
 public record Item(long Id, string Code, string Name, bool Stock, long Price, long Qty, long Value)
 { public override string ToString() => $"{Name} · {Code}"; }
-public record EntryLine(long Account, long Debit, long Credit);
+public record EntryLine(long Account, long Debit, long Credit, string Description="");
 public record InvoiceLine(long Item, string Description, decimal Qty, decimal Price, decimal Discount);
 public record Totals(long Net, long Tax, long Total);
 
 public sealed partial class Store : IDisposable
 {
-    public const int SchemaVersion = 2;
+    public const int SchemaVersion = 3;
     public string Path { get; }
     public SqliteConnection Db { get; }
     internal long CommandCount { get; private set; }

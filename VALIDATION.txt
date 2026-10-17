@@ -1,3 +1,13 @@
+Workbook workflow update (0.5.0)
+- Published Windows x64 build: 171 accounting/storage checks passed on isolated databases.
+- Arabic/English account-filter and child-report checks passed.
+- Normal and 24-DIP text previews verify visible save actions and fitting table headers.
+- Purchase-order stock transfers reconcile with the inventory ledger, including sales and reversals.
+- Schema 3 blocks opening upgraded data with an older application.
+- Physical mouse, actual printers and target-device DPI remain manual checks.
+- NuGet vulnerability-feed lookup was unavailable during the local build (NU1900); compilation and packaging succeeded.
+
+Earlier validation history follows.
 Hisab 0.4 validation
 
 Release packaging requires all 148 automated checks to pass on each x64 and x86 executable. CHECKS-win-x64.txt and CHECKS-win-x86.txt in the package are the results from those actual binaries.
