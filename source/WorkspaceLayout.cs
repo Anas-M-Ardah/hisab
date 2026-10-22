@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Windows.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -59,9 +61,40 @@ public sealed partial class MainWindow
     FrameworkElement TableSurface(DataGrid table,FrameworkElement content)
     {
         var layout=new DockPanel();var count=new TextBlock{Foreground=muted,FontSize=Math.Max(13,FontSize*.7),Margin=new Thickness(16,10,16,10)};
-        void Refresh(){count.Text=T($"{table.Items.Count} سجل",$"{table.Items.Count} records")+(table.SelectedItem==null?"":T(" · سجل محدد"," · 1 selected"));}
+        void Refresh(){count.Text=T($"{table.Items.Count} سجل",$"{table.Items.Count} records")+(table.SelectedItem==null?"":T(" · سجل محدد"," · 1 selected"))+(table.Tag is int cap&&table.Items.Count>=cap?T($" · يُعرض آخر {cap} فقط، ابحث لتضييق النتائج",$" · showing the latest {cap} only, search to narrow"):"");}
         ((System.Collections.Specialized.INotifyCollectionChanged)table.Items).CollectionChanged+=(s,e)=>Refresh();table.SelectionChanged+=(s,e)=>Refresh();Refresh();
         var footer=new Border{Background=UiTheme.Brush(Resources,"Brush.Surface"),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new Thickness(0,1,0,0),Child=count};DockPanel.SetDock(footer,Dock.Bottom);layout.Children.Add(footer);layout.Children.Add(content);return layout;
+    }
+
+    static readonly HashSet<string> NumericPaths=new(){"Qty","Price","Discount","Amount","Quantity","Cost","AmountText","DebitText","CreditText","amount_text"};
+    // Line-item tables inside forms: scale with the saved text size, align figures, and hand the mouse wheel back to the form when the table has nothing left to scroll.
+    void StyleEditorGrid(DataGrid grid,int visibleRows=3)
+    {
+        double row=(double)Resources["Row.Height"];
+        grid.FontSize=Math.Max(14,FontSize*.9);grid.RowHeight=row;grid.MinColumnWidth=95;grid.Height=grid.MinHeight=row*visibleRows+FontSize*3;grid.Margin=new Thickness(0,6,0,10);
+        foreach(var column in grid.Columns.OfType<DataGridTextColumn>())
+        {
+            var path=(column.Binding as Binding)?.Path.Path.Trim('[',']');if(path==null||!NumericPaths.Contains(path))continue;
+            if(path is "Qty" or "Price" or "Discount"){var binding=(Binding)column.Binding;binding.StringFormat="N3";binding.ConverterCulture=CultureInfo.InvariantCulture;}
+            var cell=new Style(typeof(TextBlock));cell.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));cell.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,TextAlignment.Right));cell.Setters.Add(new Setter(System.Windows.Documents.Typography.NumeralAlignmentProperty,FontNumeralAlignment.Tabular));
+            column.ElementStyle=cell;
+            var header=new Style(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader),(Style)FindResource(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader)));header.Setters.Add(new Setter(Control.HorizontalContentAlignmentProperty,HorizontalAlignment.Right));column.HeaderStyle=header;
+        }
+        ForwardWheel(grid);
+    }
+    void ForwardWheel(DataGrid grid)
+    {
+        grid.PreviewMouseWheel+=(s,e)=>
+        {
+            var inner=Descendant<ScrollViewer>(grid);bool top=inner==null||inner.VerticalOffset<=0,bottom=inner==null||inner.VerticalOffset>=inner.ScrollableHeight;
+            if((e.Delta>0&&!top)||(e.Delta<0&&!bottom)||VisualTreeHelper.GetParent(grid) is not UIElement parent)return;
+            e.Handled=true;parent.RaiseEvent(new System.Windows.Input.MouseWheelEventArgs(e.MouseDevice,e.Timestamp,e.Delta){RoutedEvent=UIElement.MouseWheelEvent,Source=grid});
+        };
+    }
+    static T? Descendant<T>(DependencyObject root) where T:DependencyObject
+    {
+        for(int i=0;i<VisualTreeHelper.GetChildrenCount(root);i++){var child=VisualTreeHelper.GetChild(root,i);if(child is T hit)return hit;var deeper=Descendant<T>(child);if(deeper!=null)return deeper;}
+        return null;
     }
 
     DataGrid PageTable()=>workspaceTable??body.Children.OfType<DataGrid>().Single();
