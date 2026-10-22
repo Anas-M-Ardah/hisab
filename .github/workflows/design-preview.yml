@@ -1,0 +1,79 @@
+name: Design preview and checks
+# Verification only: builds the app, runs the built-in self-test and the
+# screenshot previews, and uploads the results. It never publishes a release.
+on:
+  workflow_dispatch:
+  push:
+    branches: [design-polish, design-baseline]
+    paths: ['source/**', '.github/workflows/design-preview.yml']
+permissions:
+  contents: write
+jobs:
+  preview:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build
+        shell: pwsh
+        run: dotnet publish source/Hisab.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o app
+      - name: Self-test
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP 'self-test'
+          $proc = Start-Process -FilePath app/Hisab.exe -ArgumentList '--self-test', ('"' + $out + '"') -WindowStyle Hidden -Wait -PassThru
+          $results = Get-Content (Join-Path $out 'test-results.txt')
+          $results | Out-File self-test-results.txt -Encoding utf8
+          $pass = ($results | Where-Object { $_ -like 'PASS *' }).Count
+          $fail = ($results | Where-Object { $_ -notlike 'PASS *' -and $_.Trim() }).Count
+          "Passed: $pass  Other lines: $fail  Exit code: $($proc.ExitCode)" | Tee-Object -FilePath self-test-summary.txt
+          if ($proc.ExitCode -ne 0) { throw 'Self-test failed.' }
+      - name: Screenshots
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          foreach ($mode in @('', '--preview-accounts', '--preview-workflows')) {
+            $name = if ($mode) { $mode.TrimStart('-') } else { 'preview' }
+            $dir = Join-Path (Get-Location) "screens/$name"
+            New-Item -ItemType Directory -Path $dir -Force | Out-Null
+            $argList = @('--preview', '--preview-demo')
+            if ($mode) { $argList += $mode }
+            $argList += ('"' + $dir + '"')
+            $proc = Start-Process -FilePath app/Hisab.exe -ArgumentList $argList -PassThru -WindowStyle Normal
+            if (-not $proc.WaitForExit(180000)) { $proc.Kill(); $state = 'timed out and was stopped' } else { $state = "exit code $($proc.ExitCode)" }
+            $count = (Get-ChildItem $dir -Recurse -Filter *.png -ErrorAction SilentlyContinue).Count
+            "$name $state, $count screenshots" | Tee-Object -FilePath screens/summary.txt -Append
+            Get-ChildItem $dir -Recurse -Include errors.log,startup-error.txt -ErrorAction SilentlyContinue | ForEach-Object { "--- $($_.Name)"; Get-Content $_ -TotalCount 40 } | Tee-Object -FilePath screens/summary.txt -Append
+          }
+      - name: Report
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path self-test-summary.txt) { "::notice title=Self-test::" + ((Get-Content self-test-summary.txt) -join ' ') }
+          if (Test-Path screens/summary.txt) { "::notice title=Previews::" + ((Get-Content screens/summary.txt -TotalCount 60) -join ' | ').Replace("`r",'') }
+      - name: Publish screenshots to a separate branch
+        if: always()
+        shell: pwsh
+        run: |
+          if (-not (Test-Path screens)) { exit 0 }
+          git config user.name 'github-actions'
+          git config user.email 'actions@users.noreply.github.com'
+          git checkout --orphan design-preview-output-$env:GITHUB_REF_NAME
+          git rm -rf --quiet . 2>$null
+          New-Item -ItemType Directory -Path out -Force | Out-Null
+          Copy-Item screens/* out -Recurse -Force
+          if (Test-Path self-test-results.txt) { Copy-Item self-test-results.txt out }
+          git add -f out
+          git commit -m "Preview output for $env:GITHUB_SHA" --quiet
+          git push --force origin design-preview-output-$env:GITHUB_REF_NAME
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design-preview
+          path: |
+            screens
+            self-test-results.txt
+            self-test-summary.txt
