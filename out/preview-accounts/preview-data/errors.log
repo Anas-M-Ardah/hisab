@@ -1,0 +1,6 @@
+10/22/2026 5:18:27 PM System.InvalidOperationException: Organizer UI interactions failed
+   at Hisab.MainWindow.HierarchyPreviewChecks(String path, String language) in D:\a\hisab\hisab\source\HierarchyPreviewChecks.cs:line 33
+   at Hisab.MainWindow.RenderAccountPreviews(String path) in D:\a\hisab\hisab\source\AccountLayoutChecks.cs:line 15
+   at Hisab.AppEntry.<>c__DisplayClass0_1.<Main>b__2() in D:\a\hisab\hisab\source\App.cs:line 29
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)

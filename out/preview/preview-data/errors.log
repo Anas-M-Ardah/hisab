@@ -1,0 +1,7 @@
+10/22/2026 5:15:31 PM System.InvalidOperationException: Table UI checks failed
+   at Hisab.MainWindow.TablePreviewChecks(String path, String language) in D:\a\hisab\hisab\source\TablePreviewChecks.cs:line 22
+   at Hisab.MainWindow.ExtraPreviews(String path, String language) in D:\a\hisab\hisab\source\PreviewChecks.cs:line 13
+   at Hisab.MainWindow.RenderPreviews(String path) in D:\a\hisab\hisab\source\MainWindow.cs:line 253
+   at Hisab.AppEntry.<>c__DisplayClass0_1.<Main>b__2() in D:\a\hisab\hisab\source\App.cs:line 29
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
