@@ -49,7 +49,12 @@ public sealed partial class MainWindow
         var surface=new Border{Background=UiTheme.Brush(Resources,"Brush.Surface"),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new Thickness(1),CornerRadius=new CornerRadius(10),ClipToBounds=true,Child=TableSurface(table,content)};
         surface.SizeChanged+=(s,e)=>surface.Clip=new RectangleGeometry(new Rect(0,0,surface.ActualWidth,surface.ActualHeight),10,10);
         System.Windows.Controls.Grid.SetRow(surface,1);layout.Children.Add(surface);System.Windows.Controls.Grid.SetRow(footer,2);layout.Children.Add(footer);
-        dataWorkspace=layout;workspaceFooter=footer;workspaceTable=table;workspaceViewport.Children.Clear();workspaceViewport.Children.Add(layout);
+        surface.MinHeight=(double)Resources["Row.Height"]*3+FontSize*5;
+        var scroll=new ScrollViewer{Content=layout,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled};
+        void Fit()=>layout.Height=Math.Max(scroll.ViewportHeight,body.DesiredSize.Height+footer.DesiredSize.Height+surface.MinHeight+layout.Margin.Top+layout.Margin.Bottom);
+        layout.Height=Math.Max(workspaceViewport.ActualHeight,surface.MinHeight+200);
+        scroll.SizeChanged+=(s,e)=>Fit();body.SizeChanged+=(s,e)=>Fit();footer.SizeChanged+=(s,e)=>Fit();
+        dataWorkspace=layout;workspaceFooter=footer;workspaceTable=table;workspaceViewport.Children.Clear();workspaceViewport.Children.Add(scroll);
     }
     DataGridColumn TableBadgeColumn(string field,string label,double width,Style header)
     {

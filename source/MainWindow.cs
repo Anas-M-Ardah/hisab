@@ -92,7 +92,7 @@ public sealed partial class MainWindow : Window
                 style.Setters.Add(new Setter(TextBlock.ForegroundProperty,muted));var selected=new DataTrigger{Binding=new Binding(nameof(DataGridRow.IsSelected)){RelativeSource=new RelativeSource(RelativeSourceMode.FindAncestor,typeof(DataGridRow),1)},Value=true};selected.Setters.Add(new Setter(TextBlock.ForegroundProperty,UiTheme.Brush(Resources,"Brush.SelectionText")));style.Triggers.Add(selected);
             }
             if(c.Field=="state"||(c.Field=="type"&&table.Columns.Contains("incoming")))grid.Columns.Add(TableBadgeColumn(c.Field,c.Label,c.Width,header));
-            else grid.Columns.Add(new DataGridTextColumn{Header=c.Label,HeaderStyle=header,Binding=new Binding("["+c.Field+"]"),SortMemberPath=sort,ElementStyle=style,Width=new DataGridLength(c.Width,DataGridLengthUnitType.Star)});
+            else grid.Columns.Add(new DataGridTextColumn{Header=c.Label,HeaderStyle=header,Binding=new Binding("["+c.Field+"]"),SortMemberPath=sort,ElementStyle=style,MinWidth=c.Field switch{"number"=>FontSize*8.5,"date"=>FontSize*6.5,_=>0},Width=new DataGridLength(c.Width,DataGridLengthUnitType.Star)});
         }
         return grid;
     }
@@ -202,9 +202,8 @@ public sealed partial class MainWindow : Window
     public record Choice(string Key,string Label);
     void ItemsPage()
     {
-        body.Children.Add(Btn(T("تحويل طلبية إلى المخزون","Transfer order to stock"),OrderTransferForm));
         Heading(T("الأصناف والمخزون","Items & stock"),T("أسعار البيع والكميات تبدأ بصفر. اختر مخزنيًا أو خدمة لكل صنف.","Selling prices and quantities start at zero. Choose stock item or service for each item."));
-        var search=Input();body.Children.Add(SearchActions(T("بحث بالاسم أو الكود","Search name or code"),search,Btn(T("+ صنف جديد","+ New item"),()=>ItemForm(null),true)));
+        var search=Input();body.Children.Add(SearchActions(T("بحث بالاسم أو الكود","Search name or code"),search,Btn(T("+ صنف جديد","+ New item"),()=>ItemForm(null),true),Btn(T("تحويل طلبية إلى المخزون","Transfer order to stock"),OrderTransferForm)));
         DataTable Rows(){var t=new DataTable();foreach(var c in new[]{"id","code","name","type","price","incoming","outgoing","qty"})t.Columns.Add(c,c=="id"?typeof(long):typeof(string));var flows=S.StockFlows();foreach(var i in UiItems().Where(i=>(i.Name+i.Code).Contains(search.Text,StringComparison.OrdinalIgnoreCase))){var f=flows.GetValueOrDefault(i.Id);t.Rows.Add(i.Id,i.Code,i.Name,i.Stock?T("مخزني","Stock"):T("خدمة","Service"),Store.Money(i.Price),i.Stock?Store.D(f.In).ToString("0.###"):"—",i.Stock?Store.D(f.Out).ToString("0.###"):"—",i.Stock?Store.D(i.Qty).ToString("0.###"):"—");}return t;}
         var grid=Grid(Rows(),("code",T("الكود","Code"),1),("name",T("الصنف","Item"),3),("type",T("النوع","Type"),1),("price",T("سعر البيع","Sale price"),1.2),("incoming",T("الوارد","In"),1),("outgoing",T("الصادر","Out"),1),("qty",T("المتاح","Available"),1));search.TextChanged+=(s,e)=>grid.ItemsSource=Rows().DefaultView;
         var stockInfo=Text(T("الوارد والصادر: جميع الحركات منذ البداية، بما فيها الرصيد الافتتاحي والمرتجعات والإلغاءات. المتاح = الوارد − الصادر.","In and Out: all movements, including opening stock, returns and reversals. Available = In − Out."),16);
