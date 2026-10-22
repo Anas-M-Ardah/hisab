@@ -4,7 +4,7 @@ name: Design preview and checks
 on:
   workflow_dispatch:
   push:
-    branches: [design-polish]
+    branches: [design-polish, design-baseline]
     paths: ['source/**', '.github/workflows/design-preview.yml']
 permissions:
   contents: write
@@ -61,14 +61,14 @@ jobs:
           if (-not (Test-Path screens)) { exit 0 }
           git config user.name 'github-actions'
           git config user.email 'actions@users.noreply.github.com'
-          git checkout --orphan design-preview-output
+          git checkout --orphan design-preview-output-$env:GITHUB_REF_NAME
           git rm -rf --quiet . 2>$null
           New-Item -ItemType Directory -Path out -Force | Out-Null
           Copy-Item screens/* out -Recurse -Force
           if (Test-Path self-test-results.txt) { Copy-Item self-test-results.txt out }
           git add -f out
           git commit -m "Preview output for $env:GITHUB_SHA" --quiet
-          git push --force origin design-preview-output
+          git push --force origin design-preview-output-$env:GITHUB_REF_NAME
       - uses: actions/upload-artifact@v4
         if: always()
         with:
