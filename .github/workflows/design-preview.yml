@@ -7,7 +7,7 @@ on:
     branches: [design-polish]
     paths: ['source/**', '.github/workflows/design-preview.yml']
 permissions:
-  contents: read
+  contents: write
 jobs:
   preview:
     runs-on: windows-latest
@@ -42,9 +42,33 @@ jobs:
             $argList = @('--preview', '--preview-demo')
             if ($mode) { $argList += $mode }
             $argList += ('"' + $dir + '"')
-            $proc = Start-Process -FilePath app/Hisab.exe -ArgumentList $argList -Wait -PassThru -WindowStyle Normal
-            "$name exit code: $($proc.ExitCode)" | Tee-Object -FilePath screens/summary.txt -Append
+            $proc = Start-Process -FilePath app/Hisab.exe -ArgumentList $argList -PassThru -WindowStyle Normal
+            if (-not $proc.WaitForExit(180000)) { $proc.Kill(); $state = 'timed out and was stopped' } else { $state = "exit code $($proc.ExitCode)" }
+            $count = (Get-ChildItem $dir -Recurse -Filter *.png -ErrorAction SilentlyContinue).Count
+            "$name $state, $count screenshots" | Tee-Object -FilePath screens/summary.txt -Append
+            Get-ChildItem $dir -Recurse -Include errors.log,startup-error.txt -ErrorAction SilentlyContinue | ForEach-Object { "--- $($_.Name)"; Get-Content $_ -TotalCount 40 } | Tee-Object -FilePath screens/summary.txt -Append
           }
+      - name: Report
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path self-test-summary.txt) { "::notice title=Self-test::" + ((Get-Content self-test-summary.txt) -join ' ') }
+          if (Test-Path screens/summary.txt) { "::notice title=Previews::" + ((Get-Content screens/summary.txt -TotalCount 60) -join ' | ').Replace("`r",'') }
+      - name: Publish screenshots to a separate branch
+        if: always()
+        shell: pwsh
+        run: |
+          if (-not (Test-Path screens)) { exit 0 }
+          git config user.name 'github-actions'
+          git config user.email 'actions@users.noreply.github.com'
+          git checkout --orphan design-preview-output
+          git rm -rf --quiet . 2>$null
+          New-Item -ItemType Directory -Path out -Force | Out-Null
+          Copy-Item screens/* out -Recurse -Force
+          if (Test-Path self-test-results.txt) { Copy-Item self-test-results.txt out }
+          git add -f out
+          git commit -m "Preview output for $env:GITHUB_SHA" --quiet
+          git push --force origin design-preview-output
       - uses: actions/upload-artifact@v4
         if: always()
         with:
