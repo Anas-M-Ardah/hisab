@@ -39,7 +39,7 @@ public sealed partial class MainWindow : Window
         PreviewKeyDown+=(s,e)=>{if(e.Key==Key.F1){Help();e.Handled=true;} if(Keyboard.Modifiers==ModifierKeys.Control&&e.Key==Key.N){InvoiceForm(true);e.Handled=true;} if(Keyboard.Modifiers==ModifierKeys.Control&&e.Key==Key.B){Backup();e.Handled=true;}};
         Closing+=(s,e)=>{if(leaveAccountEditor!=null&&!leaveAccountEditor()){e.Cancel=true;return;} try{ var dir=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(S.Path)!,"backups");Directory.CreateDirectory(dir);S.Backup(System.IO.Path.Combine(dir,"automatic-"+DateTime.Now.ToString("yyyyMMdd")+(S.Encrypted?".hdb":".db")));}catch(Exception ex){File.AppendAllText(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(S.Path)!,"errors.log"),ex+Environment.NewLine);} };
     }
-    TextBlock Text(string text,double size=0,bool bold=false)=>new(){Text=text,FontSize=size==0?FontSize:size*FontSize/20,FontWeight=bold?FontWeights.SemiBold:FontWeights.Normal,TextWrapping=TextWrapping.Wrap,Margin=new(0,0,0,10)};
+    TextBlock Text(string text,double size=0,bool bold=false)=>new(){Text=text,FontSize=size==0?FontSize:size*FontSize/20,FontWeight=bold?FontWeights.SemiBold:FontWeights.Normal,TextWrapping=TextWrapping.Wrap,Margin=bold&&size is >=21 and <28?new(0,12,0,8):new(0,0,0,10)};
     Button Btn(string label,Action action,bool primary=false)
     {
         var b=new Button {Content=label,Command=new RelayCommand(()=>Guard(action)),FontSize=FontSize};
@@ -227,7 +227,7 @@ public sealed partial class MainWindow : Window
     void BackupsPage()
     {
         Heading(T("النسخ الاحتياطي","Backups"),T("احتفظ بنسخة على USB أو قرص آخر لنقل بياناتك أو استعادتها.","Keep a copy on a USB drive or another disk to transfer or restore your data."));
-        var p=new StackPanel();p.Children.Add(Text(T("نسخة من جميع الحسابات والمستندات","A copy of all accounts and documents"),23,true));p.Children.Add(Text(T("تُنشأ أيضًا نسخة يومية عند إغلاق البرنامج. النسخة على نفس الجهاز لا تحمي من تلف القرص.","A daily backup is also created when the app closes. A copy on the same PC cannot protect against disk failure."),18));p.Children.Add(Actions(Btn(T("حفظ نسخة احتياطية…","Save backup…"),Backup,true),Btn(T("استعادة نسخة…","Restore backup…"),()=>{PortableRestore();})));body.Children.Add(Card(p));
+        var p=new StackPanel();p.Children.Add(Text(T("نسخة من جميع الحسابات والمستندات","A copy of all accounts and documents"),22,true));p.Children.Add(Text(T("تُنشأ أيضًا نسخة يومية عند إغلاق البرنامج. النسخة على نفس الجهاز لا تحمي من تلف القرص.","A daily backup is also created when the app closes. A copy on the same PC cannot protect against disk failure."),18));p.Children.Add(Actions(Btn(T("حفظ نسخة احتياطية…","Save backup…"),Backup,true),Btn(T("استعادة نسخة…","Restore backup…"),()=>{PortableRestore();})));body.Children.Add(Card(p));
         body.Children.Add(Text(T("مكان حفظ البيانات","Data location"),22,true));var path=new TextBox{Text=S.Path,IsReadOnly=true,FlowDirection=FlowDirection.LeftToRight,TextWrapping=TextWrapping.Wrap};body.Children.Add(path);
     }
     void Backup()
