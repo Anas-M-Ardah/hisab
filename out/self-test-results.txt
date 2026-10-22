@@ -1,0 +1,171 @@
+PASS 17 source item names imported
+PASS Source chat text not imported
+PASS Sample invoice not posted
+PASS Arabic numeral parsing
+PASS Purchase increases stock and value
+PASS Cash purchase does not create supplier liability
+PASS Sale deducts stock at weighted average
+PASS Part-paid invoice posts remaining customer balance
+PASS Receipt clears customer balance
+PASS Payment clears supplier balance
+PASS Overselling rejected
+PASS Failed invoice rolls back number, document and stock
+PASS Repeated-item oversell rejected
+PASS Multi-line invoice failure fully rolls back
+PASS Unbalanced journal rejected
+PASS Unbalanced journal rolls back document
+PASS Backdated stock transaction rejected
+PASS Same cash and counterpart rejected
+PASS Money beyond 3 decimals rejected
+PASS Used account cannot be reclassified
+PASS Inclusive tax uses 3-decimal JOD rounding
+PASS Discount applied before tax
+PASS Invoice reversal restores stock and cost
+PASS Reversal preserves later receipts as customer credit
+PASS Duplicate reversal rejected
+PASS Opening stock posts value
+PASS Duplicate opening stock rejected
+PASS Weighted average across different purchase costs
+PASS Cancelling older purchase recalculates later sale costs
+PASS Service sale does not move inventory
+PASS Older inventory document can reverse after newer documents are cancelled
+PASS All posted journals balance
+PASS Inventory ledger equals stock valuation
+PASS Restore recovers database snapshot
+PASS Restore first creates safety backup
+PASS Unrelated SQLite database rejected
+PASS Database integrity check
+PASS Foreign key check
+PASS Historical invoice balance excludes later receipts
+PASS Partial receipt allocated to invoice
+PASS Voucher over-allocation rejected
+PASS Sales return reduces invoice outstanding
+PASS Excess returns rejected
+PASS Source with live returns cannot cancel
+PASS Past tax worksheet includes dated return despite later cancellation
+PASS Invoice amendment transfers allocations atomically
+PASS Amendments preserve reason and original snapshot
+PASS Backdated purchase replays subsequent weighted cost
+PASS Purchase returns reduce stock
+PASS Audited cost adjustment changes stock valuation
+PASS Bounced cheque releases allocations
+PASS Cheque reversal uses selected historical date
+PASS Terminal cheque cannot clear again
+PASS Optional negative stock supported
+PASS Receipt reconciles provisional negative-stock costing
+PASS Extended inventory ledger equals valuation
+PASS All extended journals balance
+PASS Closed period rejects posting
+PASS Closed invoice rejects amendment
+PASS Administrator reopens period with reversal
+PASS Attachment persisted within database
+PASS Editable bilingual account names
+PASS Incorrect password rejected
+PASS Viewer can authenticate
+PASS Viewer cannot post via accounting service
+PASS Viewer cannot change business settings
+PASS Administrator can authenticate
+PASS Wrong backup password rejected
+PASS Encrypted portable backup restores snapshot
+PASS Extended database integrity and foreign keys
+PASS Failed encrypted-file save rolls back in-memory change
+PASS Tampered encrypted backup rejected
+PASS Rejected backup preserves current data
+PASS Local data is encrypted at rest
+PASS Encrypted database survives process-style reopen
+PASS Portable backup restores under independent local encryption key
+PASS Legacy database migrates to current encrypted schema
+PASS App-owned legacy plaintext database and backups replaced with encrypted files
+PASS Fresh database does not silently select an account before setup
+PASS Personal setup requires no username or password
+PASS Personal profile creates exactly one internal owner
+PASS Repeated personal setup reuses the owner
+PASS Optional lock prevents direct opening
+PASS Four-character optional lock authenticates without a username
+PASS Optional lock enforces failed-attempt lockout
+PASS Removing optional lock restores direct opening
+PASS Shared sign-in cannot lock out the only personal owner
+PASS Explicit shared mode requires named user sign-in
+PASS Accountant cannot bypass shared sign-in
+PASS Administrator can enter shared mode
+PASS Personal access survives encrypted reopen
+PASS Hierarchy rolls up all descendants without posting to parent
+PASS Descendant cannot become parent
+PASS Self parent rejected
+PASS Cross-type account parent rejected
+PASS Parent type cannot conflict with children
+PASS Reparenting moves rollup without changing journals
+PASS Stock In and Out reconcile with available quantity
+PASS Stock reversal appears in opposite movement column
+PASS Multiple cheques post separately and allocate receipt total
+PASS Cheque due date retained on document
+PASS Cheque receipt description retained
+PASS Bouncing one cheque leaves sibling cleared and restores only its allocation
+PASS Mismatched receipt and cheque totals rejected
+PASS Previously recorded cheque rejected
+PASS Duplicate cheque within batch rejected
+PASS Cheque due date before receipt rejected
+PASS Cheque precision beyond three decimals rejected
+PASS Invalid invoice allocation rolls back entire batch
+PASS Rejected batch leaves no cheques or documents
+PASS Child can return to top level
+PASS Small font preference persisted
+PASS Feedback changes preserve foreign keys
+PASS Hierarchy persists after reopening
+PASS Font survives reopening
+PASS Existing accounts migrate as top-level accounts
+PASS Desktop shortcut created in isolated test directory
+PASS Shortcut targets app and embedded icon with correct working directory
+PASS Desktop shortcut refreshes to new portable version
+PASS Unrelated existing desktop shortcut preserved
+PASS Unsupported process cannot create Hisab shortcut
+PASS Valid drag target is accepted
+PASS Move updates parent directly
+PASS Moving parent retains its nested children
+PASS Move preserves original and translated names
+PASS Moved subtree updates group totals without changing own balances
+PASS Hierarchy move creates no accounting documents or postings
+PASS Drag onto self rejected
+PASS Drag onto descendant rejected
+PASS Drag onto different account type rejected
+PASS Move to top level retains subtree
+PASS Undo restores prior parent and no-op targets are rejected
+PASS Viewer cannot move accounts
+PASS Outline loads accounts, names and balances in one query
+PASS Snapshot totals include descendants without duplicating own balance
+PASS Outline respects both name translations
+PASS Account pickers load localized names in one query
+PASS Item lists load localized names in one query
+PASS Organizer saves parent, code and active-language name
+PASS Editor preserves original names, other translations and addresses
+PASS Organizer edits preserve postings and update group balances
+PASS Undo restores exact names, code and parent
+PASS Editor rejects hierarchy cycles
+PASS Editor rejects different account types
+PASS Editor rejects an empty name
+PASS Undo refuses to overwrite a later account change
+PASS Organizer respects core account code protection
+PASS Viewer cannot edit through the organizer
+PASS Workbook split payment posts each allocation and cash once
+PASS Split payment preserves line descriptions
+PASS Main trial rolls up families without double counting
+PASS Child trial retains direct parent opening balances outside period movements
+PASS Split voucher rejects excess precision
+PASS Split voucher rejects cash as its own counterpart
+PASS Split voucher requires each line description
+PASS Invalid split vouchers leave no partial documents
+PASS Split amendment reverses original and retains replacement link
+PASS Single account editor cannot flatten a split voucher
+PASS Order transfer moves accumulated cost into received stock
+PASS Order transfer reconciles inventory ledger and valuation
+PASS Order transfer cannot exceed available order cost
+PASS Order transfer requires an asset account
+PASS Sale after order transfer uses transferred unit cost
+PASS Consumed order transfer cannot reverse into negative stock
+PASS Failed transfer reversal rolls back atomically
+PASS Order transfer reversal restores order cost and stock
+PASS Workbook six-cheque receipt shares one reference and exact total
+PASS All workbook workflow documents remain balanced
+PASS Workbook workflow relationships preserve database integrity
+PASS Workflow data survives reopening with schema downgrade protection
+PASS Viewer cannot post split vouchers

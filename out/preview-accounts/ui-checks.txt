@@ -1,0 +1,2 @@
+ar: standard layout tree has 3+ rows=True, editor=dialog, name/code/parent/save fully visible=True
+ar: hierarchy collapse=True, retained=True, expand=True, cached selection=True, drag handle=True, scoped drop=True, parent drop=True, drop/undo=True, edit/undo=True, finite virtualized table=True, controls consistent=False, organizer render ms=73

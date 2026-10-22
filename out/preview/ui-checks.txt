@@ -1,0 +1,4 @@
+ar: main-account filter=True, reset=True, child report=True
+ar: workflow save visible=True, table headers fit=True, font=20
+ar: workflow save visible=True, table headers fit=True, font=20
+ar: table numeric sort=True, resize=False, scrolling=True, scrollbar thumb=False, selection count=True
