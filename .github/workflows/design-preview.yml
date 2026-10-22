@@ -1,0 +1,55 @@
+name: Design preview and checks
+# Verification only: builds the app, runs the built-in self-test and the
+# screenshot previews, and uploads the results. It never publishes a release.
+on:
+  workflow_dispatch:
+  push:
+    branches: [design-polish]
+    paths: ['source/**', '.github/workflows/design-preview.yml']
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build
+        shell: pwsh
+        run: dotnet publish source/Hisab.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o app
+      - name: Self-test
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP 'self-test'
+          $proc = Start-Process -FilePath app/Hisab.exe -ArgumentList '--self-test', ('"' + $out + '"') -WindowStyle Hidden -Wait -PassThru
+          $results = Get-Content (Join-Path $out 'test-results.txt')
+          $results | Out-File self-test-results.txt -Encoding utf8
+          $pass = ($results | Where-Object { $_ -like 'PASS *' }).Count
+          $fail = ($results | Where-Object { $_ -notlike 'PASS *' -and $_.Trim() }).Count
+          "Passed: $pass  Other lines: $fail  Exit code: $($proc.ExitCode)" | Tee-Object -FilePath self-test-summary.txt
+          if ($proc.ExitCode -ne 0) { throw 'Self-test failed.' }
+      - name: Screenshots
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          foreach ($mode in @('', '--preview-accounts', '--preview-workflows')) {
+            $name = if ($mode) { $mode.TrimStart('-') } else { 'preview' }
+            $dir = Join-Path (Get-Location) "screens/$name"
+            New-Item -ItemType Directory -Path $dir -Force | Out-Null
+            $argList = @('--preview', '--preview-demo')
+            if ($mode) { $argList += $mode }
+            $argList += ('"' + $dir + '"')
+            $proc = Start-Process -FilePath app/Hisab.exe -ArgumentList $argList -Wait -PassThru -WindowStyle Normal
+            "$name exit code: $($proc.ExitCode)" | Tee-Object -FilePath screens/summary.txt -Append
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design-preview
+          path: |
+            screens
+            self-test-results.txt
+            self-test-summary.txt
