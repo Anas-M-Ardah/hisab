@@ -65,7 +65,13 @@ public sealed partial class MainWindow : Window
         if(route is "receipt" or "payment" or "journal") {vm.Route="home";Navigate("home");}
     }
     void Heading(string title,string subtitle){body.Children.Add(Text(title,28,true));var t=Text(subtitle,18);t.Foreground=muted;body.Children.Add(t);}
-    Border Card(UIElement content)=>new(){Background=UiTheme.Brush(Resources,"Brush.Surface"),CornerRadius=new(12),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new(1),Padding=new(20),Margin=new(0,6,0,16),Child=content};
+    Border Card(UIElement content)
+    {
+        // A heading that opens a card already has the card padding above it.
+        if(content is Panel panel&&panel.Children.Count>0&&panel.Children[0] is TextBlock first&&first.Margin.Top==12)first.Margin=new(0,0,0,8);
+        return CardChrome(content);
+    }
+    Border CardChrome(UIElement content)=>new(){Background=UiTheme.Brush(Resources,"Brush.Surface"),CornerRadius=new(12),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new(1),Padding=new(20),Margin=new(0,6,0,16),Child=content};
     WrapPanel Actions(params Button[] buttons){var p=new WrapPanel{Margin=new(0,10,0,6)};foreach(var b in buttons)p.Children.Add(b);return p;}
     DataGrid Grid(DataTable table,params(string Field,string Label,double Width)[] columns)
     {
@@ -167,7 +173,7 @@ public sealed partial class MainWindow : Window
         editorCard=Card(add);editorCard.Visibility=Visibility.Collapsed;p.Children.Add(Btn(T("+ إضافة صنف","+ Add item"),()=>{editing=null;qty.Text="1";discount.Text="0";editorCard.Visibility=Visibility.Visible;},true));StyleEditorGrid(list);p.Children.Add(editorCard);p.Children.Add(list);
         p.Children.Add(Actions(Btn(T("تعديل السطر المحدد","Edit selected line"),()=>{if(list.SelectedItem is not InvoiceLine l)throw new InvalidOperationException(T("اختر سطرًا أولًا","Select a line first"));editing=l;item.SelectedItem=item.Items.Cast<Item>().FirstOrDefault(i=>i.Id==l.Item)??throw new InvalidOperationException(T("هذا الصنف لم يعد متاحًا. أزل السطر وأضفه من جديد.","This item is no longer available. Remove the line and add it again."));description.Text=l.Description;qty.Text=l.Qty.ToString(CultureInfo.InvariantCulture);price.Text=l.Price.ToString(CultureInfo.InvariantCulture);discount.Text=l.Discount.ToString(CultureInfo.InvariantCulture);editorCard.Visibility=Visibility.Visible;}),Btn(T("إزالة السطر المحدد","Remove selected line"),()=>{if(list.SelectedItem is InvoiceLine l){lines.Remove(l);Refresh();}})));
         vat.TextChanged+=(s,e)=>{try{Refresh();}catch{total.Text=T("تحقق من نسبة الضريبة","Check the tax rate");}};inclusive.Checked+=(s,e)=>Guard(Refresh);inclusive.Unchecked+=(s,e)=>Guard(Refresh);
-        p.Children.Add(Field(T("نسبة الضريبة %","Tax rate %"),vat));p.Children.Add(inclusive);p.Children.Add(Btn(T("حساب الإجمالي","Calculate total"),Refresh));
+        p.Children.Add(Field(T("نسبة الضريبة %","Tax rate %"),vat));p.Children.Add(inclusive);
         var paid=Input("0",true);var note=Input();var amendmentReason=Input();var due=new DatePicker{SelectedDate=DateTime.Today.AddDays(int.Parse(S.Setting("due_days","30")))};p.Children.Add(Field(T("المدفوع الآن JOD (٠ للآجل)","Paid now JOD (0 for credit)"),paid));p.Children.Add(Field(T("الصندوق / البنك للمدفوع الآن","Cash / bank for amount paid now"),cash));p.Children.Add(Field(T("ملاحظات الفاتورة","Invoice notes"),note));
         p.Children.Add(Field(T("تاريخ الاستحقاق","Due date"),due));if(invoiceToEdit!=null)p.Children.Add(Field(T("سبب التعديل","Amendment reason"),amendmentReason));
         p.Children.Add(Text(T("شروط الدفع والضمان وبيانات الشركة تؤخذ من الإعدادات وتُحفظ مع الفاتورة.","Payment terms, warranty and company details come from Settings and are saved with this invoice."),17));

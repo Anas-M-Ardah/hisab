@@ -82,19 +82,27 @@ public sealed partial class MainWindow
         }
         ForwardWheel(grid);
     }
+    // Report columns arrive as plain text; right-align and numerically sort every column after the first whose cells are all figures.
+    void AlignFigures(DataGrid grid,System.Data.DataTable table)
+    {
+        for(int i=1;i<grid.Columns.Count&&i<table.Columns.Count;i++)
+        {
+            if(grid.Columns[i] is not DataGridTextColumn column)continue;
+            var cells=table.Rows.Cast<System.Data.DataRow>().Select(r=>r[i]?.ToString()).Where(v=>!string.IsNullOrWhiteSpace(v)).ToList();
+            if(cells.Count==0||!cells.All(v=>decimal.TryParse(v,NumberStyles.Number,CultureInfo.InvariantCulture,out _)))continue;
+            var cell=new Style(typeof(TextBlock),column.ElementStyle);cell.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));cell.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,TextAlignment.Right));cell.Setters.Add(new Setter(System.Windows.Documents.Typography.NumeralAlignmentProperty,FontNumeralAlignment.Tabular));
+            var header=new Style(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader),column.HeaderStyle);header.Setters.Add(new Setter(FlowDirectionProperty,FlowDirection.LeftToRight));header.Setters.Add(new Setter(Control.HorizontalContentAlignmentProperty,HorizontalAlignment.Right));
+            column.ElementStyle=cell;column.HeaderStyle=header;column.SortMemberPath=table.Columns[i].ColumnName+"_numeric";
+        }
+    }
     void ForwardWheel(DataGrid grid)
     {
         grid.PreviewMouseWheel+=(s,e)=>
         {
-            var inner=Descendant<ScrollViewer>(grid);bool top=inner==null||inner.VerticalOffset<=0,bottom=inner==null||inner.VerticalOffset>=inner.ScrollableHeight;
+            var inner=Descendants<ScrollViewer>(grid).FirstOrDefault();bool top=inner==null||inner.VerticalOffset<=0,bottom=inner==null||inner.VerticalOffset>=inner.ScrollableHeight;
             if((e.Delta>0&&!top)||(e.Delta<0&&!bottom)||VisualTreeHelper.GetParent(grid) is not UIElement parent)return;
             e.Handled=true;parent.RaiseEvent(new System.Windows.Input.MouseWheelEventArgs(e.MouseDevice,e.Timestamp,e.Delta){RoutedEvent=UIElement.MouseWheelEvent,Source=grid});
         };
-    }
-    static T? Descendant<T>(DependencyObject root) where T:DependencyObject
-    {
-        for(int i=0;i<VisualTreeHelper.GetChildrenCount(root);i++){var child=VisualTreeHelper.GetChild(root,i);if(child is T hit)return hit;var deeper=Descendant<T>(child);if(deeper!=null)return deeper;}
-        return null;
     }
 
     DataGrid PageTable()=>workspaceTable??body.Children.OfType<DataGrid>().Single();
@@ -108,7 +116,7 @@ public sealed partial class MainWindow
         void Refresh(){foreach(var action in actions)action.IsEnabled=table.SelectedItem!=null;}
         table.SelectionChanged+=(s,e)=>Refresh();Refresh();
     }
-    StackPanel Section(string title)=>new(){Children={Text(title,21,true)},Margin=new Thickness(0,0,0,8)};
+    StackPanel Section(string title)=>new(){Children={Text(title,22,true)},Margin=new Thickness(0,0,0,8)};
     Button MoreActions(IEnumerable<Button> commands)
     {
         var menu=new ContextMenu{Resources=Resources,FontSize=FontSize,FlowDirection=FlowDirection,Background=UiTheme.Brush(Resources,"Brush.Surface"),Foreground=ink};
