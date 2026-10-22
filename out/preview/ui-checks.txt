@@ -1,0 +1,24 @@
+ar: main-account filter=True, reset=True, child report=True
+ar: workflow save visible=True, table headers fit=True, font=20
+ar: workflow save visible=True, table headers fit=True, font=20
+ar: table numeric sort=True, resize=True, scrolling=True, scrollbar thumb=True, selection count=True
+ar: document actions gated=True, more menu=True, empty state=True, settings save visible=True, footer clears=True
+ar: standard layout tree has 3+ rows=True, editor=dialog, name/code/parent/save fully visible=True
+ar: control heights name=52, save=0, below minimum=[], required=52
+ar: hierarchy collapse=True, retained=True, expand=True, cached selection=True, drag handle=True, scoped drop=True, parent drop=True, drop/undo=True, edit/undo=True, finite virtualized table=True, controls consistent=True, organizer render ms=109
+ar: grouped statement=True
+ar: small-text layout tree has 3+ rows=True, editor=dialog, name/code/parent/save fully visible=True
+ar: combo popup=True, selected value=b, calendar popup=True
+ar: large-text layout tree has 3+ rows=True, editor=dialog, name/code/parent/save fully visible=True
+en: main-account filter=True, reset=True, child report=True
+en: workflow save visible=True, table headers fit=True, font=20
+en: workflow save visible=True, table headers fit=True, font=20
+en: table numeric sort=True, resize=True, scrolling=True, scrollbar thumb=True, selection count=True
+en: document actions gated=True, more menu=True, empty state=True, settings save visible=True, footer clears=True
+en: standard layout tree has 3+ rows=True, editor=dialog, name/code/parent/save fully visible=True
+en: control heights name=52, save=0, below minimum=[], required=52
+en: hierarchy collapse=True, retained=True, expand=True, cached selection=True, drag handle=True, scoped drop=True, parent drop=True, drop/undo=True, edit/undo=True, finite virtualized table=True, controls consistent=True, organizer render ms=99
+en: grouped statement=True
+en: small-text layout tree has 3+ rows=True, editor=dialog, name/code/parent/save fully visible=True
+en: combo popup=True, selected value=b, calendar popup=True
+en: large-text layout tree has 3+ rows=True, editor=dialog, name/code/parent/save fully visible=True
