@@ -12,6 +12,8 @@ Hisab targets Windows WPF, with Arabic RTL and English LTR. Preserve the origina
 
 **Supporting patterns:** search and account creation share the upper control region. On narrow windows, creation actions move below search. Selected-account editing and arrangement actions sit above the table, with Undo nearby. The top-level drop target sits immediately before the outline. Instructions and total interpretation sit below the content.
 
+**Selection:** the selected account row uses a 20% wash of the existing Primary colour over Surface (`UiTheme.SelectionTint`), so it stays distinct from the grey hover colour; high contrast keeps system colours.
+
 **States:** edit, move, child creation and names actions enable when a row is selected, respecting permissions. Disclosure controls reveal children; expansion choices survive navigation within the session. Drag targets provide feedback; Move account remains a click and keyboard alternative. Undo restores the latest move.
 
 **Accessibility:** preserve visible labels, meaningful disclosure-button names, keyboard focus, 14–28 saved text preferences and high-contrast resources. Reading order mirrors in Arabic. Layout dimensions below are Hisab decisions, not Apple HIG measurements.

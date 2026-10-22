@@ -46,7 +46,7 @@ public sealed partial class MainWindow
         var table=Grid(Rows(),("name",T("الحسابات","Accounts"),3), ("balance",T("مع الفروع · JOD","With children · JOD"),1));table.MaxHeight=double.PositiveInfinity;table.MinHeight=0;table.CanUserSortColumns=false;table.AllowDrop=organize;table.Tag=scope;
         table.Columns[1].Width=new DataGridLength(Math.Max(190,FontSize*10));table.Columns[1].MinWidth=Math.Max(190,FontSize*10);
         table.ColumnHeaderHeight=Math.Max(44,FontSize*2.4);
-        var rowStyle=new Style(typeof(DataGridRow),(Style)FindResource(typeof(DataGridRow)));var selection=new Trigger{Property=DataGridRow.IsSelectedProperty,Value=true};selection.Setters.Add(new Setter(Control.BackgroundProperty,UiTheme.Brush(Resources,"Brush.Sunken")));selection.Setters.Add(new Setter(Control.ForegroundProperty,ink));rowStyle.Triggers.Add(selection);table.RowStyle=rowStyle;
+        var rowStyle=new Style(typeof(DataGridRow),(Style)FindResource(typeof(DataGridRow)));var selection=new Trigger{Property=DataGridRow.IsSelectedProperty,Value=true};selection.Setters.Add(new Setter(Control.BackgroundProperty,UiTheme.SelectionTint(Resources)));selection.Setters.Add(new Setter(Control.ForegroundProperty,ink));rowStyle.Triggers.Add(selection);table.RowStyle=rowStyle;
         var cellStyle=new Style(typeof(DataGridCell),(Style)FindResource(typeof(DataGridCell)));var selectedCell=new Trigger{Property=DataGridCell.IsSelectedProperty,Value=true};selectedCell.Setters.Add(new Setter(Control.ForegroundProperty,ink));cellStyle.Triggers.Add(selectedCell);table.CellStyle=cellStyle;
         var detail=new StackPanel();var editorActions=new StackPanel();var hint=Text("",16);hint.FontSize=Math.Max(12,FontSize*.8);hint.Foreground=muted;hint.Margin=new(0);var undo=Btn(T("تراجع","Undo"),()=>{});undo.IsEnabled=editable&&lastAccountChange!=null;undo.Margin=new(12,0,0,0);
         TextBox? editName=null,editCode=null;ComboBox? editParent=null;long? editing=null;bool selecting=false;Window? editorDialog=null;
@@ -80,8 +80,8 @@ public sealed partial class MainWindow
                 detail.Children.Add(EditorField(T("اسم الحساب","Account name"),editName));detail.Children.Add(EditorField(T("كود الحساب","Account code"),editCode));detail.Children.Add(EditorField(T("الحساب الرئيسي","Parent account"),editParent));
                 var save=Btn(T("حفظ التعديل","Save changes"),SaveEdit,true);save.Name="AccountSaveButton";save.Margin=new(0,12,0,0);editorActions.Children.Add(save);
             }
-            else{detail.Children.Add(Text(account.Code+" · "+AccountKind(account.Kind),16));var edit=Btn(T("تعديل الحساب","Edit account"),()=>AccountForm(account));edit.IsEnabled=editable;detail.Children.Add(Actions(edit,Btn(T("الأسماء والعناوين","Names & addresses"),()=>BilingualForm("accounts",id))));}
-            if(!organize){detail.Children.Add(Text(T("رصيد الحساب فقط","Own balance"),16));detail.Children.Add(Text(Store.Money(entry.Own)+" JOD",22,true));detail.Children.Add(Text(T("مع جميع الفروع","Including all children"),16));detail.Children.Add(Text(Store.Money(entry.Total)+" JOD",22,true));}
+            else{var identity=Text(account.Code+" · "+AccountKind(account.Kind),16);identity.Foreground=muted;identity.Margin=new(0,0,0,6);detail.Children.Add(identity);var edit=Btn(T("تعديل الحساب","Edit account"),()=>AccountForm(account));edit.IsEnabled=editable;detail.Children.Add(Actions(edit,Btn(T("الأسماء والعناوين","Names & addresses"),()=>BilingualForm("accounts",id))));}
+            if(!organize)foreach(var figure in new[]{(T("رصيد الحساب فقط","Own balance"),entry.Own),(T("مع جميع الفروع","Including all children"),entry.Total)}){var caption=Text(figure.Item1,16);caption.Foreground=muted;caption.Margin=new(0,10,0,2);detail.Children.Add(caption);var amount=Text(Store.Money(figure.Item2)+" JOD",22,true);amount.Margin=new(0,0,0,6);detail.Children.Add(amount);}
         }
         void Move(long id,long? parent)
         {
