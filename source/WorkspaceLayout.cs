@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Windows.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -47,7 +49,12 @@ public sealed partial class MainWindow
         var surface=new Border{Background=UiTheme.Brush(Resources,"Brush.Surface"),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new Thickness(1),CornerRadius=new CornerRadius(10),ClipToBounds=true,Child=TableSurface(table,content)};
         surface.SizeChanged+=(s,e)=>surface.Clip=new RectangleGeometry(new Rect(0,0,surface.ActualWidth,surface.ActualHeight),10,10);
         System.Windows.Controls.Grid.SetRow(surface,1);layout.Children.Add(surface);System.Windows.Controls.Grid.SetRow(footer,2);layout.Children.Add(footer);
-        dataWorkspace=layout;workspaceFooter=footer;workspaceTable=table;workspaceViewport.Children.Clear();workspaceViewport.Children.Add(layout);
+        surface.MinHeight=(double)Resources["Row.Height"]*3+FontSize*5;
+        var scroll=new ScrollViewer{Content=layout,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled};
+        void Fit()=>layout.Height=Math.Max(scroll.ViewportHeight,body.DesiredSize.Height+footer.DesiredSize.Height+surface.MinHeight+layout.Margin.Top+layout.Margin.Bottom);
+        layout.Height=Math.Max(workspaceViewport.ActualHeight,surface.MinHeight+200);
+        scroll.SizeChanged+=(s,e)=>Fit();body.SizeChanged+=(s,e)=>Fit();footer.SizeChanged+=(s,e)=>Fit();
+        dataWorkspace=layout;workspaceFooter=footer;workspaceTable=table;workspaceViewport.Children.Clear();workspaceViewport.Children.Add(scroll);
     }
     DataGridColumn TableBadgeColumn(string field,string label,double width,Style header)
     {
@@ -59,11 +66,56 @@ public sealed partial class MainWindow
     FrameworkElement TableSurface(DataGrid table,FrameworkElement content)
     {
         var layout=new DockPanel();var count=new TextBlock{Foreground=muted,FontSize=Math.Max(13,FontSize*.7),Margin=new Thickness(16,10,16,10)};
-        void Refresh(){count.Text=T($"{table.Items.Count} سجل",$"{table.Items.Count} records")+(table.SelectedItem==null?"":T(" · سجل محدد"," · 1 selected"));}
+        void Refresh(){count.Text=T($"{table.Items.Count} سجل",$"{table.Items.Count} records")+(table.SelectedItem==null?"":T(" · سجل محدد"," · 1 selected"))+(table.Tag is int cap&&table.Items.Count>=cap?T($" · يُعرض آخر {cap} فقط، ابحث لتضييق النتائج",$" · showing the latest {cap} only, search to narrow"):"");}
         ((System.Collections.Specialized.INotifyCollectionChanged)table.Items).CollectionChanged+=(s,e)=>Refresh();table.SelectionChanged+=(s,e)=>Refresh();Refresh();
         var footer=new Border{Background=UiTheme.Brush(Resources,"Brush.Surface"),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new Thickness(0,1,0,0),Child=count};DockPanel.SetDock(footer,Dock.Bottom);layout.Children.Add(footer);layout.Children.Add(content);return layout;
     }
 
+    static readonly HashSet<string> NumericPaths=new(){"Qty","Price","Discount","Amount","Quantity","Cost","AmountText","DebitText","CreditText","amount_text"};
+    // Line-item tables inside forms: scale with the saved text size, align figures, and hand the mouse wheel back to the form when the table has nothing left to scroll.
+    void StyleEditorGrid(DataGrid grid,int visibleRows=3)
+    {
+        double row=(double)Resources["Row.Height"];
+        grid.FontSize=Math.Max(14,FontSize*.9);grid.RowHeight=row;grid.MinColumnWidth=95;grid.Height=grid.MinHeight=row*visibleRows+FontSize*3;grid.Margin=new Thickness(0,6,0,10);
+        foreach(var column in grid.Columns.OfType<DataGridTextColumn>())
+        {
+            var path=(column.Binding as Binding)?.Path.Path.Trim('[',']');if(path==null||!NumericPaths.Contains(path))continue;
+            if(path is "Qty" or "Price" or "Discount"){var binding=(Binding)column.Binding;binding.StringFormat="N3";binding.ConverterCulture=CultureInfo.InvariantCulture;}
+            var cell=new Style(typeof(TextBlock));cell.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));cell.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,TextAlignment.Right));cell.Setters.Add(new Setter(System.Windows.Documents.Typography.NumeralAlignmentProperty,FontNumeralAlignment.Tabular));
+            column.ElementStyle=cell;
+            var header=new Style(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader),(Style)FindResource(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader)));header.Setters.Add(new Setter(Control.HorizontalContentAlignmentProperty,HorizontalAlignment.Right));column.HeaderStyle=header;
+        }
+        ForwardWheel(grid);
+    }
+    // Report columns arrive as plain text; right-align and numerically sort every column after the first whose cells are all figures.
+    void AlignFigures(DataGrid grid,System.Data.DataTable table)
+    {
+        for(int i=1;i<grid.Columns.Count&&i<table.Columns.Count;i++)
+        {
+            if(grid.Columns[i] is not DataGridTextColumn column)continue;
+            var cells=table.Rows.Cast<System.Data.DataRow>().Select(r=>r[i]?.ToString()).Where(v=>!string.IsNullOrWhiteSpace(v)).ToList();
+            if(cells.Count==0||!cells.All(v=>decimal.TryParse(v,NumberStyles.Number,CultureInfo.InvariantCulture,out _)))continue;
+            var cell=new Style(typeof(TextBlock),column.ElementStyle);cell.Setters.Add(new Setter(TextBlock.FlowDirectionProperty,FlowDirection.LeftToRight));cell.Setters.Add(new Setter(TextBlock.TextAlignmentProperty,TextAlignment.Right));cell.Setters.Add(new Setter(System.Windows.Documents.Typography.NumeralAlignmentProperty,FontNumeralAlignment.Tabular));
+            var header=new Style(typeof(System.Windows.Controls.Primitives.DataGridColumnHeader),column.HeaderStyle);header.Setters.Add(new Setter(FlowDirectionProperty,FlowDirection.LeftToRight));header.Setters.Add(new Setter(Control.HorizontalContentAlignmentProperty,HorizontalAlignment.Right));
+            column.ElementStyle=cell;column.HeaderStyle=header;column.SortMemberPath=table.Columns[i].ColumnName+"_numeric";
+        }
+    }
+    void ForwardWheel(DataGrid grid)
+    {
+        grid.PreviewMouseWheel+=(s,e)=>
+        {
+            var inner=Descendants<ScrollViewer>(grid).FirstOrDefault();bool top=inner==null||inner.VerticalOffset<=0,bottom=inner==null||inner.VerticalOffset>=inner.ScrollableHeight;
+            if((e.Delta>0&&!top)||(e.Delta<0&&!bottom)||VisualTreeHelper.GetParent(grid) is not UIElement parent)return;
+            e.Handled=true;parent.RaiseEvent(new System.Windows.Input.MouseWheelEventArgs(e.MouseDevice,e.Timestamp,e.Delta){RoutedEvent=UIElement.MouseWheelEvent,Source=grid});
+        };
+    }
+
+    // Widest single word of a column heading plus its padding and sort arrow, so a heading wraps between words and never inside one.
+    double HeaderWord(string label,double size)
+    {
+        var typeface=new Typeface(FontFamily,FontStyles.Normal,FontWeights.SemiBold,FontStretches.Normal);double dpi=VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        return label.Split([' ','·','/'],StringSplitOptions.RemoveEmptyEntries).Select(word=>new FormattedText(word,CultureInfo.CurrentUICulture,FlowDirection,typeface,size,Brushes.Black,dpi).Width).DefaultIfEmpty(0).Max()+32+16;
+    }
     DataGrid PageTable()=>workspaceTable??body.Children.OfType<DataGrid>().Single();
     FrameworkElement SearchActions(string label,TextBox search,params Button[] actions)
     {
@@ -75,7 +127,7 @@ public sealed partial class MainWindow
         void Refresh(){foreach(var action in actions)action.IsEnabled=table.SelectedItem!=null;}
         table.SelectionChanged+=(s,e)=>Refresh();Refresh();
     }
-    StackPanel Section(string title)=>new(){Children={Text(title,21,true)},Margin=new Thickness(0,0,0,8)};
+    StackPanel Section(string title)=>new(){Children={Text(title,22,true)},Margin=new Thickness(0,0,0,8)};
     Button MoreActions(IEnumerable<Button> commands)
     {
         var menu=new ContextMenu{Resources=Resources,FontSize=FontSize,FlowDirection=FlowDirection,Background=UiTheme.Brush(Resources,"Brush.Surface"),Foreground=ink};
