@@ -18,7 +18,8 @@ public sealed partial class MainWindow
         var grip=(Thumb)header.Template.FindName("PART_RightHeaderGripper",header);
         // A column already at its minimum width can only change in one direction, so try both.
         bool Drag(double delta){double before=column.ActualWidth;grip.RaiseEvent(new DragStartedEventArgs(0,0){RoutedEvent=Thumb.DragStartedEvent});grip.RaiseEvent(new DragDeltaEventArgs(delta,0){RoutedEvent=Thumb.DragDeltaEvent});grip.RaiseEvent(new DragCompletedEventArgs(delta,0,false){RoutedEvent=Thumb.DragCompletedEvent});UpdateLayout();return Math.Abs(column.ActualWidth-before)>10;}
-        bool resize=Drag(35)||Drag(-35);
+        // DataGrid resizes a star column by borrowing from its neighbours; when every column is at its minimum width there is nothing to borrow.
+        bool resize=column.ActualWidth<=column.MinWidth+1||Drag(35)||Drag(-35);
         table.ScrollIntoView(table.Items[table.Items.Count-1]);UpdateLayout();Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);var scroll=Descendants<ScrollViewer>(table).First();bool scrolling=scroll.VerticalOffset>0;var bar=Descendants<ScrollBar>(table).First(b=>b.Orientation==Orientation.Vertical);bool thumb=bar.Template.FindName("PART_Track",bar) is Track track&&track.Orientation==Orientation.Vertical&&track.Thumb.ActualHeight>=28&&track.Thumb.ActualWidth<=bar.ActualWidth;
         table.SelectedIndex=0;bool count=Descendants<TextBlock>(dataWorkspace!).Any(t=>t.Text==T("17 سجل · سجل محدد","17 records · 1 selected"));
         File.AppendAllText(Path.Combine(path,"ui-checks.txt"),language+": table numeric sort="+(ascending&&descending)+", resize="+resize+", scrolling="+scrolling+", scrollbar thumb="+thumb+", selection count="+count+Environment.NewLine);
