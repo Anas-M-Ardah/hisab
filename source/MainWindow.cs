@@ -92,7 +92,7 @@ public sealed partial class MainWindow : Window
                 style.Setters.Add(new Setter(TextBlock.ForegroundProperty,muted));var selected=new DataTrigger{Binding=new Binding(nameof(DataGridRow.IsSelected)){RelativeSource=new RelativeSource(RelativeSourceMode.FindAncestor,typeof(DataGridRow),1)},Value=true};selected.Setters.Add(new Setter(TextBlock.ForegroundProperty,UiTheme.Brush(Resources,"Brush.SelectionText")));style.Triggers.Add(selected);
             }
             if(c.Field=="state"||(c.Field=="type"&&table.Columns.Contains("incoming")))grid.Columns.Add(TableBadgeColumn(c.Field,c.Label,c.Width,header));
-            else grid.Columns.Add(new DataGridTextColumn{Header=c.Label,HeaderStyle=header,Binding=new Binding("["+c.Field+"]"),SortMemberPath=sort,ElementStyle=style,MinWidth=c.Field switch{"number"=>FontSize*8.5,"date"=>FontSize*6.5,"code"=>FontSize*5,"party"=>FontSize*8,"type"=>FontSize*6,"amount" or "balance" or "price" or "qty" or "incoming" or "outgoing" or "own" or "amount_text"=>FontSize*5,_=>0},Width=new DataGridLength(c.Width,DataGridLengthUnitType.Star)});
+            else grid.Columns.Add(new DataGridTextColumn{Header=c.Label,HeaderStyle=header,Binding=new Binding("["+c.Field+"]"),SortMemberPath=sort,ElementStyle=style,MinWidth=c.Field switch{"number"=>FontSize*8.5,"date"=>FontSize*6.5,"code"=>FontSize*5,"party"=>FontSize*8,"type"=>FontSize*6,"amount" or "balance" or "own" or "amount_text"=>FontSize*5,_=>0},Width=new DataGridLength(c.Width,DataGridLengthUnitType.Star)});
         }
         return grid;
     }
