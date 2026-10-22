@@ -110,6 +110,12 @@ public sealed partial class MainWindow
         };
     }
 
+    // Widest single word of a column heading plus its padding and sort arrow, so a heading wraps between words and never inside one.
+    double HeaderWord(string label,double size)
+    {
+        var typeface=new Typeface(FontFamily,FontStyles.Normal,FontWeights.SemiBold,FontStretches.Normal);double dpi=VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        return label.Split([' ','·','/'],StringSplitOptions.RemoveEmptyEntries).Select(word=>new FormattedText(word,CultureInfo.CurrentUICulture,FlowDirection,typeface,size,Brushes.Black,dpi).Width).DefaultIfEmpty(0).Max()+32+16;
+    }
     DataGrid PageTable()=>workspaceTable??body.Children.OfType<DataGrid>().Single();
     FrameworkElement SearchActions(string label,TextBox search,params Button[] actions)
     {

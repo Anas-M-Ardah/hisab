@@ -45,7 +45,7 @@ public sealed partial class MainWindow
         }
         var table=Grid(Rows(),("name",T("الحسابات","Accounts"),3), ("balance",T("مع الفروع · JOD","With children · JOD"),1));table.MaxHeight=double.PositiveInfinity;table.MinHeight=0;table.CanUserSortColumns=false;table.AllowDrop=organize;table.Tag=scope;
         table.Columns[1].Width=new DataGridLength(Math.Max(190,FontSize*10));table.Columns[1].MinWidth=Math.Max(190,FontSize*10);
-        table.ColumnHeaderHeight=Math.Max(44,FontSize*2.4);
+        table.ColumnHeaderHeight=double.NaN;
         var rowStyle=new Style(typeof(DataGridRow),(Style)FindResource(typeof(DataGridRow)));var selection=new Trigger{Property=DataGridRow.IsSelectedProperty,Value=true};selection.Setters.Add(new Setter(Control.BackgroundProperty,UiTheme.SelectionTint(Resources)));selection.Setters.Add(new Setter(Control.ForegroundProperty,ink));rowStyle.Triggers.Add(selection);table.RowStyle=rowStyle;
         var cellStyle=new Style(typeof(DataGridCell),(Style)FindResource(typeof(DataGridCell)));var selectedCell=new Trigger{Property=DataGridCell.IsSelectedProperty,Value=true};selectedCell.Setters.Add(new Setter(Control.ForegroundProperty,ink));cellStyle.Triggers.Add(selectedCell);table.CellStyle=cellStyle;
         var detail=new StackPanel();var editorActions=new StackPanel();var hint=Text("",16);hint.FontSize=Math.Max(12,FontSize*.8);hint.Foreground=muted;hint.Margin=new(0);var undo=Btn(T("تراجع","Undo"),()=>{});undo.IsEnabled=editable&&lastAccountChange!=null;undo.Margin=new(12,0,0,0);
