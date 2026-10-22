@@ -22,7 +22,7 @@
     <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
       <Grid x:Name="root">
         <Border x:Name="chrome" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8"/>
-        <Border x:Name="tint" Background="{DynamicResource Brush.Text}" CornerRadius="8" Opacity="0" IsHitTestVisible="False"/>
+        <Border x:Name="tint" Background="{TemplateBinding Foreground}" CornerRadius="8" Opacity="0" IsHitTestVisible="False"/>
         <ContentPresenter Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"/>
       </Grid>
       <ControlTemplate.Triggers>
