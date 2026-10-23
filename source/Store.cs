@@ -115,11 +115,22 @@ public sealed partial class Store : IDisposable
         } else Exec("INSERT INTO accounts(code,name,kind,parent_id) VALUES(@p0,@p1,@p2,@p3)",code.Trim(),name.Trim(),kind,parentId);
         Audit("account",name); tx.Commit();
     }
+    // Next automatic item code: one more than the highest ITM-nnn already used.
+    public string NextItemCode()
+    {
+        long highest=0;
+        foreach(System.Data.DataRow row in Table("SELECT code FROM items").Rows) {
+            var code=(string)row["code"];
+            if(code.StartsWith("ITM-",StringComparison.OrdinalIgnoreCase)&&long.TryParse(code.AsSpan(4),System.Globalization.NumberStyles.None,System.Globalization.CultureInfo.InvariantCulture,out long number)) highest=Math.Max(highest,number);
+        }
+        return "ITM-"+(highest+1).ToString("D3");
+    }
     public void SaveItem(long? id,string code,string name,bool stock,decimal price)
     {
         Require("master");
-        if(string.IsNullOrWhiteSpace(name)||string.IsNullOrWhiteSpace(code)||price<0) throw new InvalidOperationException("أكمل الاسم والكود والسعر / Complete name, code and price");
+        if(string.IsNullOrWhiteSpace(name)||price<0) throw new InvalidOperationException("أكمل اسم الصنف / Complete the item name");
         using var tx=BeginTransaction();
+        if(string.IsNullOrWhiteSpace(code)) code=NextItemCode();
         if(id!=null) {
             var item=Items().Single(x=>x.Id==id);
             if(item.Stock!=stock && Convert.ToInt64(Scalar("SELECT count(*) FROM invoice_lines WHERE item=@p0",id))>0) throw new InvalidOperationException("لا يمكن تغيير نوع صنف مستخدم / Used item type cannot change");

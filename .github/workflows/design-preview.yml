@@ -4,7 +4,7 @@ name: Design preview and checks
 on:
   workflow_dispatch:
   push:
-    branches: [design-polish, design-baseline]
+    branches: [design-polish, design-baseline, items-and-accounts]
     paths: ['source/**', '.github/workflows/design-preview.yml']
 permissions:
   contents: write

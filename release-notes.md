@@ -1,18 +1,17 @@
-# حساب 0.5.1 — تحسينات التصميم والجداول
+# حساب 0.5.2 — الأصناف التلقائية وشجرة حسابات أوضح
 
-- أزرار بتأثير واضح عند التمرير والضغط، بما فيها القائمة الجانبية.
-- جداول بأعمدة لا تضيق عن أطول كلمة في عنوانها، فلا تُقطع العناوين مثل «مع الفروع» ولا تتكسر الكلمات.
-- جداول الأصناف والفواتير تحتفظ بارتفاع مناسب في النوافذ القصيرة، وتصبح الصفحة قابلة للتمرير بدل إخفاء الجدول.
-- أرقام وتواريخ الجداول وتقارير الميزان محاذاة ومرتبة كأرقام، وجداول سطور الفواتير والقيود والشيكات تتبع حجم الخط المحفوظ.
-- الحساب المحدد في شجرة الحسابات يختلف لونه عن لون التمرير.
-- أيقونة خاصة للإعدادات، وعناوين أقسام موحدة الحجم والمسافات، وشاشة ترحيب أوضح.
-- البحث في المستندات يعامل الرمزين % و _ كحروف عادية، ويُنبَّه المستخدم عند عرض آخر ٥٠٠ مستند فقط.
-- إصلاح إعادة حجم الخط إلى ٢٠ عند أول تشغيل إذا كان محفوظًا بحجم مختلف عن الخيارات الخمسة.
+- حذف سعر البيع من الأصناف والمخزون؛ يكتب المستخدم السعر في كل فاتورة، وتبقى الأسعار القديمة المحفوظة كما هي.
+- ترقيم الأصناف الجديدة تلقائيًا (ITM-001، ITM-002 …) مع إمكانية تغيير الكود.
+- دليل الحسابات مقسّم حسب النوع (صندوق وبنك، عملاء، موردون، أصول، التزامات، حقوق ملكية، إيرادات، مصروفات) مع عدد الحسابات والإجمالي لكل نوع.
+- مستويات أوضح: إزاحة أكبر وخط إرشاد، وسهم للحساب الرئيسي ونقطة للحساب الفرعي، وعمود للكود وآخر للحركات المباشرة والرصيد مع الفروع.
+- تفاصيل الحساب تعرض حركاته المباشرة وكل حساب فرعي ومجموعها.
+- دمج شاشة «ترتيب الحسابات» في الدليل: سحب وإفلات على الحساب الرئيسي أو على عنوان النوع، مع التراجع.
+- أزرار «+ حساب» و«+ حساب فرعي»، ونافذة إضافة تسأل: الاسم، النوع، «أين يوضع الحساب؟»، ونافذة «نقل إلى…» بنفس الاختيار.
 
 ## English
 
-Buttons and the sidebar show clear hover and pressed states. Table columns never get narrower than the widest word of their heading, so headings such as "With children" are no longer clipped and words no longer break apart. Items and Documents tables keep a usable height on short windows and the page scrolls instead of hiding the table. Figures and dates align and sort as numbers, including trial-balance reports, and line-item tables in invoices, journals and cheques follow the saved text size. The selected account row is distinct from hover, Settings has its own icon, section headings share one size and spacing, and the Welcome screen has a single headline.
+Sale price is removed from items and stock; the price is typed on each invoice and stored prices on existing items are untouched. New items are numbered automatically (ITM-001, ITM-002, …) and the code can still be changed.
 
-Document search treats % and _ literally and says when only the latest 500 documents are shown. A saved text size outside the five Welcome presets is no longer reset to 20 on first run.
+The account list is grouped by type with counts and totals, with clearer levels (wider indent, guide line, parent chevrons, leaf dots) and columns for code, own postings and balance including sub-accounts. The details panel shows own postings plus each sub-account adding up to the total. The Organize screen is merged into the list, with drag and drop onto a parent or a type heading, plus Undo. New "+ Account" and "+ Sub-account" buttons, an add dialog that asks name, type and "Where does it go?", and a "Move to…" dialog.
 
 The release pipeline still requires 171 accounting/storage checks on x64 and x86 before publishing.
