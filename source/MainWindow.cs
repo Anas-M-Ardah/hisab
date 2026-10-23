@@ -195,9 +195,18 @@ public sealed partial class MainWindow : Window
     void AccountsPage()=>HierarchyAccountsPage();
     void AccountForm(Account? a,long? defaultParent=null,string returnRoute="accounts")
     {
-        var (w,p,finish)=Dialog(T(a==null?"حساب جديد":"تعديل الحساب",a==null?"New account":"Edit account"),700);var code=Input(a?.Code??"");var name=Input(a?.Name??"");var kinds=new[]{"Unclassified","Customer","Supplier","Cash","Asset","Liability","Equity","Income","Expense"};var type=new ComboBox{ItemsSource=kinds.Select(k=>new Choice(k,AccountKind(k))).ToList(),DisplayMemberPath="Label",SelectedValuePath="Key",SelectedValue=a?.Kind??(defaultParent==null?"Unclassified":S.Accounts().Single(x=>x.Id==defaultParent).Kind)};
-        var parent=new ComboBox{DisplayMemberPath="Label",SelectedValuePath="Id"};var excluded=a==null?new List<long>():S.AccountFamily(a.Id);void Parents(){parent.ItemsSource=new[]{new PositionChoice(null,T("حساب رئيسي — بدون أب","Top level — no parent"))}.Concat(UiAccounts().Where(x=>!excluded.Contains(x.Id)&&x.Kind==type.SelectedValue?.ToString()).Select(x=>new PositionChoice(x.Id,x.ToString()))).ToList();parent.SelectedValue=a?.ParentId??defaultParent;if(parent.SelectedIndex<0)parent.SelectedIndex=0;}type.SelectionChanged+=(s,e)=>Parents();Parents();
-        p.Children.Add(Field(T("كود الحساب","Account code"),code));p.Children.Add(Field(T("اسم الحساب","Account name"),name));p.Children.Add(Field(T("نوع الحساب","Account type"),type));p.Children.Add(Field(T("الحساب الرئيسي (اختياري)","Parent account (optional)"),parent));p.Children.Add(Text(T("مثال: المصروفات ← المياه، المواصلات. يجب أن يكون الأب والفروع من نفس النوع.","Example: Expenses → Water, Transportation. Parent and children must share the same type."),18));p.Children.Add(Btn(T("حفظ الحساب","Save account"),()=>{S.SaveAccount(a?.Id,code.Text,name.Text,type.SelectedValue?.ToString()??"Unclassified",(parent.SelectedItem as PositionChoice)?.Id);finish();Navigate(returnRoute);},true));w.ShowDialog();
+        var all=UiAccounts();var byId=all.ToDictionary(x=>x.Id);
+        string Path(long id){var names=new List<string>();for(long? next=id;next!=null&&byId.ContainsKey(next.Value);next=byId[next.Value].ParentId)names.Add(byId[next.Value].Name);names.Reverse();return string.Join(" / ",names);}
+        var under=defaultParent==null?null:byId.GetValueOrDefault(defaultParent.Value);
+        var (w,p,finish)=Dialog(a!=null?T("تعديل الحساب","Edit account"):under!=null?T("حساب فرعي جديد","New sub-account"):T("حساب جديد","New account"),700);
+        var name=Input(a?.Name??"");var code=Input(a?.Code??"");var kinds=new[]{"Unclassified","Customer","Supplier","Cash","Asset","Liability","Equity","Income","Expense"};
+        var type=new ComboBox{ItemsSource=kinds.Select(k=>new Choice(k,AccountKind(k))).ToList(),DisplayMemberPath="Label",SelectedValuePath="Key",SelectedValue=a?.Kind??under?.Kind??"Unclassified",IsEnabled=under==null||a!=null};
+        var parent=new ComboBox{DisplayMemberPath="Label",SelectedValuePath="Id"};var excluded=a==null?new List<long>():S.AccountFamily(a.Id);
+        void Parents(){string kind=type.SelectedValue?.ToString()??"Unclassified";parent.ItemsSource=new[]{new PositionChoice(null,T("المستوى الرئيسي","Top level")+" — "+AccountKind(kind))}.Concat(all.Where(x=>!excluded.Contains(x.Id)&&x.Kind==kind).Select(x=>new PositionChoice(x.Id,Path(x.Id)))).ToList();parent.SelectedValue=a?.ParentId??defaultParent;if(parent.SelectedIndex<0)parent.SelectedIndex=0;}
+        type.SelectionChanged+=(s,e)=>Parents();Parents();
+        p.Children.Add(Field(T("اسم الحساب","Account name"),name));p.Children.Add(Field(T("نوع الحساب","Account type"),type));p.Children.Add(Field(T("أين يوضع الحساب؟","Where does it go?"),parent));p.Children.Add(Field(T("كود الحساب","Account code"),code));
+        p.Children.Add(Text(T("مثال: المصروفات ← المياه، المواصلات. يجب أن يكون الأب والفروع من نفس النوع.","Example: Expenses → Water, Transportation. Parent and children must share the same type."),18));
+        p.Children.Add(Btn(T("حفظ الحساب","Save account"),()=>{S.SaveAccount(a?.Id,code.Text,name.Text,type.SelectedValue?.ToString()??"Unclassified",(parent.SelectedItem as PositionChoice)?.Id);finish();Navigate(returnRoute);},true));w.ShowDialog();
     }
     public record Choice(string Key,string Label);
     void ItemsPage()
