@@ -1,0 +1,8 @@
+ar: main-account filter=True, reset=True, child report=True
+ar: workflow save visible=True, table headers fit=True, font=20
+ar: workflow save visible=True, table headers fit=True, font=20
+en: main-account filter=True, reset=True, child report=True
+en: workflow save visible=True, table headers fit=True, font=20
+en: workflow save visible=True, table headers fit=True, font=20
+en: workflow save visible=True, table headers fit=True, font=24
+en: workflow save visible=True, table headers fit=True, font=24
