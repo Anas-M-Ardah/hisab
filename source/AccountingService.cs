@@ -79,6 +79,7 @@ public sealed partial class AccountingService(Store store)
                 goods+=lt.Net; if(sale) cost+=lineCost;
             } else services+=lt.Net;
             Exec("INSERT INTO invoice_lines(doc,item,description,qty,price,discount,net,tax,cost) VALUES(@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8)",id,item.Id,l.Description,q,M(l.Price),M(l.Discount),lt.Net,lt.Tax,lineCost);
+            long lineId=Convert.ToInt64(Scalar("SELECT last_insert_rowid()"));Exec("UPDATE invoice_lines SET location=@p0 WHERE id=@p1",l.Location,lineId);if(item.Stock)RecordSerials(id,lineId,item.Id,l.Location,q,l.Serials,sale?-1:1,!sale);
         }
         List<EntryLine> jl=[];
         if(sale) {
@@ -89,16 +90,17 @@ public sealed partial class AccountingService(Store store)
         }
         Journal(id,jl);SnapshotBranding(id);RebuildInventory("invoice "+id);tx.Commit(); return id;
     }
-    public long OpeningStock(long itemId,DateTime date,decimal quantity,decimal unitCost)
+    public long OpeningStock(long itemId,DateTime date,decimal quantity,decimal unitCost,long location=1,string serials="")
     {
         long q=M(quantity),v=M(quantity*unitCost); var item=Items().Single(x=>x.Id==itemId);
         if(!item.Stock||q<=0||v<=0||D(q)!=quantity||D(M(unitCost))!=unitCost||Convert.ToInt64(Scalar("SELECT count(*) FROM stock_moves WHERE item=@p0",itemId))>0) throw new InvalidOperationException("رصيد افتتاحي لصنف مخزني بدون حركات سابقة، بكمية وتكلفة موجبتين / Opening stock requires unused stock item and positive quantity/cost");
         using var tx=store.BeginTransaction(); long id=NewDoc("OB",date,null,null,item.Name,new(v,0,v));
-        Exec("UPDATE items SET qty=@p0,value=@p1 WHERE id=@p2",q,v,itemId); Exec("INSERT INTO stock_moves(doc,item,qty,value) VALUES(@p0,@p1,@p2,@p3)",id,itemId,q,v);
+        Exec("UPDATE items SET qty=@p0,value=@p1 WHERE id=@p2",q,v,itemId); Exec("INSERT INTO stock_moves(doc,item,qty,value) VALUES(@p0,@p1,@p2,@p3)",id,itemId,q,v);Exec("UPDATE stock_moves SET location=@p0 WHERE doc=@p1",location,id);RecordSerials(id,null,itemId,location,q,serials,1,true);
         Journal(id,[new(AccountId("1301"),v,0),new(AccountId("3201"),0,v)]);RebuildInventory("opening stock "+id);tx.Commit();return id;
     }
     public long Reverse(long id,string reason,DateTime? reversalDate=null,bool managed=false)
     {
+        CheckInventoryReversal(id);CheckPurchasingReversal(id);
         if(string.IsNullOrWhiteSpace(reason)) throw new InvalidOperationException("اكتب سبب الإلغاء / Enter a cancellation reason");
         using var tx=store.BeginTransaction();var effectiveDate=reversalDate??DateTime.Today; var doc=Table("SELECT * FROM documents WHERE id=@p0",id).Rows[0];
         if((long)doc["reversed"]==1||doc["kind"].ToString()=="RV") throw new InvalidOperationException("المستند ملغى بالفعل / Document already cancelled");
@@ -109,7 +111,8 @@ public sealed partial class AccountingService(Store store)
         EnsureOpen(DateTime.Parse((string)doc["date"]));
         long reversal=NewDoc("RV",effectiveDate,null,null,reason,new((long)doc["total"],0,(long)doc["total"]));
         Exec("UPDATE documents SET original=@p0 WHERE id=@p1",id,reversal);
-        var original=Table("SELECT * FROM entries WHERE doc=@p0",id).Rows.Cast<DataRow>().Select(r=>new EntryLine((long)r["account"],(long)r["credit"],(long)r["debit"],(string)r["description"])); Journal(reversal,original);
+        Exec("UPDATE stock_counts SET state='Reversed' WHERE posted_doc=@p0",id);
+        var original=Table("SELECT * FROM entries WHERE doc=@p0",id).Rows.Cast<DataRow>().Select(r=>new EntryLine((long)r["account"],(long)r["credit"],(long)r["debit"],(string)r["description"])); if(original.Any())Journal(reversal,original);
         Exec("UPDATE documents SET reversed=1,reversal_date=@p0 WHERE id=@p1",effectiveDate.ToString("yyyy-MM-dd"),id);Exec("UPDATE allocations SET revoked=@p0 WHERE (invoice=@p1 OR voucher=@p1) AND revoked IS NULL",effectiveDate.ToString("yyyy-MM-dd"),id);foreach(DataRow m in moves.Rows)Exec("INSERT INTO stock_moves(doc,item,qty,value) VALUES(@p0,@p1,@p2,@p3)",reversal,m["item"],-(long)m["qty"],-(long)m["value"]);RebuildInventory("reverse "+id);Audit("reverse",$"{doc["number"]}: {reason}");tx.Commit();return reversal;
     }
 }

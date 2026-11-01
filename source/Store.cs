@@ -12,12 +12,12 @@ public record Account(long Id, string Code, string Name, string Kind, bool Syste
 public record Item(long Id, string Code, string Name, bool Stock, long Price, long Qty, long Value)
 { public override string ToString() => $"{Name} · {Code}"; }
 public record EntryLine(long Account, long Debit, long Credit, string Description="");
-public record InvoiceLine(long Item, string Description, decimal Qty, decimal Price, decimal Discount);
+public record InvoiceLine(long Item, string Description, decimal Qty, decimal Price, decimal Discount,long Location=1,string Serials="");
 public record Totals(long Net, long Tax, long Total);
 
 public sealed partial class Store : IDisposable
 {
-    public const int SchemaVersion = 3;
+    public const int SchemaVersion = 4;
     public string Path { get; }
     public SqliteConnection Db { get; }
     internal long CommandCount { get; private set; }
@@ -133,7 +133,7 @@ public sealed partial class Store : IDisposable
         if(string.IsNullOrWhiteSpace(code)) code=NextItemCode();
         if(id!=null) {
             var item=Items().Single(x=>x.Id==id);
-            if(item.Stock!=stock && Convert.ToInt64(Scalar("SELECT count(*) FROM invoice_lines WHERE item=@p0",id))>0) throw new InvalidOperationException("لا يمكن تغيير نوع صنف مستخدم / Used item type cannot change");
+            if(item.Stock!=stock && (IsSerialized(id.Value) || Convert.ToInt64(Scalar("SELECT (SELECT count(*) FROM invoice_lines WHERE item=@p0)+(SELECT count(*) FROM stock_moves WHERE item=@p0)+(SELECT count(*) FROM purchase_order_lines WHERE item=@p0)+(SELECT count(*) FROM stock_count_lines WHERE item=@p0)",id))>0)) throw new InvalidOperationException("لا يمكن تغيير نوع صنف مستخدم / Used item type cannot change");
             Exec("UPDATE items SET code=@p0,name=@p1,stock=@p2,price=@p3 WHERE id=@p4",code.Trim(),name.Trim(),stock?1:0,M(price),id);
         } else Exec("INSERT INTO items(code,name,stock,price) VALUES(@p0,@p1,@p2,@p3)",code.Trim(),name.Trim(),stock?1:0,M(price));
         Audit("item",name); tx.Commit();
@@ -162,3 +162,4 @@ public sealed partial class Store : IDisposable
     }
     public void Dispose(){Db.Dispose();}
 }
+

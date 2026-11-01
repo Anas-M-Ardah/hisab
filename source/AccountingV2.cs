@@ -4,7 +4,7 @@ using System.Text.Json;
 using static Hisab.Store;
 
 namespace Hisab;
-public record ReturnLine(long SourceLine,decimal Quantity);
+public record ReturnLine(long SourceLine,decimal Quantity,string Serials="");
 public record InvoicePosition(long Invoice,string Number,string Party,string Kind,string Date,string Due,long Total,long Paid,long Returned,long Outstanding);
 public sealed partial class AccountingService
 {
@@ -57,7 +57,8 @@ public sealed partial class AccountingService
     {
         if(requested.Count==0||string.IsNullOrWhiteSpace(reason)||requested.Select(r=>r.SourceLine).Distinct().Count()!=requested.Count)throw new InvalidOperationException("حدد الكميات وسبب المرتجع / Select return quantities and reason");
         using var tx=store.BeginTransaction();var source=Table("SELECT * FROM documents WHERE id=@p0",original).Rows[0];string sourceKind=(string)source["kind"];
-        if(sourceKind is not("SI" or "PI")||(long)source["reversed"]==1||date.Date<DateTime.Parse((string)source["date"]))throw new InvalidOperationException("الفاتورة أو تاريخ المرتجع غير صالح / Invalid invoice or return date");
+        if(sourceKind is not("SI" or "PI" or "GR")||(long)source["reversed"]==1||date.Date<DateTime.Parse((string)source["date"]))throw new InvalidOperationException("الفاتورة أو تاريخ المرتجع غير صالح / Invalid invoice or return date");
+        if(sourceKind=="GR"&&Table("SELECT l.id FROM invoice_lines l JOIN receipt_bills b ON b.receipt_line=l.id JOIN invoice_lines bl ON bl.id=b.line JOIN documents bd ON bd.id=bl.doc WHERE l.doc=@p0 AND bd.reversed=0",original).Rows.Count>0)InventoryError("Return billed goods through the supplier invoice; reverse invoices before returning unbilled goods");
         long net=0,tax=0;var calculated=new List<(DataRow Line,long Qty,long Net,long Tax,long Discount)>();
         foreach(var request in requested){var line=Table("SELECT * FROM invoice_lines WHERE id=@p0 AND doc=@p1",request.SourceLine,original);if(line.Rows.Count==0)throw new InvalidOperationException("Invalid source line");var l=line.Rows[0];long q=M(request.Quantity);
             var old=Table("SELECT coalesce(sum(l.qty),0) qty,coalesce(sum(l.net),0) net,coalesce(sum(l.tax),0) tax,coalesce(sum(l.discount),0) discount FROM invoice_lines l JOIN documents d ON d.id=l.doc WHERE l.source_line=@p0 AND d.reversed=0",request.SourceLine).Rows[0];
@@ -65,9 +66,9 @@ public sealed partial class AccountingService
             long Portion(string field)=>q==remaining?(long)l[field]-Convert.ToInt64(old[field]):M(D((long)l[field])*q/(long)l["qty"]);
             long n=Portion("net"),t=Portion("tax");net+=n;tax+=t;calculated.Add((l,q,n,t,Portion("discount")));
         }
-        long id=NewDoc(sourceKind=="SI"?"SR":"PR",date,(long)source["party"],null,reason,new(net,tax,net+tax),0,decimal.Parse((string)source["vat"],CultureInfo.InvariantCulture),(long)source["inclusive"]==1);
+        long id=NewDoc(sourceKind=="SI"?"SR":sourceKind=="GR"?"GU":"PR",date,(long)source["party"],null,reason,new(net,tax,net+tax),0,decimal.Parse((string)source["vat"],CultureInfo.InvariantCulture),(long)source["inclusive"]==1);
         Exec("UPDATE documents SET original=@p0,branding=@p1,logo=@p2,seal=@p3 WHERE id=@p4",original,source["branding"],source["logo"],source["seal"],id);
-        foreach(var l in calculated)Exec("INSERT INTO invoice_lines(doc,item,description,qty,price,discount,net,tax,cost,source_line) VALUES(@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,0,@p8)",id,l.Line["item"],l.Line["description"],l.Qty,l.Line["price"],l.Discount,l.Net,l.Tax,l.Line["id"]);
+        foreach(var l in calculated){Exec("INSERT INTO invoice_lines(doc,item,description,qty,price,discount,net,tax,cost,source_line) VALUES(@p0,@p1,@p2,@p3,@p4,@p5,@p6,@p7,0,@p8)",id,l.Line["item"],l.Line["description"],l.Qty,l.Line["price"],l.Discount,l.Net,l.Tax,l.Line["id"]);long lineId=Convert.ToInt64(Scalar("SELECT last_insert_rowid()"));Exec("UPDATE invoice_lines SET location=@p0 WHERE id=@p1",l.Line["location"],lineId);if(Items().Single(i=>i.Id==(long)l.Line["item"]).Stock)RecordSerials(id,lineId,(long)l.Line["item"],(long)l.Line["location"],l.Qty,requested.Single(r=>r.SourceLine==(long)l.Line["id"]).Serials,sourceKind=="SI"?1:-1,false,Convert.ToInt64(Scalar("SELECT receipt_line FROM receipt_bills WHERE line=@p0",l.Line["id"])??l.Line["id"]));}
         RebuildInventory("return "+id);Audit("return",source["number"]+" → "+id);tx.Commit();return id;
     }
     sealed class StockState {public long Qty;public long Value;public decimal LastCost;}
@@ -75,26 +76,28 @@ public sealed partial class AccountingService
     {
         if(deferredRebuild>0)return;
         var states=Items().Where(i=>i.Stock).ToDictionary(i=>i.Id,i=>new StockState());
-        var docs=Table("SELECT * FROM documents WHERE kind IN ('SI','PI','SR','PR','OB','VA','OT') AND reversed=0 ORDER BY date,id");
-        foreach(DataRow doc in docs.Rows){long id=(long)doc["id"];string kind=(string)doc["kind"];long goods=0,services=0,cost=0,variance=0,oldCost=Convert.ToInt64(Scalar("SELECT coalesce(sum(cost),0) FROM invoice_lines WHERE doc=@p0",id));
+        var docs=Table("SELECT * FROM documents WHERE kind IN ('SI','PI','SR','PR','OB','VA','OT','IA','GR','GU') AND reversed=0 ORDER BY date,id");
+        foreach(DataRow doc in docs.Rows){long id=(long)doc["id"];string kind=(string)doc["kind"];long goods=0,services=0,cost=0,variance=0,extra=0,oldCost=Convert.ToInt64(Scalar("SELECT coalesce(sum(cost),0) FROM invoice_lines WHERE doc=@p0",id));
+            if(kind=="PI"&&IsReceiptBill(id)){ReplayReceiptBill(doc);continue;}
+            if(kind=="IA"){ReplayCount(doc,states);continue;}
             if(kind is "OB" or "VA" or "OT"){
                 foreach(DataRow move in Table("SELECT * FROM stock_moves WHERE doc=@p0",id).Rows){var st=states[(long)move["item"]];if(kind=="OT"&&st.Qty<0)throw new InvalidOperationException("سوّ الكمية السالبة قبل تحويل الطلبية / Resolve negative stock before transferring an order");st.Qty+=(long)move["qty"];st.Value+=(long)move["value"];if(st.Qty>0)st.LastCost=D(st.Value)*1000/st.Qty;}continue;
             }
             Exec("DELETE FROM stock_moves WHERE doc=@p0",id);
             foreach(DataRow line in Table("SELECT * FROM invoice_lines WHERE doc=@p0 ORDER BY id",id).Rows){long item=(long)line["item"],q=(long)line["qty"],n=(long)line["net"],lc=0;bool stock=states.TryGetValue(item,out var st);
                 if(stock){
-                    bool incoming=kind is "PI" or "SR";
+                    bool incoming=kind is "PI" or "GR" or "SR";
                     if(incoming){
-                        if(kind=="PI")lc=n;else{var source=Table("SELECT qty,cost FROM invoice_lines WHERE id=@p0",line["source_line"]).Rows[0];lc=M(D((long)source["cost"])*q/(long)source["qty"]);}
+                        if(kind is "PI" or "GR"){long added=ReceiptExtra((long)line["id"]);lc=n+added;extra+=added;}else{var source=Table("SELECT qty,cost FROM invoice_lines WHERE id=@p0",line["source_line"]).Rows[0];lc=M(D((long)source["cost"])*q/(long)source["qty"]);}
                         long beforeQty=st!.Qty,beforeValue=st.Value;st.Qty+=q;st.Value+=lc;
                         if(beforeQty<0){long cover=Math.Min(q,-beforeQty);long provisional=cover==-beforeQty?-beforeValue:M(D(-beforeValue)*cover/-beforeQty);long actual=M(D(lc)*cover/q);long adjustment=actual-provisional;st.Value-=adjustment;variance+=adjustment;}
                         if(st.Qty>0)st.LastCost=D(st.Value)*1000/st.Qty;else if(st.Qty==0){variance+=st.Value;st.Value=0;}
-                        Exec("INSERT INTO stock_moves(doc,item,qty,value) VALUES(@p0,@p1,@p2,@p3)",id,item,q,st.Value-beforeValue);
+                        Exec("INSERT INTO stock_moves(doc,item,qty,value,location) VALUES(@p0,@p1,@p2,@p3,@p4)",id,item,q,st.Value-beforeValue,line["location"]);
                     }else{
                         decimal average=st!.Qty>0?D(st.Value)*1000/st.Qty:st.LastCost;
                         lc=q==st.Qty&&st.Qty>0?st.Value:M(average*D(q));long before=st.Value;st.Qty-=q;st.Value-=lc;
                         if(st.Qty<0&&store.Setting("allow_negative","0")!="1")throw new InvalidOperationException("الكمية غير كافية في التسلسل التاريخي / Insufficient stock in date order: "+Items().Single(i=>i.Id==item).Name);
-                        Exec("INSERT INTO stock_moves(doc,item,qty,value) VALUES(@p0,@p1,@p2,@p3)",id,item,-q,st.Value-before);
+                        Exec("INSERT INTO stock_moves(doc,item,qty,value,location) VALUES(@p0,@p1,@p2,@p3,@p4)",id,item,-q,st.Value-before,line["location"]);
                     }
                     goods+=n;cost+=lc;
                 }else services+=n;
@@ -103,16 +106,20 @@ public sealed partial class AccountingService
             Exec("DELETE FROM entries WHERE doc=@p0",id);long total=(long)doc["total"],tax=(long)doc["tax"],net=(long)doc["net"],paid=(long)doc["paid"],party=(long)doc["party"];var jl=new List<EntryLine>();
             void Signed(long account,long debit){if(debit>0)jl.Add(new(account,debit,0));else if(debit<0)jl.Add(new(account,0,-debit));}
             if(kind=="SI"){Signed(party,total-paid);if(paid>0)Signed((long)doc["cash"],paid);Signed(AccountId("4101"),-net);Signed(AccountId("2102"),-tax);Signed(AccountId("5104"),cost);Signed(AccountId("1301"),-cost);}
-            if(kind=="PI"){Signed(AccountId("1301"),goods-variance);Signed(AccountId("5104"),variance);Signed(AccountId("5101"),services);Signed(AccountId("1401"),tax);Signed(party,-(total-paid));if(paid>0)Signed((long)doc["cash"],-paid);}
+            if(kind=="PI"){Signed(AccountId("1301"),goods+extra-variance);Signed(AccountId("2196"),-extra);Signed(AccountId("5104"),variance);Signed(AccountId("5101"),services);Signed(AccountId("1401"),tax);Signed(party,-(total-paid));if(paid>0)Signed((long)doc["cash"],-paid);}
+            if(kind=="GR"){Signed(AccountId("1301"),goods+extra-variance);Signed(AccountId("2195"),-goods);Signed(AccountId("2196"),-extra);Signed(AccountId("5104"),variance);}
+            if(kind=="GU"){Signed(AccountId("2195"),net);Signed(AccountId("1301"),-cost);Signed(AccountId("5104"),cost-net);}
             if(kind=="SR"){Signed(party,-total);Signed(AccountId("4101"),net);Signed(AccountId("2102"),tax);Signed(AccountId("1301"),cost-variance);Signed(AccountId("5104"),-cost+variance);}
             if(kind=="PR"){Signed(party,total);Signed(AccountId("1401"),-tax);Signed(AccountId("1301"),-cost);Signed(AccountId("5101"),-services);Signed(AccountId("5104"),cost-goods);}
             if(jl.Any())Journal(id,jl);
             if(oldCost!=cost)Exec("INSERT INTO cost_history(doc,old_cost,new_cost,reason) VALUES(@p0,@p1,@p2,@p3)",id,oldCost,cost,reason);
         }
         foreach(var state in states)Exec("UPDATE items SET qty=@p0,value=@p1,last_cost=@p2 WHERE id=@p3",state.Value.Qty,state.Value.Value,M(state.Value.LastCost),state.Key);
+        ValidateInventory();RefreshPurchaseOrders();
     }
     public long AmendInvoice(long original,bool sale,DateTime date,long party,long? cash,decimal paid,decimal vat,bool inclusive,string note,List<InvoiceLine> lines,string reason)
     {
+        if(IsReceiptBill(original))InventoryError("Reverse and rebill linked goods receipts instead of editing this invoice");
         if(string.IsNullOrWhiteSpace(reason))throw new InvalidOperationException("سبب التعديل مطلوب / Amendment reason required");
         using var tx=store.BeginTransaction();var d=Table("SELECT * FROM documents WHERE id=@p0",original).Rows[0];if(d["kind"].ToString()!=(sale?"SI":"PI")||(long)d["reversed"]==1)throw new InvalidOperationException("Invalid invoice for amendment");
         if(Convert.ToInt64(Scalar("SELECT count(*) FROM documents WHERE original=@p0 AND kind IN ('SR','PR') AND reversed=0",original))>0)throw new InvalidOperationException("ألغِ المرتجعات المرتبطة قبل تعديل الفاتورة / Cancel linked returns before amending this invoice");
@@ -178,4 +185,5 @@ public sealed partial class AccountingService
         """,from.ToString("yyyy-MM-dd"),to.ToString("yyyy-MM-dd"));
     }
 }
+
 
