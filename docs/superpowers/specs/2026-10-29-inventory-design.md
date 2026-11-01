@@ -1,7 +1,7 @@
 # Hisab: inventory-first design
 
 Date: 2026-10-29
-Status: proposed design for user approval; no product changes made.
+Status: approved in conversation; implemented in version 0.6.0.
 
 ## Intent and agreed scope
 

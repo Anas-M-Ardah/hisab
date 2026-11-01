@@ -6,6 +6,11 @@ public sealed partial class Store
 {
     void UpgradeInventory()
     {
+        if(transactions!=0)throw new InvalidOperationException("Inventory migration requires an independent transaction");
+        bool foreignKeys=Convert.ToInt64(Scalar("PRAGMA foreign_keys"))==1;
+        Exec("PRAGMA foreign_keys=OFF");
+        try {
+        using var migration=BeginTransaction();
         void Column(string table,string name,string type){if(!Table("PRAGMA table_info("+table+")").Rows.Cast<DataRow>().Any(r=>r["name"].ToString()==name))Exec($"ALTER TABLE {table} ADD COLUMN {name} {type}");}
         Exec("CREATE TABLE IF NOT EXISTS locations(id INTEGER PRIMARY KEY,name TEXT NOT NULL UNIQUE COLLATE NOCASE,active INTEGER NOT NULL DEFAULT 1); INSERT OR IGNORE INTO locations(id,name) VALUES(1,'المخزون الرئيسي / Main stock');");
         Column("items","barcode","TEXT NOT NULL DEFAULT ''");Column("items","serialized","INTEGER NOT NULL DEFAULT 0");Column("items","serial_start","INTEGER NOT NULL DEFAULT 0");
@@ -23,13 +28,19 @@ public sealed partial class Store
         CREATE TABLE IF NOT EXISTS receipt_links(line INTEGER PRIMARY KEY REFERENCES invoice_lines(id),order_line INTEGER NOT NULL REFERENCES purchase_order_lines(id));
         CREATE TABLE IF NOT EXISTS receipt_bills(line INTEGER PRIMARY KEY REFERENCES invoice_lines(id),receipt_line INTEGER NOT NULL REFERENCES invoice_lines(id));
         CREATE TABLE IF NOT EXISTS landed_allocations(doc INTEGER NOT NULL REFERENCES documents(id),receipt_line INTEGER NOT NULL REFERENCES invoice_lines(id),amount INTEGER NOT NULL CHECK(amount>=0),PRIMARY KEY(doc,receipt_line));
-        CREATE TABLE IF NOT EXISTS landed_sources(doc INTEGER PRIMARY KEY REFERENCES documents(id),source INTEGER UNIQUE REFERENCES documents(id));
+        CREATE TABLE IF NOT EXISTS landed_sources(doc INTEGER PRIMARY KEY REFERENCES documents(id),source INTEGER REFERENCES documents(id));
         CREATE TABLE IF NOT EXISTS reorder_rules(item INTEGER NOT NULL REFERENCES items(id),location INTEGER NOT NULL REFERENCES locations(id),minimum INTEGER NOT NULL,target INTEGER NOT NULL,PRIMARY KEY(item,location));
         INSERT OR IGNORE INTO accounts(code,name,name_en,kind,system) VALUES('2195','بضاعة مستلمة غير مفوترة','Goods received not invoiced','Liability',1),('5195','فروقات الجرد','Inventory count differences','Expense',1),('2196','تسوية تكاليف الشراء','Acquisition cost clearing','Liability',1);
         PRAGMA user_version=4;
         """);
         Column("receipt_bills","base_value","INTEGER NOT NULL DEFAULT 0");
         Column("stock_count_lines","expected_serials","TEXT NOT NULL DEFAULT ''");
+        if((Scalar("SELECT sql FROM sqlite_master WHERE name='landed_sources'")?.ToString()??"").Contains("UNIQUE",StringComparison.OrdinalIgnoreCase))
+            Exec("ALTER TABLE landed_sources RENAME TO landed_sources_old; CREATE TABLE landed_sources(doc INTEGER PRIMARY KEY REFERENCES documents(id),source INTEGER REFERENCES documents(id)); INSERT INTO landed_sources SELECT doc,source FROM landed_sources_old; DROP TABLE landed_sources_old;");
+        Exec("CREATE INDEX IF NOT EXISTS ix_landed_source ON landed_sources(source)");
+        if(Table("PRAGMA foreign_key_check").Rows.Count!=0)throw new InvalidOperationException("Inventory migration failed foreign key validation");
+        migration.Commit();
+        } finally { Exec("PRAGMA foreign_keys="+(foreignKeys?"ON":"OFF")); }
     }
     public List<StockLocation> Locations(bool activeOnly=true)=>Table("SELECT * FROM locations WHERE @p0=0 OR active=1 ORDER BY id",activeOnly?1:0).Rows.Cast<DataRow>().Select(r=>new StockLocation((long)r["id"],(string)r["name"],(long)r["active"]==1)).ToList();
     public long SaveLocation(long? id,string name,bool active=true)

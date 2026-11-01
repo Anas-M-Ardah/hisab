@@ -24,8 +24,18 @@ public sealed partial class AccountingService
     public long ReceivedQuantity(long orderLine)=>Convert.ToInt64(Scalar("SELECT coalesce(sum(l.qty),0) FROM receipt_links r JOIN invoice_lines l ON l.id=r.line JOIN documents d ON d.id=l.doc WHERE r.order_line=@p0 AND d.reversed=0",orderLine))-Convert.ToInt64(Scalar("SELECT coalesce(sum(ret.qty),0) FROM receipt_links r JOIN invoice_lines ret ON ret.source_line=r.line JOIN documents d ON d.id=ret.doc WHERE r.order_line=@p0 AND d.kind='GU' AND d.reversed=0",orderLine));
     public long BilledQuantity(long receiptLine)=>Convert.ToInt64(Scalar("SELECT coalesce(sum(l.qty),0) FROM receipt_bills b JOIN invoice_lines l ON l.id=b.line JOIN documents d ON d.id=l.doc WHERE b.receipt_line=@p0 AND d.reversed=0",receiptLine));
     public long UnbilledQuantity(long receiptLine){var l=Table("SELECT qty FROM invoice_lines WHERE id=@p0",receiptLine).Rows[0];return (long)l["qty"]-BilledQuantity(receiptLine)-Convert.ToInt64(Scalar("SELECT coalesce(sum(l.qty),0) FROM invoice_lines l JOIN documents d ON d.id=l.doc WHERE l.source_line=@p0 AND d.kind='GU' AND d.reversed=0",receiptLine));}
+    long ReceiptBaseForQuantity(long receiptLine,long quantity)
+    {
+        var row=Table("SELECT qty,net FROM invoice_lines WHERE id=@p0",receiptLine).Rows[0];
+        long remaining=UnbilledQuantity(receiptLine);
+        if(quantity<=0||quantity>remaining)InventoryError("Quantity exceeds unbilled receipt balance");
+        long basis=(long)row["net"]-Convert.ToInt64(Scalar("SELECT coalesce(sum(b.base_value),0) FROM receipt_bills b JOIN invoice_lines l ON l.id=b.line JOIN documents d ON d.id=l.doc WHERE b.receipt_line=@p0 AND d.reversed=0",receiptLine))-Convert.ToInt64(Scalar("SELECT coalesce(sum(l.net),0) FROM invoice_lines l JOIN documents d ON d.id=l.doc WHERE l.source_line=@p0 AND d.kind='GU' AND d.reversed=0",receiptLine));
+        return quantity==remaining?basis:Math.Min(basis,M(D((long)row["net"])*quantity/(long)row["qty"]));
+    }
     void RefreshPurchaseOrders()
     {
+        foreach(DataRow line in Table("SELECT id,qty FROM purchase_order_lines").Rows)
+            if(ReceivedQuantity((long)line["id"])>(long)line["qty"])InventoryError("Receipt quantity exceeds the order; amend the order or reverse replacement receipts first");
         foreach(DataRow o in Table("SELECT id FROM purchase_orders WHERE state NOT IN ('Draft','Cancelled')").Rows){var lines=Table("SELECT id,qty FROM purchase_order_lines WHERE order_id=@p0",o["id"]).Rows.Cast<DataRow>().ToList();bool all=lines.All(l=>ReceivedQuantity((long)l["id"])>=(long)l["qty"]),any=lines.Any(l=>ReceivedQuantity((long)l["id"])>0);Exec("UPDATE purchase_orders SET state=@p0 WHERE id=@p1",all?"Received":any?"Partial":"Issued",o["id"]);}
     }
     public long ReceivePurchaseOrder(long order,DateTime date,IReadOnlyList<ReceiptInput> inputs)
@@ -43,7 +53,7 @@ public sealed partial class AccountingService
         if(inputs.Count==0||inputs.Select(i=>i.ReceiptLine).Distinct().Count()!=inputs.Count||vat<0||vat>100||!Accounts().Any(a=>a.Id==supplier&&a.Kind=="Supplier"))InventoryError("Choose supplier and distinct receipt lines with a valid tax rate");
         using var tx=store.BeginTransaction();long id=NewDoc("PI",date,supplier,null,"Receipt billing",new(0,0,0),0,vat);long net=0,tax=0;
         foreach(var input in inputs){var rows=Table("SELECT l.*,d.date receipt_date FROM invoice_lines l JOIN documents d ON d.id=l.doc WHERE l.id=@p0 AND d.kind='GR' AND d.party=@p1 AND d.reversed=0",input.ReceiptLine,supplier);if(rows.Rows.Count!=1)InventoryError("Choose an active goods receipt for this supplier");var r=rows.Rows[0];EnsureOpen(DateTime.Parse((string)r["receipt_date"]));if(date.Date<DateTime.Parse((string)r["receipt_date"]))InventoryError("Invoice cannot precede receipt");long q=M(input.Quantity),remaining=UnbilledQuantity(input.ReceiptLine);if(q<=0||D(q)!=input.Quantity||q>remaining||input.UnitCost<=0||D(M(input.UnitCost))!=input.UnitCost||(store.IsSerialized((long)r["item"])&&q%1000!=0))InventoryError("Bill only remaining received quantities at a positive cost");
-            long n=M(input.Quantity*input.UnitCost),v=M(D(n)*vat/100),basis=M(D((long)r["net"])*q/(long)r["qty"]);net+=n;tax+=v;
+            long n=M(input.Quantity*input.UnitCost),v=M(D(n)*vat/100),basis=ReceiptBaseForQuantity(input.ReceiptLine,q);net+=n;tax+=v;
             Exec("INSERT INTO invoice_lines(doc,item,description,qty,price,discount,net,tax,cost,location) VALUES(@p0,@p1,@p2,@p3,@p4,0,@p5,@p6,0,@p7)",id,r["item"],r["description"],q,M(input.UnitCost),n,v,r["location"]);long line=Convert.ToInt64(Scalar("SELECT last_insert_rowid()"));Exec("INSERT INTO receipt_bills(line,receipt_line,base_value) VALUES(@p0,@p1,@p2)",line,input.ReceiptLine,basis);
         }
         Exec("UPDATE documents SET net=@p0,tax=@p1,total=@p2 WHERE id=@p3",net,tax,net+tax,id);SnapshotBranding(id);RebuildInventory("receipt invoice "+id);tx.Commit();return id;

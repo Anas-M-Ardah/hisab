@@ -31,7 +31,7 @@ public static class InventoryTests
         s.Backup(Path.Combine(directory,"inventory-backup.db"));
         Check(s.Table("PRAGMA foreign_key_check").Rows.Count==0,"Inventory foreign keys hold");
         CountChecks(s,a,item,other,results);
-        PurchasingChecks(s,a,supplier.Id,customer.Id,results);InventoryEdgeTests.Run(directory,results);
+        PurchasingChecks(s,a,supplier.Id,customer.Id,results);InventoryEdgeTests.Run(directory,results);InventoryReviewTests.Run(directory,results);
 
     }
     static void CountChecks(Store s,AccountingService a,long item,long location,List<string> results)
@@ -77,4 +77,3 @@ public static class InventoryTests
     }
 
 }
-

@@ -20,11 +20,11 @@ Create and issue a purchase order before receiving. Details & receive supports p
 
 Goods receipts post inventory against account 2195 (goods received not invoiced). Bill receipts can combine receipts from the same supplier and bill only remaining quantities. The invoice records the supplier payable, tax and price differences without receiving stock again. Pay and allocate using the existing payment workflow. Direct purchase invoices remain available for simultaneous delivery/invoicing. Invoice-first purchasing is not supported.
 
-Return unbilled goods through the receipt; return billed goods through the linked supplier invoice. Reverse linked returns, invoices and landed-cost allocations before cancelling their receipt. Linked supplier invoices are corrected by reversing and rebilling, not by using the generic invoice editor.
+Return unbilled goods through the receipt; return billed goods through the linked supplier invoice. A partially billed receipt still permits returns up to its unbilled remainder. Reverse linked returns, invoices and landed-cost allocations before cancelling their receipt. Linked supplier invoices are corrected by reversing and rebilling, not by using the generic invoice editor.
 
 ## Landed costs
 
-Select stock receipt lines and allocate a charge by receipt value, quantity, or manual amounts. Preview allocations before posting. Amounts must sum exactly, using JOD precision. Recoverable tax is not part of the entered capitalizable cost. Charges can be a payable or an immediate cash/bank payment. To reuse a previously posted payment/journal, it must debit account 2196 (acquisition cost clearing) for the exact amount and must not have been allocated already. This prevents duplicate recognition of that charge.
+Select stock receipt lines and allocate a charge by receipt value, quantity, or manual amounts. Preview allocations before posting. Amounts must sum exactly, using JOD precision. Recoverable tax is not part of the entered capitalizable cost. Charges can be a payable or an immediate cash/bank payment. To reuse a previously posted payment/journal, it must debit account 2196 (acquisition cost clearing) for the exact amount and must not have an active allocation. Reverse an incorrect allocation before reallocating that same charge; its history remains available. This prevents duplicate recognition of that charge.
 
 Receipt cost changes replay company-wide weighted-average valuation, including later sales. Late charges or invoice changes affecting closed periods are blocked; an administrator must explicitly reopen affected periods before correction.
 

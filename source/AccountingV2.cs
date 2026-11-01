@@ -58,13 +58,12 @@ public sealed partial class AccountingService
         if(requested.Count==0||string.IsNullOrWhiteSpace(reason)||requested.Select(r=>r.SourceLine).Distinct().Count()!=requested.Count)throw new InvalidOperationException("حدد الكميات وسبب المرتجع / Select return quantities and reason");
         using var tx=store.BeginTransaction();var source=Table("SELECT * FROM documents WHERE id=@p0",original).Rows[0];string sourceKind=(string)source["kind"];
         if(sourceKind is not("SI" or "PI" or "GR")||(long)source["reversed"]==1||date.Date<DateTime.Parse((string)source["date"]))throw new InvalidOperationException("الفاتورة أو تاريخ المرتجع غير صالح / Invalid invoice or return date");
-        if(sourceKind=="GR"&&Table("SELECT l.id FROM invoice_lines l JOIN receipt_bills b ON b.receipt_line=l.id JOIN invoice_lines bl ON bl.id=b.line JOIN documents bd ON bd.id=bl.doc WHERE l.doc=@p0 AND bd.reversed=0",original).Rows.Count>0)InventoryError("Return billed goods through the supplier invoice; reverse invoices before returning unbilled goods");
         long net=0,tax=0;var calculated=new List<(DataRow Line,long Qty,long Net,long Tax,long Discount)>();
         foreach(var request in requested){var line=Table("SELECT * FROM invoice_lines WHERE id=@p0 AND doc=@p1",request.SourceLine,original);if(line.Rows.Count==0)throw new InvalidOperationException("Invalid source line");var l=line.Rows[0];long q=M(request.Quantity);
             var old=Table("SELECT coalesce(sum(l.qty),0) qty,coalesce(sum(l.net),0) net,coalesce(sum(l.tax),0) tax,coalesce(sum(l.discount),0) discount FROM invoice_lines l JOIN documents d ON d.id=l.doc WHERE l.source_line=@p0 AND d.reversed=0",request.SourceLine).Rows[0];
             long remaining=(long)l["qty"]-Convert.ToInt64(old["qty"]);if(q<=0||D(q)!=request.Quantity||q>remaining)throw new InvalidOperationException("كمية المرتجع تتجاوز المتبقي / Return quantity exceeds unreturned quantity");
             long Portion(string field)=>q==remaining?(long)l[field]-Convert.ToInt64(old[field]):M(D((long)l[field])*q/(long)l["qty"]);
-            long n=Portion("net"),t=Portion("tax");net+=n;tax+=t;calculated.Add((l,q,n,t,Portion("discount")));
+            long n=sourceKind=="GR"?ReceiptBaseForQuantity(request.SourceLine,q):Portion("net"),t=Portion("tax");net+=n;tax+=t;calculated.Add((l,q,n,t,Portion("discount")));
         }
         long id=NewDoc(sourceKind=="SI"?"SR":sourceKind=="GR"?"GU":"PR",date,(long)source["party"],null,reason,new(net,tax,net+tax),0,decimal.Parse((string)source["vat"],CultureInfo.InvariantCulture),(long)source["inclusive"]==1);
         Exec("UPDATE documents SET original=@p0,branding=@p1,logo=@p2,seal=@p3 WHERE id=@p4",original,source["branding"],source["logo"],source["seal"],id);
