@@ -84,7 +84,7 @@ public sealed partial class MainWindow
     }
     FlowDocument InvoiceReview(string title,string party,DateTime date,List<InvoiceLine> lines,Totals totals,decimal paid,decimal vat,bool inclusive,string note)
     {
-        var doc=Page(T("مراجعة — ","Review — ")+title,S.Setting("company"));Paragraph(doc,T("التاريخ: ","Date: ")+date.ToString("yyyy-MM-dd"));Paragraph(doc,T("العميل / المورد: ","Customer / supplier: ")+party);PrintTable(doc,new[]{T("الوصف","Description"),T("الكمية","Qty"),T("السعر","Price"),T("الخصم","Discount")},lines.Select(l=>new[]{l.Description,l.Qty.ToString(CultureInfo.InvariantCulture),l.Price.ToString("N3",CultureInfo.InvariantCulture),l.Discount.ToString("N3",CultureInfo.InvariantCulture)}));
+        var doc=Page(T("مراجعة — ","Review — ")+title,S.Setting("company"));Paragraph(doc,T("التاريخ: ","Date: ")+date.ToString("yyyy-MM-dd"));Paragraph(doc,T("العميل / المورد: ","Customer / supplier: ")+party);PrintTable(doc,new[]{T("الوصف","Description"),T("الكمية","Qty"),T("السعر","Price"),T("الخصم","Discount")},lines.Select(l=>new[]{l.Description+(string.IsNullOrWhiteSpace(l.Serials)?"":"\n"+l.Serials),l.Qty.ToString(CultureInfo.InvariantCulture),l.Price.ToString("N3",CultureInfo.InvariantCulture),l.Discount.ToString("N3",CultureInfo.InvariantCulture)}));
         AddTotals(doc,totals,Store.M(paid),vat.ToString(CultureInfo.InvariantCulture),inclusive);Paragraph(doc,note);return doc;
     }
     void AddTotals(FlowDocument doc,Totals t,long paid,string vat,bool inclusive)
@@ -110,6 +110,12 @@ public sealed partial class MainWindow
             var position=A.Positions(DateTime.Today).FirstOrDefault(p=>p.Invoice==id);if(position!=null){Paragraph(doc,T("المدفوع حتى اليوم: ","Paid through today: ")+Store.Money(position.Paid)+" JOD");Paragraph(doc,T("المرتجعات حتى اليوم: ","Returns through today: ")+Store.Money(position.Returned)+" JOD");Paragraph(doc,T("المتبقي حتى اليوم: ","Outstanding through today: ")+Store.Money(position.Outstanding)+" JOD",true);}
             foreach(var f in new[]{("terms",T("شروط الدفع: ","Payment terms: ")),("warranty",T("الضمان: ","Warranty: ")),("shipping",T("الشحن والتركيب: ","Shipping / installation: ")),("bank",T("بيانات الدفع: ","Payment details: "))}){var text=vm.Arabic?row[f.Item1].ToString():Brand(f.Item1+"_en",row[f.Item1].ToString()!);if(text!="")Paragraph(doc,f.Item2+text);}
         }else if(!combined){Paragraph(doc,T("المبلغ: ","Amount: ")+Store.Money((long)row["total"])+" JOD",true);var entries=S.Table("SELECT a.name,coalesce(p.name,'') parent,e.description,e.debit,e.credit FROM entries e JOIN accounts a ON a.id=e.account LEFT JOIN accounts p ON p.id=a.parent_id WHERE doc=@p0",id);PrintTable(doc,new[]{T("الحساب","Account"),T("الحساب الرئيسي","Main account"),T("البيان","Description"),T("مدين JOD","Debit JOD"),T("دائن JOD","Credit JOD")},entries.Rows.Cast<DataRow>().Select(r=>new[]{(string)r["name"],(string)r["parent"],(string)r["description"],Store.Money((long)r["debit"]),Store.Money((long)r["credit"])}));}
+        var devices=S.Table("SELECT u.number,i.name,l.name location,e.direction FROM serial_events e JOIN serial_units u ON u.id=e.unit JOIN items i ON i.id=u.item JOIN locations l ON l.id=e.location WHERE e.doc=@p0 ORDER BY e.id",id);
+        if(devices.Rows.Count>0)PrintTable(doc,new[]{T("الصنف","Item"),T("التسلسلي","Serial"),T("الموقع","Location"),T("الحركة","Movement")},devices.Rows.Cast<DataRow>().Select(r=>new[]{(string)r["name"],(string)r["number"],(string)r["location"],(long)r["direction"]>0?T("وارد","In"):T("صادر","Out")}));
+        if(row["kind"].ToString() is "IA" or "IT" or "OB"){
+            var stock=S.Table("SELECT i.name,l.name location,m.qty,m.value FROM stock_moves m JOIN items i ON i.id=m.item JOIN locations l ON l.id=m.location WHERE m.doc=@p0",id);
+            PrintTable(doc,new[]{T("الصنف","Item"),T("الموقع","Location"),T("الكمية","Quantity"),T("القيمة JOD","Value JOD")},stock.Rows.Cast<DataRow>().Select(r=>new[]{(string)r["name"],(string)r["location"],Store.D((long)r["qty"]).ToString("0.###",CultureInfo.InvariantCulture),Store.Money((long)r["value"])}));
+        }
         if(row["note"].ToString()!="")Paragraph(doc,T("البيان: ","Description: ")+row["note"]);Paragraph(doc,T("التوقيع: __________________","Signature: __________________"));
         Picture("seal",120,70);
         AddChequeReceipt(doc,id);

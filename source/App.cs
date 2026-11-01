@@ -10,6 +10,7 @@ public static class AppEntry
     {
         SQLitePCL.Batteries_V2.Init();
         if(args.Contains("--diagnostics")){File.WriteAllText(args.Last(),Diagnostics.Report());return 0;}
+        if(args.Contains("--inventory-test")){var output=new List<string>();try{Directory.CreateDirectory(args.Last());InventoryTests.Run(args.Last(),output);}catch(Exception ex){output.Add("FAIL "+ex);}File.WriteAllLines(Path.Combine(args.Last(),"test-results.txt"),output);return output.Any(x=>x.StartsWith("FAIL"))?1:0;}
         if(args.Contains("--self-test")) return SelfTest.Run(args.Last());
         var preview=args.Contains("--preview");
         string root=preview?System.IO.Path.Combine(args.Last(),"preview-data"):System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Hisab");
@@ -26,9 +27,11 @@ public static class AppEntry
             app.DispatcherUnhandledException+=(s,e)=>{ File.AppendAllText(System.IO.Path.Combine(root,"errors.log"),DateTime.Now+" "+e.Exception+Environment.NewLine); MessageBox.Show("تعذر إكمال العملية. تم تسجيل التفاصيل.\nThe operation could not finish. Details were logged.","Hisab"); e.Handled=true; };
             var window=new MainWindow(new MainViewModel(store));
             app.MainWindow=window;
-            if(preview) window.Loaded+=(s,e)=>window.Dispatcher.BeginInvoke(()=>{ try {if(args.Contains("--preview-workflows"))window.RenderWorkbookPreviews(args.Last());else if(args.Contains("--preview-accounts"))window.RenderAccountPreviews(args.Last());else window.RenderPreviews(args.Last());} finally {window.Close();} },DispatcherPriority.ApplicationIdle);
+            if(preview) window.Loaded+=(s,e)=>window.Dispatcher.BeginInvoke(()=>{ try {if(args.Contains("--preview-inventory"))window.RenderInventoryPreviews(args.Last());else if(args.Contains("--preview-workflows"))window.RenderWorkbookPreviews(args.Last());else if(args.Contains("--preview-accounts"))window.RenderAccountPreviews(args.Last());else window.RenderPreviews(args.Last());} finally {window.Close();} },DispatcherPriority.ApplicationIdle);
             app.Run(window);
             return 0;
         } catch(Exception ex) { File.WriteAllText(System.IO.Path.Combine(root,"startup-error.txt"),ex.ToString()); MessageBox.Show("تعذر فتح البرنامج. راجع ملف startup-error.txt في مجلد البيانات.\nUnable to open Hisab. See startup-error.txt in the data folder.","Hisab"); return 1; }
     }
 }
+
+

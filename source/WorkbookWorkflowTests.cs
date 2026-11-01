@@ -36,7 +36,7 @@ public static class WorkbookWorkflowTests
         Check(ids.Count==6&&Convert.ToInt64(s.Scalar("SELECT count(*) FROM documents WHERE receipt_group=@p0",ids[0]))==6&&Convert.ToInt64(s.Scalar("SELECT sum(total) FROM documents WHERE receipt_group=@p0",ids[0]))==3294410,"Workbook six-cheque receipt shares one reference and exact total");
         Check(s.Table("SELECT doc FROM entries GROUP BY doc HAVING sum(debit)!=sum(credit)").Rows.Count==0,"All workbook workflow documents remain balanced");
         Check(s.Table("PRAGMA foreign_key_check").Rows.Count==0,"Workbook workflow relationships preserve database integrity");
-        using(var reopened=new Store(path))Check(reopened.Scalar("SELECT description FROM entries WHERE doc=@p0 AND account=@p1",replacement,order)?.ToString()=="Order cost"&&Convert.ToInt64(reopened.Scalar("PRAGMA user_version"))==3,"Workflow data survives reopening with schema downgrade protection");
+        using(var reopened=new Store(path))Check(reopened.Scalar("SELECT description FROM entries WHERE doc=@p0 AND account=@p1",replacement,order)?.ToString()=="Order cost"&&Convert.ToInt64(reopened.Scalar("PRAGMA user_version"))==Store.SchemaVersion,"Workflow data survives reopening with schema downgrade protection");
         s.SaveUser("workbook-viewer","TestPassword123","Viewer");s.Login("workbook-viewer","TestPassword123");Reject(()=>a.SplitVoucher(false,day,cash,"No permission",[new(rent,1,"Rent")]),"Viewer cannot post split vouchers");
     }
 }

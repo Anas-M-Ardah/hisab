@@ -52,7 +52,7 @@ public sealed partial class Store
             PRAGMA user_version=2;
             """);Exec("PRAGMA foreign_keys=ON");
         }
-        Exec("PRAGMA user_version=3");
+        UpgradeInventory();
         Exec("UPDATE documents SET due_date=date WHERE due_date=''");
         Exec("UPDATE documents SET reversal_date=(SELECT date FROM documents rv WHERE rv.original=documents.id AND rv.kind='RV' LIMIT 1) WHERE reversed=1 AND reversal_date IS NULL");
         Exec("INSERT OR IGNORE INTO accounts(code,name,kind,system) VALUES('2190','شيكات صادرة','Liability',1),('3301','أرباح محتجزة','Equity',1)");
