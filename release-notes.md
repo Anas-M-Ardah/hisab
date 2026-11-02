@@ -1,28 +1,21 @@
-# حساب 0.6.0 — إدارة المخزون والمشتريات
+# حساب 0.6.1 — تحسين القوائم المنسدلة
 
-- باركود الأصناف وتتبع الأجهزة بالأرقام التسلسلية وسجل الحركة وتواريخ الضمان.
-- مخزون رئيسي افتراضي مع مواقع إضافية اختيارية وتحويلات داخلية.
-- جلسات جرد قابلة للاستكمال، ومنع الحركة للأصناف المشمولة، وتسويات موثقة للفروقات.
-- أوامر شراء واستلام جزئي وفوترة الكميات المستلمة دون مضاعفة المخزون، مع إرجاع الكميات غير المفوترة.
-- توزيع تكاليف الشحن والمصاريف الإضافية واقتراحات إعادة الطلب حسب الموقع.
-- شاشات عربية وإنجليزية وتفاصيل المخزون في المستندات المطبوعة.
-
-## الترقية
-
-احتفظ بنسخة احتياطية قابلة للاستعادة قبل الترقية. ينتقل الملف إلى إصدار قاعدة البيانات 4، ولا تستطيع الإصدارات القديمة فتحه بعد ذلك. تنتقل الكميات الحالية إلى المخزون الرئيسي مع الحفاظ على المستندات والأرصدة.
-
-فك ضغط Hisab-Windows.zip ثم شغّل Start-Hisab.cmd. تتضمن الحزمة إصدارات Windows x64 وx86 وARM64 وبيئة .NET، إضافة إلى دليل الاستخدام والمصدر. راجع INVENTORY-WORKFLOWS.md لمعرفة خطوات العمل الجديدة.
+- تحسين تنسيق محرر الحسابات: شريط تمرير أنحف، مسافات أوضح، وسهم أوضح للقائمة المنسدلة.
+- عرض «لا توجد بيانات» في القوائم المنسدلة الفارغة، داخل الحقل وعند فتح القائمة.
+- تختفي الرسالة تلقائيًا عند توفر الخيارات، ولا يمكن اختيارها كقيمة.
+- دعم العربية والإنجليزية وأحجام النص المختلفة.
 
 ## English
 
-Hisab 0.6.0 adds product barcodes, device serial tracking and warranty dates; optional stock locations and internal transfers; resumable stock counts with audited adjustments; purchase orders, partial receipts and supplier billing without duplicate inventory; landed-cost allocation; and replenishment suggestions by location. Arabic/English screens and printed inventory details are included.
+- Refine the account editor with a slimmer scrollbar, more space around fields and a clearer dropdown arrow.
+- Show “No data available” in empty dropdown fields and their open menus.
+- Update the empty message automatically when options are added or removed; the message is never a selectable item.
+- Verify Arabic/English layouts, account editing interactions and different text sizes.
 
-Existing quantities migrate to Main stock. Keep a portable backup before upgrading: schema 4 databases cannot be reopened by older versions. Company-wide weighted-average costing is retained.
+## Download and upgrade
 
-Extract Hisab-Windows.zip and run Start-Hisab.cmd. The package includes Windows x64, x86 and ARM64 builds, the .NET runtime, source code and workflow documentation.
+Extract Hisab-Windows.zip and run Start-Hisab.cmd. Includes Windows x64, x86 and ARM64 builds with the .NET runtime, source code and guides.
 
-## Validation
+This is a UI update with no database schema change from 0.6.0. When upgrading from older versions, keep a portable backup: schema 4 cannot be reopened by pre-0.6.0 versions.
 
-The release pipeline requires all 219 automated checks to pass on x64 and x86 before publishing. ARM64 is cross-built but not executed on the hosted x64 runner. Local validation also covered populated schema-3 migration and 10 bilingual UI preview checks. Physical barcode scanners and printers still require acceptance testing.
-
-Includes fixes for legacy serial returns, partially billed receipt returns, receipt rounding, freight-allocation corrections and order limits when reversing returns.
+The release pipeline requires all 219 automated checks to pass on both x64 and x86. ARM64 is cross-built but not executed on the hosted x64 runner. Bilingual UI checks also verify empty-menu messages, data changes and account-editor layouts.
