@@ -12,6 +12,7 @@ public sealed partial class MainWindow
         foreach(string language in new[]{"ar","en"})
         {
             S.Set("language",language);S.Set("font","20");Width=originalWidth;Height=originalHeight;BuildShell();
+            EmptyDropdownPreviewChecks(path,language);
             HierarchyPreviewChecks(path,language);
             foreach(var size in new[]{(Name:"small-text",Font:14,Width:originalWidth,Height:originalHeight),(Name:"standard",Font:20,Width:originalWidth,Height:originalHeight),(Name:"large-text",Font:24,Width:1024.0,Height:768.0)})
             {
@@ -19,6 +20,29 @@ public sealed partial class MainWindow
                 AccountWorkspaceLayoutChecks(path,language,size.Name);Capture(this,Path.Combine(path,language+"-"+size.Name+"-organizer.png"));
             }
         }
+    }
+    void EmptyDropdownPreviewChecks(string path,string language)
+    {
+        var items=new System.Collections.ObjectModel.ObservableCollection<string>();
+        var combo=new ComboBox{ItemsSource=items,Margin=new Thickness(24)};
+        var window=new Window{Owner=this,Width=440,Height=180,Resources=Resources,FontSize=FontSize,FlowDirection=FlowDirection,Content=combo,WindowStartupLocation=WindowStartupLocation.CenterOwner};
+        window.Show();
+        try {
+            window.UpdateLayout();combo.ApplyTemplate();
+            var placeholder=(TextBlock)combo.Template.FindName("emptySelection",combo);
+            string expected=language=="ar"?"لا توجد بيانات":"No data available";
+            if(placeholder.Visibility!=Visibility.Visible||placeholder.Text!=expected||combo.SelectedIndex!=-1)throw new InvalidOperationException("Empty dropdown placeholder failed");
+            combo.IsDropDownOpen=true;window.UpdateLayout();Dispatcher.Invoke(()=>{},System.Windows.Threading.DispatcherPriority.ContextIdle);
+            var message=(TextBlock)combo.Template.FindName("emptyMenu",combo);
+            if(!message.IsVisible||message.Text!=expected||combo.Items.Count!=0)throw new InvalidOperationException("Empty dropdown menu failed");
+            combo.IsDropDownOpen=false;
+            Capture(window,Path.Combine(path,language+"-empty-dropdown.png"));
+            items.Add("Available item");window.UpdateLayout();
+            if(placeholder.Visibility!=Visibility.Collapsed)throw new InvalidOperationException("Empty message stayed visible after data arrived");
+            combo.SelectedIndex=0;items.Clear();window.UpdateLayout();
+            if(placeholder.Visibility!=Visibility.Visible||combo.SelectedIndex!=-1)throw new InvalidOperationException("Empty message failed after data cleared");
+            File.AppendAllText(Path.Combine(path,"ui-checks.txt"),language+": empty dropdown placeholder/menu localized, nonselectable and reactive=True"+Environment.NewLine);
+        } finally {window.Close();}
     }
     static void AccountEditorLayoutChecks(DependencyObject root)
     {
