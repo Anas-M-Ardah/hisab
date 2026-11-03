@@ -39,7 +39,14 @@ public sealed partial class MainWindow
             Capture(window,Path.Combine(path,language+"-empty-dropdown.png"));
             items.Add("Available item");window.UpdateLayout();
             if(placeholder.Visibility!=Visibility.Collapsed)throw new InvalidOperationException("Empty message stayed visible after data arrived");
-            combo.SelectedIndex=0;items.Clear();window.UpdateLayout();
+            items.Add("Other choice");combo.SelectedIndex=0;combo.IsDropDownOpen=true;window.UpdateLayout();
+            var search=(TextBox)combo.Template.FindName("PART_Search",combo);var matches=(ListBox)combo.Template.FindName("PART_SearchResults",combo);var noMatches=(TextBlock)combo.Template.FindName("PART_NoMatches",combo);
+            search.Text="Other";window.UpdateLayout();if(matches.Items.Count!=1||combo.Items.Count!=2||combo.SelectedIndex!=0)throw new InvalidOperationException("Dropdown search changed source or selection");
+            search.Text="missing";window.UpdateLayout();if(noMatches.Visibility!=Visibility.Visible)throw new InvalidOperationException("No-match feedback missing");
+            search.Text="Other";window.UpdateLayout();matches.SelectedIndex=0;
+            matches.RaiseEvent(new System.Windows.Input.KeyEventArgs(System.Windows.Input.Keyboard.PrimaryDevice,PresentationSource.FromVisual(window),0,System.Windows.Input.Key.Enter){RoutedEvent=System.Windows.Input.Keyboard.PreviewKeyDownEvent});
+            if(combo.SelectedItem?.ToString()!="Other choice"||combo.IsDropDownOpen)throw new InvalidOperationException("Keyboard search selection failed");
+            combo.IsDropDownOpen=false;items.Clear();window.UpdateLayout();
             if(placeholder.Visibility!=Visibility.Visible||combo.SelectedIndex!=-1)throw new InvalidOperationException("Empty message failed after data cleared");
             File.AppendAllText(Path.Combine(path,"ui-checks.txt"),language+": empty dropdown placeholder/menu localized, nonselectable and reactive=True"+Environment.NewLine);
         } finally {window.Close();}

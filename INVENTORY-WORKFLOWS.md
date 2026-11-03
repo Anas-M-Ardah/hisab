@@ -34,7 +34,7 @@ Set minimum and target quantities by item/location. Suggestions use on-hand plus
 
 ## Compatibility
 
-Schema 4 adds locations, serial identities, counts and procurement records. Older app versions reject the upgraded database. Keep a portable backup before upgrading. Existing documents and accounting balances are preserved. This change retains local single-process operation and company-wide weighted-average costing; it does not add branch accounting or multi-computer synchronization.
+Schema 4 introduced locations, serial identities, counts and procurement records; version 0.7.0 advances to schema 5 for quotations. Older app versions reject the upgraded database. Keep a portable backup before upgrading. Existing documents and accounting balances are preserved. This change retains local single-process operation and company-wide weighted-average costing; it does not add branch accounting or multi-computer synchronization.
 
 ## Validation commands
 

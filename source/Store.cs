@@ -17,7 +17,7 @@ public record Totals(long Net, long Tax, long Total);
 
 public sealed partial class Store : IDisposable
 {
-    public const int SchemaVersion = 4;
+    public const int SchemaVersion = 5;
     public string Path { get; }
     public SqliteConnection Db { get; }
     internal long CommandCount { get; private set; }

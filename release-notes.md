@@ -1,21 +1,20 @@
-# حساب 0.6.1 — تحسين القوائم المنسدلة
+# حساب 0.7.0 — عروض الأسعار وتحسين الواجهة
 
-- تحسين تنسيق محرر الحسابات: شريط تمرير أنحف، مسافات أوضح، وسهم أوضح للقائمة المنسدلة.
-- عرض «لا توجد بيانات» في القوائم المنسدلة الفارغة، داخل الحقل وعند فتح القائمة.
-- تختفي الرسالة تلقائيًا عند توفر الخيارات، ولا يمكن اختيارها كقيمة.
-- دعم العربية والإنجليزية وأحجام النص المختلفة.
+- عروض أسعار مستقلة مع العميل، الأصناف، الخصومات، الضريبة وتاريخ الصلاحية.
+- حالات مسودة، مرسل، مقبول، مرفوض، منتهي الصلاحية ومحّول إلى فاتورة.
+- طباعة العرض أو حفظه PDF وتحويله إلى فاتورة مبيعات بعد مراجعة الدفع والموقع والأرقام التسلسلية.
+- العرض لا يحجز المخزون ولا يؤثر على الحسابات. يحتفظ النظام بمراجعات العرض ويمنع تحويله مرتين.
+- بحث داخل القوائم المنسدلة مع رسائل عربية وإنجليزية للقوائم الفارغة والبحث دون نتائج.
+- أخطاء واضحة داخل النماذج، وتنسيق تمرير ومسافات متسق.
 
 ## English
 
-- Refine the account editor with a slimmer scrollbar, more space around fields and a clearer dropdown arrow.
-- Show “No data available” in empty dropdown fields and their open menus.
-- Update the empty message automatically when options are added or removed; the message is never a selectable item.
-- Verify Arabic/English layouts, account editing interactions and different text sizes.
+Quotations include customer details, priced lines, discounts, tax, validity dates and tracked status. Print or save to PDF, then convert once into a reviewed sales invoice with stock, serial and payment validation. Quotes do not reserve stock or post accounting entries. Saved revisions and conversion links are retained.
 
-## Download and upgrade
+Dropdown search preserves original options and selection, with keyboard support and localized empty/no-match feedback. Form validation messages stay visible above the fields; shared scrolling and quotation layouts are refined for Arabic/English and different text sizes.
 
-Extract Hisab-Windows.zip and run Start-Hisab.cmd. Includes Windows x64, x86 and ARM64 builds with the .NET runtime, source code and guides.
+## Upgrade
 
-This is a UI update with no database schema change from 0.6.0. When upgrading from older versions, keep a portable backup: schema 4 cannot be reopened by pre-0.6.0 versions.
+Back up before upgrading. Schema 5 preserves existing stock and documents but cannot be reopened by 0.6.x. See QUOTATIONS.md for the workflow and conversion rules.
 
-The release pipeline requires all 219 automated checks to pass on both x64 and x86. ARM64 is cross-built but not executed on the hosted x64 runner. Bilingual UI checks also verify empty-menu messages, data changes and account-editor layouts.
+The release pipeline requires 241 accounting/storage checks on x64 and x86. ARM64 is cross-built; hardware scanners and printers still require acceptance testing.
