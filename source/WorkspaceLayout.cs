@@ -25,7 +25,7 @@ public sealed partial class MainWindow
 
     void ArrangeDataWorkspace(string route)
     {
-        if(route is not ("accounts" or "items" or "invoices" or "cheques" or "users" or "periods"))return;
+        if(route is not ("accounts" or "items" or "invoices" or "quotes" or "cheques" or "users" or "periods"))return;
         var table=body.Children.OfType<DataGrid>().FirstOrDefault();if(table==null)return;
         if(route=="invoices")
         {
@@ -51,6 +51,7 @@ public sealed partial class MainWindow
         System.Windows.Controls.Grid.SetRow(surface,1);layout.Children.Add(surface);System.Windows.Controls.Grid.SetRow(footer,2);layout.Children.Add(footer);
         surface.MinHeight=(double)Resources["Row.Height"]*3+FontSize*5;
         var scroll=new ScrollViewer{Content=layout,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled};
+        scroll.Resources[typeof(System.Windows.Controls.Primitives.ScrollBar)]=FindResource("FormScrollBar");
         void Fit()=>layout.Height=Math.Max(scroll.ViewportHeight,body.DesiredSize.Height+footer.DesiredSize.Height+surface.MinHeight+layout.Margin.Top+layout.Margin.Bottom);
         layout.Height=Math.Max(workspaceViewport.ActualHeight,surface.MinHeight+200);
         scroll.SizeChanged+=(s,e)=>Fit();body.SizeChanged+=(s,e)=>Fit();footer.SizeChanged+=(s,e)=>Fit();
@@ -154,6 +155,7 @@ public sealed partial class MainWindow
             var submit=fields.Children.OfType<Button>().LastOrDefault();if(submit!=null){fields.Children.Remove(submit);var actions=Actions(submit);actions.HorizontalAlignment=HorizontalAlignment.Right;var footer=new Border{Background=UiTheme.Brush(Resources,"Brush.Surface"),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new Thickness(0,1,0,0),Padding=new Thickness(24,8,24,8),Child=actions};DockPanel.SetDock(footer,Dock.Bottom);layout.Children.Insert(0,footer);}}
         else return;
         var header=new DockPanel{Margin=new Thickness(24,18,24,10)};var cancel=Btn(T("إلغاء","Cancel"),window.Close);cancel.Margin=new Thickness(16,0,0,0);DockPanel.SetDock(cancel,Dock.Right);header.Children.Add(cancel);var label=Text(title,24,true);label.VerticalAlignment=VerticalAlignment.Center;label.Margin=new Thickness(0);header.Children.Add(label);DockPanel.SetDock(header,Dock.Top);layout.Children.Insert(0,header);
+        var error=Text("",16);error.Visibility=Visibility.Collapsed;error.Foreground=UiTheme.Brush(Resources,"Brush.Text");error.Margin=new Thickness(24,0,24,12);System.Windows.Automation.AutomationProperties.SetLiveSetting(error,System.Windows.Automation.AutomationLiveSetting.Assertive);DockPanel.SetDock(error,Dock.Top);layout.Children.Insert(1,error);formErrors[window]=error;window.Closed+=(_,_)=>formErrors.Remove(window);
         window.MaxWidth=Math.Max(500,SystemParameters.WorkArea.Width-32);window.UseLayoutRounding=true;
     }
 }
