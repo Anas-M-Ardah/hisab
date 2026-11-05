@@ -13,11 +13,11 @@ foreach($runtime in @('win-x64','win-x86','win-arm64')) {
     if($proc.ExitCode -ne 0){throw "Self-test failed: $runtime"}
     $results=Get-Content (Join-Path $tests 'test-results.txt')
     if(@($results | Where-Object {$_ -like 'FAIL *'}).Count -gt 0){throw "Self-test reported failed checks: $runtime"}
-    if(@($results | Where-Object {$_ -like 'PASS *'}).Count -ne 241){throw 'Expected 241 passed checks.'}
+    if(@($results | Where-Object {$_ -like 'PASS *'}).Count -ne 281){throw 'Expected 281 passed checks.'}
     $results | Out-File (Join-Path $package ('CHECKS-'+$runtime+'.txt')) -Encoding utf8
   }
 }
-foreach($file in @('Start-Hisab.cmd','Setup-Guide-Arabic.pdf','QUICKSTART-AR.txt','README.txt','ARCHITECTURE.txt','VALIDATION.txt','UI-DESIGN.txt','DESIGN-SYSTEM.md','CLIENT-FEEDBACK.md','WORKBOOK-WORKFLOWS.md','INVENTORY-WORKFLOWS.md','QUOTATIONS.md','release-notes.md')) {
+foreach($file in @('Start-Hisab.cmd','Setup-Guide-Arabic.pdf','QUICKSTART-AR.txt','README.txt','ARCHITECTURE.txt','VALIDATION.txt','UI-DESIGN.txt','DESIGN-SYSTEM.md','CLIENT-FEEDBACK.md','WORKBOOK-WORKFLOWS.md','INVENTORY-WORKFLOWS.md','QUOTATIONS.md','STOCK-RESERVATIONS.md','release-notes.md')) {
   Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination $package
 }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ThirdParty') -Destination $package -Recurse

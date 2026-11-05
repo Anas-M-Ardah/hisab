@@ -31,7 +31,6 @@ public sealed partial class Store
         CREATE TABLE IF NOT EXISTS landed_sources(doc INTEGER PRIMARY KEY REFERENCES documents(id),source INTEGER REFERENCES documents(id));
         CREATE TABLE IF NOT EXISTS reorder_rules(item INTEGER NOT NULL REFERENCES items(id),location INTEGER NOT NULL REFERENCES locations(id),minimum INTEGER NOT NULL,target INTEGER NOT NULL,PRIMARY KEY(item,location));
         INSERT OR IGNORE INTO accounts(code,name,name_en,kind,system) VALUES('2195','بضاعة مستلمة غير مفوترة','Goods received not invoiced','Liability',1),('5195','فروقات الجرد','Inventory count differences','Expense',1),('2196','تسوية تكاليف الشراء','Acquisition cost clearing','Liability',1);
-        PRAGMA user_version=4;
         """);
         Column("receipt_bills","base_value","INTEGER NOT NULL DEFAULT 0");
         Column("stock_count_lines","expected_serials","TEXT NOT NULL DEFAULT ''");

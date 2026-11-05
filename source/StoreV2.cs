@@ -54,10 +54,12 @@ public sealed partial class Store
         }
         UpgradeInventory();
         UpgradeQuotes();
+        UpgradeReservations();
         Exec("UPDATE documents SET due_date=date WHERE due_date=''");
         Exec("UPDATE documents SET reversal_date=(SELECT date FROM documents rv WHERE rv.original=documents.id AND rv.kind='RV' LIMIT 1) WHERE reversed=1 AND reversal_date IS NULL");
         Exec("INSERT OR IGNORE INTO accounts(code,name,kind,system) VALUES('2190','شيكات صادرة','Liability',1),('3301','أرباح محتجزة','Equity',1)");
         foreach(var pair in new[]{("allow_negative","0"),("due_days","30"),("company_en",""),("terms_en",""),("warranty_en",""),("shipping_en",""),("bank_en",""),("logo",""),("seal","")})Exec("INSERT OR IGNORE INTO settings VALUES(@p0,@p1)",pair.Item1,pair.Item2);
+        Exec("PRAGMA user_version="+SchemaVersion);
     }
     public IDisposableTransaction BeginTransaction()=>new(this);
     public sealed class IDisposableTransaction : IDisposable

@@ -10,6 +10,10 @@ Configure tracking sets an optional product barcode and enables serial tracking.
 
 Devices & warranties shows serial history and optional supplier/customer warranty end dates. This is inventory information, not a repair management system. Printed inventory documents include serial details.
 
+## Reservations
+
+Inventory shows on-hand, reserved and available quantities by location. Open Reservations to hold stock for a customer or accepted quote, optionally including specific serials. Holds expire or can be released with a reason; sell through the hold to consume it. See STOCK-RESERVATIONS.md for the complete workflow.
+
 ## Stock counts
 
 Start a count for selected items at one location. Movements for those items/location are blocked until completion or cancellation. Save progress to resume later; locks survive restart. Enter zero explicitly for absent items. Serialized items require the physical serial list. Review expected and actual quantities, enter a discrepancy reason, and review a positive cost for gains before posting. The adjustment posts inventory differences and preserves the count. Later same-day movements are allowed; earlier-dated changes affecting a completed count require reversing that count first.
@@ -30,11 +34,11 @@ Receipt cost changes replay company-wide weighted-average valuation, including l
 
 ## Replenishment
 
-Set minimum and target quantities by item/location. Suggestions use on-hand plus outstanding issued orders. Draft and cancelled orders are excluded. Expected arrival and overdue status remain visible. Create draft order pre-fills the selected item, location and suggested quantity; a person selects the supplier, cost and confirms the order.
+Set minimum and target quantities by item/location. Suggestions use on-hand minus active reservations plus outstanding issued orders. Draft and cancelled orders are excluded. Expected arrival and overdue status remain visible. Create draft order pre-fills the selected item, location and suggested quantity; a person selects the supplier, cost and confirms the order.
 
 ## Compatibility
 
-Schema 4 introduced locations, serial identities, counts and procurement records; version 0.7.0 advances to schema 5 for quotations. Older app versions reject the upgraded database. Keep a portable backup before upgrading. Existing documents and accounting balances are preserved. This change retains local single-process operation and company-wide weighted-average costing; it does not add branch accounting or multi-computer synchronization.
+Schema 4 introduced locations, serial identities, counts and procurement records; version 0.7.0 introduced schema 5 for quotations, and version 0.8.0 uses schema 6 for stock reservations. Older app versions reject the upgraded database. Keep a portable backup before upgrading. Existing documents and accounting balances are preserved. This change retains local single-process operation and company-wide weighted-average costing; it does not add branch accounting or multi-computer synchronization.
 
 ## Validation commands
 

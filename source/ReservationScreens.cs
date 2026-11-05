@@ -1,0 +1,48 @@
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+namespace Hisab;
+public sealed partial class MainWindow
+{
+    string ReservationState(string state)=>state switch {"Active"=>T("نشط","Active"),"Expired"=>T("منتهي","Expired"),"Released"=>T("محرر","Released"),"Fulfilled"=>T("تم البيع","Fulfilled"),_=>state};
+    void ReservationsPage()
+    {
+        Heading(T("حجوزات المخزون","Stock reservations"),T("احتفظ بالكميات للعميل حتى البيع أو انتهاء الصلاحية.","Hold stock for a customer until sale, release or expiry."));
+        var search=Input();var active=new CheckBox{Content=T("الحجوزات النشطة فقط","Active reservations only"),IsChecked=true};
+        body.Children.Add(SearchActions(T("بحث بالرقم أو العميل","Search number or customer"),search,Btn(T("+ حجز مخزون","+ Reserve stock"),()=>ReservationForm(),true),Btn(T("تحديث","Refresh"),()=>Navigate("reservations"))));body.Children.Add(active);
+        DataTable Rows(){var t=new DataTable();t.Columns.Add("id",typeof(long));foreach(var c in new[]{"number","customer","expires","state","quote","invoice"})t.Columns.Add(c);foreach(var r in S.Reservations(active.IsChecked==true)){string customer=S.LocalName("accounts",r.Customer,vm.Arabic);if(!(r.Number+" "+customer).Contains(search.Text.Trim(),StringComparison.OrdinalIgnoreCase))continue;t.Rows.Add(r.Id,r.Number,customer,r.Expires.ToString("yyyy-MM-dd"),ReservationState(r.EffectiveState),r.Quote==null?"":S.GetQuote(r.Quote.Value).Number,r.Invoice==null?"":S.Scalar("SELECT number FROM documents WHERE id=@p0",r.Invoice));}return t;}
+        var grid=Grid(Rows(),("number",T("الحجز","Reservation"),1.2),("customer",T("العميل","Customer"),2),("expires",T("صالح حتى","Valid through"),1.4),("state",T("الحالة","Status"),1),("quote",T("العرض","Quote"),1),("invoice",T("الفاتورة","Invoice"),1));grid.Columns[4].MinWidth=Math.Max(135,FontSize*6);grid.Columns[5].MinWidth=Math.Max(135,FontSize*6);body.Children.Add(grid);
+        void Refresh()=>grid.ItemsSource=Rows().DefaultView;search.TextChanged+=(_,_)=>Refresh();active.Checked+=(_,_)=>Refresh();active.Unchecked+=(_,_)=>Refresh();
+        var details=Btn(T("تفاصيل","Details"),()=>ReservationDetails(Selected(grid)));var sell=Btn(T("بيع المحجوز","Sell reserved stock"),()=>OpenReservedSale(Selected(grid)),true);var release=Btn(T("تحرير الحجز","Release reservation"),()=>ReleaseReservationForm(Selected(grid)));body.Children.Add(Actions(details,sell,release));BindSelection(grid,details,sell,release);grid.MouseDoubleClick+=(_,_)=>Guard(()=>ReservationDetails(Selected(grid)));
+    }
+    record ReservationDraft(long ItemId,long LocationId,string Item,string Location,decimal Quantity,string Serials);
+    void ReservationForm(long? quoteId=null)
+    {
+        Quote? quote=quoteId==null?null:S.GetQuote(quoteId.Value);
+        if(quote!=null){if(S.ActiveQuoteReservation(quote.Id) is long existing){ReservationDetails(existing);return;}if(quote.EffectiveState!="Accepted")throw new InvalidOperationException(T("اقبل عرض السعر أولًا قبل حجز المخزون.","Mark the quotation accepted before reserving stock."));}
+        var (w,p,finish)=Dialog(T("حجز مخزون","Reserve stock"),1000);p.Children.Add(Text(T("الحجز لا يغيّر المخزون الفعلي أو الأرصدة. تنتهي الصلاحية في نهاية اليوم المحدد.","Reservations do not change physical stock or balances. Validity ends after the selected day."),17));
+        var customer=Choose(UiAccounts().Where(a=>a.Kind=="Customer"));if(quote!=null){customer.SelectedItem=customer.Items.Cast<Account>().First(a=>a.Id==quote.Customer);customer.IsEnabled=false;}p.Children.Add(Field(T("العميل","Customer"),customer));var expires=Date();expires.SelectedDate=quote!=null&&quote.Expires<DateTime.Today.AddDays(7)?quote.Expires:DateTime.Today.AddDays(7);p.Children.Add(Field(T("صالح حتى","Valid through"),expires));
+        var rows=new ObservableCollection<ReservationDraft>();var list=new DataGrid{ItemsSource=rows,Height=190};foreach(var c in new[]{("Item",T("الصنف","Item"),3.0),("Location",T("الموقع","Location"),1.5),("Quantity",T("الكمية","Quantity"),1.0),("Serials",T("أجهزة محددة","Fixed serials"),2.0)})list.Columns.Add(new DataGridTextColumn{Header=c.Item2,Binding=new Binding(c.Item1),Width=new DataGridLength(c.Item3,DataGridLengthUnitType.Star)});StyleEditorGrid(list);
+        var item=Choose(UiItems().Where(i=>i.Stock));p.Children.Add(Field(T("الصنف","Item"),item));var location=LocationPicker(p);var quantity=Input("1",true);p.Children.Add(Field(T("الكمية","Quantity"),quantity));var serials=SerialInput(p,T("أرقام تسلسلية محددة (اختياري)","Specific serials (optional)"));var serialField=p.Children[p.Children.Count-1];var availability=Text("",17);p.Children.Add(availability);
+        void Availability(){bool tracked=item.SelectedItem is Item it&&S.IsSerialized(it.Id);serialField.Visibility=tracked?Visibility.Visible:Visibility.Collapsed;if(item.SelectedItem is Item selected){long loc=PickLocation(location);availability.Text=T("فعلي / محجوز / متاح: ","On hand / reserved / available: ")+Store.D(S.LocationQuantity(selected.Id,loc))+" / "+Store.D(S.ReservedQuantity(selected.Id,loc))+" / "+Store.D(S.AvailableQuantity(selected.Id,loc));}else availability.Text="";}
+        item.SelectionChanged+=(_,_)=>{serials.Clear();Availability();};location.SelectionChanged+=(_,_)=>Availability();Availability();
+        ReservationDraft? editing=null;
+        p.Children.Add(Btn(T("اعتماد السطر","Apply line"),()=>{var it=GetItem(item);var loc=(StockLocation)location.SelectedItem;decimal qty=Store.Parse(quantity.Text);if(qty<=0||Store.D(Store.M(qty))!=qty)throw new InvalidOperationException(T("أدخل كمية موجبة بثلاث منازل عشرية كحد أقصى.","Enter a positive quantity with at most three decimals."));var line=new ReservationDraft(it.Id,loc.Id,it.Name,loc.Name,qty,S.IsSerialized(it.Id)?serials.Text:"");if(editing!=null)rows.Remove(editing);var duplicate=rows.FirstOrDefault(l=>l.ItemId==it.Id&&l.LocationId==loc.Id);if(duplicate!=null)rows.Remove(duplicate);rows.Add(line);editing=null;serials.Clear();},true));p.Children.Add(list);
+        p.Children.Add(Actions(Btn(T("تعديل السطر","Edit line"),()=>{if(list.SelectedItem is not ReservationDraft l)throw new InvalidOperationException(T("اختر سطرًا","Select a line"));editing=l;item.SelectedItem=item.Items.Cast<Item>().First(i=>i.Id==l.ItemId);location.SelectedItem=location.Items.Cast<StockLocation>().First(x=>x.Id==l.LocationId);quantity.Text=l.Quantity.ToString(CultureInfo.InvariantCulture);serials.Text=l.Serials;}),Btn(T("إزالة السطر","Remove line"),()=>{if(list.SelectedItem is ReservationDraft l)rows.Remove(l);editing=null;})));
+        if(quote!=null){p.Children.Add(Text(quote.Number+T(" — احجز كامل الكميات المخزنية؛ عدّل السطر لاختيار الموقع والأجهزة."," — reserve all stock quantities; edit a line to choose its location and devices."),17));foreach(var group in quote.Lines.Where(l=>S.Items().Single(i=>i.Id==l.Item).Stock).GroupBy(l=>l.Item)){var loc=S.Locations().First();rows.Add(new(group.Key,loc.Id,S.LocalName("items",group.Key,vm.Arabic),loc.Name,group.Sum(l=>l.Qty),""));}}
+        var note=Input();p.Children.Add(Field(T("ملاحظات","Notes"),note));p.Children.Add(Btn(T("حفظ الحجز","Save reservation"),()=>{long id=A.CreateReservation(GetAccount(customer).Id,GetDate(expires),rows.Select(l=>new ReservationInput(l.ItemId,l.LocationId,l.Quantity,l.Serials)).ToList(),note.Text,quoteId);finish();Navigate("reservations");ReservationDetails(id);},true));w.ShowDialog();
+    }
+    void OpenReservedSale(long id){var r=S.GetReservation(id);if(r.Invoice is long invoice){ShowDocument(invoice);return;}if(r.EffectiveState!="Active")throw new InvalidOperationException(T("الحجز لم يعد نشطًا. أنشئ حجزًا جديدًا إذا لزم.","Reservation is no longer active. Create a new hold if needed."));InvoiceForm(true,quoteId:r.Quote,reservationId:id);}
+    void ReleaseReservationForm(long id)
+    {
+        var r=S.GetReservation(id);if(r.State!="Active")throw new InvalidOperationException(T("لا يمكن تحرير هذا الحجز.","This reservation cannot be released."));var (w,p,finish)=Dialog(T("تحرير الحجز","Release reservation")+" · "+r.Number,700);var reason=Input();p.Children.Add(Field(T("سبب التحرير","Release reason"),reason));p.Children.Add(Btn(T("تحرير الكمية","Release stock"),()=>{A.ReleaseReservation(id,reason.Text);finish();Navigate("reservations");},true));w.ShowDialog();
+    }
+    void ReservationDetails(long id)
+    {
+        var r=S.GetReservation(id);var (w,p,finish)=Dialog(r.Number,950,false);p.Children.Add(Text(S.LocalName("accounts",r.Customer,vm.Arabic),22,true));p.Children.Add(Text(ReservationState(r.EffectiveState)+" · "+T("صالح حتى ","Valid through ")+r.Expires.ToString("yyyy-MM-dd"),18));if(r.Quote!=null)p.Children.Add(Text(S.GetQuote(r.Quote.Value).Number,18));p.Children.Add(Text(r.Note,17));var t=new DataTable();foreach(var col in new[]{"item","location","qty","serials"})t.Columns.Add(col);foreach(var l in r.Lines)t.Rows.Add(S.LocalName("items",l.Item,vm.Arabic),S.Locations(false).First(x=>x.Id==l.Location).Name,l.Quantity,l.Serials);p.Children.Add(Grid(t,("item",T("الصنف","Item"),3),("location",T("الموقع","Location"),1.5),("qty",T("الكمية","Quantity"),1),("serials",T("أجهزة محددة","Fixed serials"),2)));
+        if(r.EffectiveState=="Active")p.Children.Add(Btn(T("بيع المحجوز","Sell reserved stock"),()=>{finish();OpenReservedSale(id);},true));if(r.Invoice!=null)p.Children.Add(Btn(T("فتح الفاتورة","Open invoice"),()=>{finish();ShowDocument(r.Invoice.Value);}));if(r.State=="Active")p.Children.Add(Btn(T("تحرير الحجز","Release reservation"),()=>{finish();ReleaseReservationForm(id);}));w.ShowDialog();
+    }
+}

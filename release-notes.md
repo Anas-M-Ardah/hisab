@@ -1,20 +1,21 @@
-# حساب 0.7.0 — عروض الأسعار وتحسين الواجهة
+# حساب 0.8.0 — حجوزات المخزون
 
-- عروض أسعار مستقلة مع العميل، الأصناف، الخصومات، الضريبة وتاريخ الصلاحية.
-- حالات مسودة، مرسل، مقبول، مرفوض، منتهي الصلاحية ومحّول إلى فاتورة.
-- طباعة العرض أو حفظه PDF وتحويله إلى فاتورة مبيعات بعد مراجعة الدفع والموقع والأرقام التسلسلية.
-- العرض لا يحجز المخزون ولا يؤثر على الحسابات. يحتفظ النظام بمراجعات العرض ويمنع تحويله مرتين.
-- بحث داخل القوائم المنسدلة مع رسائل عربية وإنجليزية للقوائم الفارغة والبحث دون نتائج.
-- أخطاء واضحة داخل النماذج، وتنسيق تمرير ومسافات متسق.
+- حجز كميات لعميل مع موقع وتاريخ صلاحية، وأرقام أجهزة محددة اختياريًا.
+- عرض المخزون الفعلي والمحجوز والمتاح، وإدخال الطلب المحجوز في اقتراحات إعادة الطلب.
+- منع بيع أو نقل أو إرجاع مخزون يغطي حجزًا نشطًا؛ تحرير الحجز مع سبب موثق أو انتهاء صلاحيته تلقائيًا.
+- إنشاء الحجز من عرض سعر مقبول، ثم تنفيذ البيع في فاتورة مرتبطة واحدة دون خصم المخزون مرتين.
+- تحديث شاشات الحجز والعرض والبيع بالعربية والإنجليزية.
 
 ## English
 
-Quotations include customer details, priced lines, discounts, tax, validity dates and tracked status. Print or save to PDF, then convert once into a reviewed sales invoice with stock, serial and payment validation. Quotes do not reserve stock or post accounting entries. Saved revisions and conversion links are retained.
+Reserve stock quantities by customer and location, with an expiry date and optional fixed device serials. Inventory shows on hand, reserved and available quantities; replenishment accounts for held demand.
 
-Dropdown search preserves original options and selection, with keyboard support and localized empty/no-match feedback. Form validation messages stay visible above the fields; shared scrolling and quotation layouts are refined for Arabic/English and different text sizes.
+Active holds protect quantities and fixed serials across sales, transfers, supplier returns, reversals and stock-count adjustments. Reservations do not post accounting entries or change physical stock. Release with an audit reason or allow the hold to expire after its validity date.
 
-## Upgrade
+Accepted quotations can reserve their stock items. Fulfillment creates one linked invoice atomically, preserving the hold if validation fails. This version supports full fulfillment; invoice reversal does not reactivate an old reservation.
 
-Back up before upgrading. Schema 5 preserves existing stock and documents but cannot be reopened by 0.6.x. See QUOTATIONS.md for the workflow and conversion rules.
+## Upgrade and validation
 
-The release pipeline requires 241 accounting/storage checks on x64 and x86. ARM64 is cross-built; hardware scanners and printers still require acceptance testing.
+Back up before upgrading to schema 6; older versions cannot reopen the database. See STOCK-RESERVATIONS.md for operation and expiry rules.
+
+The release pipeline requires 281 automated checks on x64 and x86. ARM64 is cross-built. Arabic/English reservation workflows and availability screens are checked at 14/24-point text. Physical hardware acceptance testing remains necessary.

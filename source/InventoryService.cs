@@ -54,6 +54,7 @@ public sealed partial class AccountingService
         foreach(var item in Items().Where(i=>store.IsSerialized(i.Id))){
             foreach(var loc in store.Locations(false)){long count=positions.Count(p=>p.Value==loc.Id&&Convert.ToInt64(Scalar("SELECT item FROM serial_units WHERE id=@p0",p.Key))==item.Id);if(count*1000!=quantities.GetValueOrDefault((item.Id,loc.Id)))InventoryError("Serials and stock quantity differ; register/select all units");}
         }
+        ValidateReservations();
     }
     void CheckInventoryReversal(long id)
     {

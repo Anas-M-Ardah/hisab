@@ -16,7 +16,6 @@ public sealed partial class Store
         Exec("""
         CREATE TABLE IF NOT EXISTS quotes(id INTEGER PRIMARY KEY,number TEXT NOT NULL UNIQUE,customer INTEGER NOT NULL REFERENCES accounts(id),date TEXT NOT NULL,expires TEXT NOT NULL,state TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 1,payload TEXT NOT NULL,invoice INTEGER UNIQUE REFERENCES documents(id));
         CREATE TABLE IF NOT EXISTS quote_versions(quote INTEGER NOT NULL REFERENCES quotes(id),revision INTEGER NOT NULL,payload TEXT NOT NULL,PRIMARY KEY(quote,revision));
-        PRAGMA user_version=5;
         """);tx.Commit();
     }
     public Quote GetQuote(long id)
@@ -37,6 +36,7 @@ public sealed partial class AccountingService
         if(lines.Count==0||Calculate(lines,vat,inclusive).Total<=0)InventoryError("Add priced quotation lines / أضف أصناف العرض وأسعارها");
         foreach(var l in lines)if(!Items().Any(i=>i.Id==l.Item)||string.IsNullOrWhiteSpace(l.Description)||(store.IsSerialized(l.Item)&&l.Qty!=decimal.Truncate(l.Qty)))InventoryError("Check item, description and whole device quantities / تحقق من الصنف والوصف والكمية");
         using var tx=store.BeginTransaction();Quote? old=id==null?null:store.GetQuote(id.Value);
+        if(id!=null&&store.ActiveQuoteReservation(id.Value)!=null)InventoryError("حرر حجز العرض قبل تعديله / Release the quote reservation before editing");
         if(old!=null&&(old.Invoice!=null||old.Revision!=revision))InventoryError("Quote was converted or changed; reopen it / تم تحويل العرض أو تعديله؛ أعد فتحه");
         string number=old?.Number??"QT-"+(Convert.ToInt64(Scalar("SELECT coalesce(max(id),0)+1 FROM quotes"))).ToString("D6");
         var q=new Quote(id??0,number,customer,store.LocalName("accounts",customer,true),store.LocalName("accounts",customer,false),date.Date,expires.Date,"Draft",(old?.Revision??0)+1,note,Setting("company"),Setting("company_en"),Setting("terms"),Setting("terms_en"),vat,inclusive,lines.Select(l=>l with {Serials="",Location=1}).ToList(),null);
@@ -48,6 +48,7 @@ public sealed partial class AccountingService
     public void SetQuoteState(long id,int revision,string state)
     {
         store.Require("post");using var tx=store.BeginTransaction();var q=store.GetQuote(id);
+        if(store.ActiveQuoteReservation(id)!=null)InventoryError("حرر حجز العرض قبل تغيير حالته / Release the quote reservation before changing status");
         if(q.Invoice!=null||q.Revision!=revision||state is not ("Sent" or "Accepted" or "Declined")||q.EffectiveState=="Expired")InventoryError("Reopen or revise this quote before changing its status / أعد فتح العرض أو تعديله");
         Exec("UPDATE quotes SET state=@p0,revision=revision+1 WHERE id=@p1",state,id);SnapshotQuote(id);Audit("quote-status",q.Number+": "+state);tx.Commit();
     }
@@ -56,7 +57,8 @@ public sealed partial class AccountingService
         store.Require("post");using var tx=store.BeginTransaction();var q=store.GetQuote(id);
         if(q.Invoice!=null||q.Revision!=revision||q.EffectiveState is "Expired" or "Declined"||date.Date<q.Date||date.Date>q.Expires)InventoryError("Quote is expired, declined, changed or already converted; revise it first / راجع حالة العرض وصلاحيته");
         if(customer!=q.Customer||vat!=q.Vat||inclusive!=q.Inclusive||!lines.Select(l=>l with {Location=1,Serials=""}).SequenceEqual(q.Lines))InventoryError("Revise the quote before changing its customer, prices or lines / عدّل العرض أولًا لتغيير العميل أو الأسعار أو الأصناف");
-        long invoice=Invoice(true,date,customer,cash,paid,vat,inclusive,note,lines);SetDueDate(invoice,due);
+        long? reservation=store.ActiveQuoteReservation(id);if(reservation!=null)PrepareReservation(reservation.Value,date,customer,lines);
+        long invoice=Invoice(true,date,customer,cash,paid,vat,inclusive,note,lines);SetDueDate(invoice,due);if(reservation!=null)CompleteReservation(reservation.Value,invoice);
         Exec("UPDATE quotes SET state='Converted',invoice=@p0,revision=revision+1 WHERE id=@p1",invoice,id);SnapshotQuote(id);Audit("quote-convert",q.Number+" -> "+invoice);tx.Commit();return invoice;
     }
 }

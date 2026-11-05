@@ -25,7 +25,7 @@ public sealed partial class MainWindow
 
     void ArrangeDataWorkspace(string route)
     {
-        if(route is not ("accounts" or "items" or "invoices" or "quotes" or "cheques" or "users" or "periods"))return;
+        if(route is not ("accounts" or "items" or "invoices" or "quotes" or "reservations" or "cheques" or "users" or "periods"))return;
         var table=body.Children.OfType<DataGrid>().FirstOrDefault();if(table==null)return;
         if(route=="invoices")
         {
