@@ -1,21 +1,16 @@
-# حساب 0.8.0 — حجوزات المخزون
+# حساب 0.9.0 — سجل الصنف
 
-- حجز كميات لعميل مع موقع وتاريخ صلاحية، وأرقام أجهزة محددة اختياريًا.
-- عرض المخزون الفعلي والمحجوز والمتاح، وإدخال الطلب المحجوز في اقتراحات إعادة الطلب.
-- منع بيع أو نقل أو إرجاع مخزون يغطي حجزًا نشطًا؛ تحرير الحجز مع سبب موثق أو انتهاء صلاحيته تلقائيًا.
-- إنشاء الحجز من عرض سعر مقبول، ثم تنفيذ البيع في فاتورة مرتبطة واحدة دون خصم المخزون مرتين.
-- تحديث شاشات الحجز والعرض والبيع بالعربية والإنجليزية.
+- شاشة موحدة لحركات الصنف والفواتير والمرتجعات والتحويلات والجرد والحجوزات.
+- بحث بالمستند أو الرقم التسلسلي أو الملاحظات، مع فلاتر التاريخ والموقع ونوع النشاط.
+- فتح المستند أو الحجز الأصلي من السجل، وعرض تفاصيل العميل أو المورد والأجهزة.
+- تمييز الحركات الملغاة وعدم احتساب الفوترة اللاحقة للاستلام كمخزون وارد جديد.
 
 ## English
 
-Reserve stock quantities by customer and location, with an expiry date and optional fixed device serials. Inventory shows on hand, reserved and available quantities; replenishment accounts for held demand.
+Open Item history from Items & stock or Inventory management. Review purchases, sales, returns, transfers, stock counts, serial movements, cost activity and reservations together. Search by reference, serial or notes; filter by dates, location and activity type; open the source record from any row.
 
-Active holds protect quantities and fixed serials across sales, transfers, supplier returns, reversals and stock-count adjustments. Reservations do not post accounting entries or change physical stock. Release with an audit reason or allow the hold to expire after its validity date.
+Current on-hand, reserved and available quantities remain visible. Cancelled documents and reversals are labeled, and billing previously received goods does not double-count incoming stock. Reservations show creation date and current status without changing physical quantities.
 
-Accepted quotations can reserve their stock items. Fulfillment creates one linked invoice atomically, preserving the hold if validation fails. This version supports full fulfillment; invoice reversal does not reactivate an old reservation.
+## Compatibility and validation
 
-## Upgrade and validation
-
-Back up before upgrading to schema 6; older versions cannot reopen the database. See STOCK-RESERVATIONS.md for operation and expiry rules.
-
-The release pipeline requires 281 automated checks on x64 and x86. ARM64 is cross-built. Arabic/English reservation workflows and availability screens are checked at 14/24-point text. Physical hardware acceptance testing remains necessary.
+Schema remains 6. This is a read-only history view; see ITEM-HISTORY.md for details. The release workflow requires 302 automated checks on x64 and x86 and cross-builds ARM64. Arabic/English history, detail, empty-state and search previews cover 14/24-point text.

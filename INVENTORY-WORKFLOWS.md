@@ -10,6 +10,10 @@ Configure tracking sets an optional product barcode and enables serial tracking.
 
 Devices & warranties shows serial history and optional supplier/customer warranty end dates. This is inventory information, not a repair management system. Printed inventory documents include serial details.
 
+## Item history
+
+Select an item and choose Item history from Items & stock or Inventory management. Filter physical movements and reservations by date, location, activity, reference or serial number, and open the original record. See ITEM-HISTORY.md for cancellation and quantity rules.
+
 ## Reservations
 
 Inventory shows on-hand, reserved and available quantities by location. Open Reservations to hold stock for a customer or accepted quote, optionally including specific serials. Holds expire or can be released with a reason; sell through the hold to consume it. See STOCK-RESERVATIONS.md for the complete workflow.

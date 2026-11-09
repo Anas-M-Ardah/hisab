@@ -25,7 +25,7 @@ public sealed partial class MainWindow
 
     void ArrangeDataWorkspace(string route)
     {
-        if(route is not ("accounts" or "items" or "invoices" or "quotes" or "reservations" or "cheques" or "users" or "periods"))return;
+        if(route is not ("accounts" or "items" or "invoices" or "quotes" or "reservations" or "item-history" or "cheques" or "users" or "periods"))return;
         var table=body.Children.OfType<DataGrid>().FirstOrDefault();if(table==null)return;
         if(route=="invoices")
         {
@@ -44,7 +44,7 @@ public sealed partial class MainWindow
         layout.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});layout.RowDefinitions.Add(new RowDefinition{Height=new GridLength(1,GridUnitType.Star)});layout.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});
         layout.Children.Add(body);table.MaxHeight=double.PositiveInfinity;table.MinHeight=0;
         var content=new System.Windows.Controls.Grid();content.Children.Add(table);
-        var empty=new TextBlock{Text=T("لا توجد سجلات لعرضها. غيّر البحث أو أضف سجلًا.","No records to show. Change the search or add a record."),Foreground=muted,FontSize=Math.Max(14,FontSize*.9),TextWrapping=TextWrapping.Wrap,TextAlignment=TextAlignment.Center,HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(24),IsHitTestVisible=false};
+        var empty=new TextBlock{Text=route=="item-history"?T("لا توجد حركات مطابقة. جرّب مسح الفلاتر.","No matching activity. Try clearing the filters."):T("لا توجد سجلات لعرضها. غيّر البحث أو أضف سجلًا.","No records to show. Change the search or add a record."),Foreground=muted,FontSize=Math.Max(14,FontSize*.9),TextWrapping=TextWrapping.Wrap,TextAlignment=TextAlignment.Center,HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(24),IsHitTestVisible=false};
         var emptyStyle=new Style(typeof(TextBlock));emptyStyle.Setters.Add(new Setter(VisibilityProperty,Visibility.Collapsed));var noRows=new DataTrigger{Binding=new System.Windows.Data.Binding(nameof(ItemsControl.HasItems)){Source=table},Value=false};noRows.Setters.Add(new Setter(VisibilityProperty,Visibility.Visible));emptyStyle.Triggers.Add(noRows);empty.Style=emptyStyle;content.Children.Add(empty);
         var surface=new Border{Background=UiTheme.Brush(Resources,"Brush.Surface"),BorderBrush=UiTheme.Brush(Resources,"Brush.Divider"),BorderThickness=new Thickness(1),CornerRadius=new CornerRadius(10),ClipToBounds=true,Child=TableSurface(table,content)};
         surface.SizeChanged+=(s,e)=>surface.Clip=new RectangleGeometry(new Rect(0,0,surface.ActualWidth,surface.ActualHeight),10,10);
