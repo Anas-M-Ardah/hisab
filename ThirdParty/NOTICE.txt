@@ -4,3 +4,5 @@ Microsoft.Data.Sqlite.Core 10.0.12 — MIT, Microsoft and .NET Foundation contri
 SQLitePCLRaw 3.0.5 — Apache-2.0, Copyright 2014–2026 SourceGear, LLC. https://github.com/ericsink/SQLitePCL.raw
 SQLite 3.53.4 — public domain. https://sqlite.org/copyright.html
 The bundled license texts and runtime third-party notices accompany these components.
+
+DocumentFormat.OpenXml and DocumentFormat.OpenXml.Framework 3.5.1 — MIT, .NET Foundation and Contributors. https://github.com/dotnet/Open-XML-SDK

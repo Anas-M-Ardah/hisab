@@ -10,6 +10,10 @@ Configure tracking sets an optional product barcode and enables serial tracking.
 
 Devices & warranties shows serial history and optional supplier/customer warranty end dates. This is inventory information, not a repair management system. Printed inventory documents include serial details.
 
+## Excel import
+
+Use Import Excel in Items & stock to map a worksheet and preview products and optional opening quantities. Existing codes are skipped by default; eligible existing items can explicitly receive opening stock without overwriting their details. No rows are saved until validation passes and import is confirmed. See EXCEL-IMPORT.md.
+
 ## Item history
 
 Select an item and choose Item history from Items & stock or Inventory management. Filter physical movements and reservations by date, location, activity, reference or serial number, and open the original record. See ITEM-HISTORY.md for cancellation and quantity rules.

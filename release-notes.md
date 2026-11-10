@@ -1,16 +1,21 @@
-# حساب 0.9.0 — سجل الصنف
+# حساب 0.10.0 — استيراد Excel مع المعاينة
 
-- شاشة موحدة لحركات الصنف والفواتير والمرتجعات والتحويلات والجرد والحجوزات.
-- بحث بالمستند أو الرقم التسلسلي أو الملاحظات، مع فلاتر التاريخ والموقع ونوع النشاط.
-- فتح المستند أو الحجز الأصلي من السجل، وعرض تفاصيل العميل أو المورد والأجهزة.
-- تمييز الحركات الملغاة وعدم احتساب الفوترة اللاحقة للاستلام كمخزون وارد جديد.
+- استيراد الأصناف والأرصدة الافتتاحية الاختيارية من ملفات xlsx، مع اختيار الورقة ومطابقة الأعمدة.
+- معاينة الجديد والمتخطى والأخطاء قبل الحفظ، مع تفاصيل الصفوف والبحث عن الأخطاء.
+- حماية الأكواد والباركود النصية والأرقام التسلسلية، ومنع تكرار الرصيد الافتتاحي.
+- حفظ الدفعة كاملة في معاملة واحدة، أو التراجع عنها كاملة عند الخطأ.
+- يتضمن سجل الصنف الموحد، والفلاتر وروابط المستندات الأصلية.
 
 ## English
 
-Open Item history from Items & stock or Inventory management. Review purchases, sales, returns, transfers, stock counts, serial movements, cost activity and reservations together. Search by reference, serial or notes; filter by dates, location and activity type; open the source record from any row.
+Import Excel workbooks from Items & stock. Choose a worksheet, match columns and review every product and optional opening balance before saving. The preview distinguishes new items, existing-item opening balances, skipped duplicates and validation errors.
 
-Current on-hand, reserved and available quantities remain visible. Cancelled documents and reversals are labeled, and billing previously received goods does not double-count incoming stock. Reservations show creation date and current status without changing physical quantities.
+Existing codes are skipped by default; an explicit opening-only option preserves existing item details. Serial numbers, barcodes, quantities, costs, stock-count conflicts and closed periods are checked. The entire reviewed batch commits atomically and is revalidated before saving.
+
+Includes unified Item history, date/location/activity filters, serial search and links to source records.
 
 ## Compatibility and validation
 
-Schema remains 6. This is a read-only history view; see ITEM-HISTORY.md for details. The release workflow requires 302 automated checks on x64 and x86 and cross-builds ARM64. Arabic/English history, detail, empty-state and search previews cover 14/24-point text.
+Schema remains 6. Supports standard .xlsx files; see EXCEL-IMPORT.md for supported columns, formats and limits. Microsoft Open XML SDK licenses are included.
+
+The release workflow requires 342 automated checks on x64 and x86 and cross-builds ARM64. Arabic/English import and history previews cover normal and large text sizes.
