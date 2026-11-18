@@ -1,3 +1,11 @@
+Warranty and exchanges update (0.11.0)
+- Packaged Windows x64 executable: 390 checks passed, zero failures.
+- Covers free replacements, custody, repeat claims, expiry overrides, permissions, reservations, historical cost replay, undo, backup/restore and schema 6 migration.
+- Arabic/English list, forms, certificate, receipt, serial search and empty states verified at 14 and 24 font settings.
+- Faulty devices remain outside available stock; original customer balances, sales and tax are unchanged.
+- Database schema 7; older binaries cannot open upgraded data.
+- Physical printers, target-device DPI and native ARM64 execution remain manual checks.
+
 Workbook workflow update (0.5.0)
 - Published Windows x64 build: 171 accounting/storage checks passed on isolated databases.
 - Arabic/English account-filter and child-report checks passed.

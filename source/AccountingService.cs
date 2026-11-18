@@ -100,7 +100,7 @@ public sealed partial class AccountingService(Store store)
     }
     public long Reverse(long id,string reason,DateTime? reversalDate=null,bool managed=false)
     {
-        CheckInventoryReversal(id);CheckPurchasingReversal(id);
+        CheckInventoryReversal(id);CheckPurchasingReversal(id);CheckWarrantyReversal(id);
         if(string.IsNullOrWhiteSpace(reason)) throw new InvalidOperationException("اكتب سبب الإلغاء / Enter a cancellation reason");
         using var tx=store.BeginTransaction();var effectiveDate=reversalDate??DateTime.Today; var doc=Table("SELECT * FROM documents WHERE id=@p0",id).Rows[0];
         if((long)doc["reversed"]==1||doc["kind"].ToString()=="RV") throw new InvalidOperationException("المستند ملغى بالفعل / Document already cancelled");

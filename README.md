@@ -38,3 +38,9 @@
 ## Development
 
 C# / .NET 10 / WPF, SQLite, encrypted local snapshots. The release includes `Source.zip`, architecture and validation notes, and third-party notices. See `source/build.ps1` for Windows builds.
+
+## الضمان والاستبدال المجاني — 0.11.0
+
+تسجيل ضمان الأجهزة حسب التسلسلي والفاتورة، واستلام المطالبات ومتابعة المورد، مع استبدال مجاني وشهادة ضمان وإيصال قابلين للطباعة. الجهاز التالف يبقى خارج المخزون المتاح، والبديل يرث نهاية الضمان الأصلية. [دليل الضمان والاستبدال](WARRANTIES.md).
+
+Schema 7: back up before upgrading; older versions cannot open upgraded data.

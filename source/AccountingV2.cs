@@ -75,10 +75,11 @@ public sealed partial class AccountingService
     {
         if(deferredRebuild>0)return;
         var states=Items().Where(i=>i.Stock).ToDictionary(i=>i.Id,i=>new StockState());
-        var docs=Table("SELECT * FROM documents WHERE kind IN ('SI','PI','SR','PR','OB','VA','OT','IA','GR','GU') AND reversed=0 ORDER BY date,id");
+        var docs=Table("SELECT * FROM documents WHERE kind IN ('SI','PI','SR','PR','OB','VA','OT','IA','GR','GU','WX') AND reversed=0 ORDER BY date,id");
         foreach(DataRow doc in docs.Rows){long id=(long)doc["id"];string kind=(string)doc["kind"];long goods=0,services=0,cost=0,variance=0,extra=0,oldCost=Convert.ToInt64(Scalar("SELECT coalesce(sum(cost),0) FROM invoice_lines WHERE doc=@p0",id));
             if(kind=="PI"&&IsReceiptBill(id)){ReplayReceiptBill(doc);continue;}
             if(kind=="IA"){ReplayCount(doc,states);continue;}
+            if(kind=="WX"){ReplayWarranty(doc,states);continue;}
             if(kind is "OB" or "VA" or "OT"){
                 foreach(DataRow move in Table("SELECT * FROM stock_moves WHERE doc=@p0",id).Rows){var st=states[(long)move["item"]];if(kind=="OT"&&st.Qty<0)throw new InvalidOperationException("سوّ الكمية السالبة قبل تحويل الطلبية / Resolve negative stock before transferring an order");st.Qty+=(long)move["qty"];st.Value+=(long)move["value"];if(st.Qty>0)st.LastCost=D(st.Value)*1000/st.Qty;}continue;
             }

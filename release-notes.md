@@ -1,21 +1,19 @@
-# حساب 0.10.0 — استيراد Excel مع المعاينة
+# حساب 0.11.0 — الضمان والاستبدال المجاني
 
-- استيراد الأصناف والأرصدة الافتتاحية الاختيارية من ملفات xlsx، مع اختيار الورقة ومطابقة الأعمدة.
-- معاينة الجديد والمتخطى والأخطاء قبل الحفظ، مع تفاصيل الصفوف والبحث عن الأخطاء.
-- حماية الأكواد والباركود النصية والأرقام التسلسلية، ومنع تكرار الرصيد الافتتاحي.
-- حفظ الدفعة كاملة في معاملة واحدة، أو التراجع عنها كاملة عند الخطأ.
-- يتضمن سجل الصنف الموحد، والفلاتر وروابط المستندات الأصلية.
+- تسجيل ضمان الأجهزة حسب التسلسلي وفاتورة البيع، مع شهادة ضمان قابلة للطباعة.
+- استلام المطالبات وتسجيل العطل والحالة والملحقات وطباعة إيصال للعميل.
+- متابعة عهدة الأجهزة وإرسالها للمورد واستلامها برقم مرجعي، بدون تكامل خارجي.
+- استبدال مجاني من المخزون المتاح مع حماية الحجوزات، واحتساب تكلفة الضمان دون تغيير الفاتورة أو رصيد العميل.
+- يرث الجهاز البديل نهاية الضمان الأصلية، مع سجل للمطالبات المتتابعة والاستثناءات والإلغاء والإتلاف.
 
 ## English
 
-Import Excel workbooks from Items & stock. Choose a worksheet, match columns and review every product and optional opening balance before saving. The preview distinguishes new items, existing-item opening balances, skipped duplicates and validation errors.
+Adds a bilingual Warranties & exchanges workspace for serialized hardware. Register coverage against the sold serial and invoice, print a certificate, receive a claim, record condition/accessories, and track supplier custody locally.
 
-Existing codes are skipped by default; an explicit opening-only option preserves existing item details. Serial numbers, barcodes, quantities, costs, stock-count conflicts and closed periods are checked. The entire reviewed batch commits atomically and is revalidated before saving.
+Free replacements remove an available device at weighted-average cost and post warranty expense. Original sales, customer balances and taxes stay unchanged. Faulty units stay outside available stock. Replacement coverage inherits the original expiry; expired/unrecorded coverage requires an administrator's recorded exception.
 
-Includes unified Item history, date/location/activity filters, serial search and links to source records.
+Includes safe exchange undo, repeat claims on replacement hardware, original-invoice links, printable claim receipts, reservation/count/period protections and backup persistence. Paid upgrades, supplier reimbursements and refurbishment stock are not included.
 
 ## Compatibility and validation
 
-Schema remains 6. Supports standard .xlsx files; see EXCEL-IMPORT.md for supported columns, formats and limits. Microsoft Open XML SDK licenses are included.
-
-The release workflow requires 342 automated checks on x64 and x86 and cross-builds ARM64. Arabic/English import and history previews cover normal and large text sizes.
+Schema 7; back up before upgrading. Older versions cannot open upgraded databases. See WARRANTIES.md for the workflow and rules. Release checks cover 390 accounting/storage scenarios plus Arabic/English interface previews at normal and large text sizes. Physical printing and native ARM64 execution remain manual checks.

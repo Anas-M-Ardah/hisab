@@ -31,6 +31,7 @@ public sealed partial class AccountingService
             if(found==null){if(!newUnits&&sourceLine!=null&&!legacyIncoming)InventoryError("Returned serial was not on the original document");if(direction<0)InventoryError("Unknown serial: "+number);Exec("INSERT INTO serial_units(item,number,normalized) VALUES(@p0,@p1,@p2)",item,number,key);unit=Convert.ToInt64(Scalar("SELECT last_insert_rowid()"));}
             else unit=Convert.ToInt64(found);
             if(sourceLine!=null&&Convert.ToInt64(Scalar("SELECT count(*) FROM serial_events WHERE line=@p0 AND unit=@p1",sourceLine,unit))==0){long sourceDoc=Convert.ToInt64(Scalar("SELECT doc FROM invoice_lines WHERE id=@p0",sourceLine));long start=Convert.ToInt64(Scalar("SELECT serial_start FROM items WHERE id=@p0",item));if(sourceDoc>=start)InventoryError("Serial does not belong to the original line");Audit("legacy-return-serial",doc+": "+number);}
+            if(direction==1)CheckWarrantyReturn(unit);
             Exec("INSERT INTO serial_events(unit,doc,line,location,direction) VALUES(@p0,@p1,@p2,@p3,@p4)",unit,doc,line,location,direction);
         }
     }
