@@ -1,0 +1,38 @@
+ENTRYPOINT Hisab.Audit.Program; synthetic fixtures: C:\Users\admin\AppData\Local\Temp\HisabAudit\099d97cd61614049a8ee3260c7937123
+PASS ar/14 reconciliation labels, totals and print rendering
+PASS ar/24 reconciliation labels, totals and print rendering
+PASS en/14 reconciliation labels, totals and print rendering
+PASS en/24 reconciliation labels, totals and print rendering
+PASS ar/14 opening forms, preview, allocation, print and late-billing form
+PASS ar/24 opening forms, preview, allocation, print and late-billing form
+PASS en/14 opening forms, preview, allocation, print and late-billing form
+PASS en/24 opening forms, preview, allocation, print and late-billing form
+PASS sorted rows and reordered columns preserved in saved snapshot and export
+PASS ar/14 profit bilingual values, snapshot, CSV and print parity
+PASS ar/14 balance-sheet bilingual values, snapshot, CSV and print parity
+PASS ar/14 historical-stock bilingual values, snapshot, CSV and print parity
+PASS ar/14 receipt-accruals bilingual values, snapshot, CSV and print parity
+PASS ar/14 cash-flow bilingual values, snapshot, CSV and print parity
+PASS ar/14 cash-flow-details bilingual values, snapshot, CSV and print parity
+PASS ar/14 noncash bilingual values, snapshot, CSV and print parity
+PASS ar/24 profit bilingual values, snapshot, CSV and print parity
+PASS ar/24 balance-sheet bilingual values, snapshot, CSV and print parity
+PASS ar/24 historical-stock bilingual values, snapshot, CSV and print parity
+PASS ar/24 receipt-accruals bilingual values, snapshot, CSV and print parity
+PASS ar/24 cash-flow bilingual values, snapshot, CSV and print parity
+PASS ar/24 cash-flow-details bilingual values, snapshot, CSV and print parity
+PASS ar/24 noncash bilingual values, snapshot, CSV and print parity
+PASS en/14 profit bilingual values, snapshot, CSV and print parity
+PASS en/14 balance-sheet bilingual values, snapshot, CSV and print parity
+PASS en/14 historical-stock bilingual values, snapshot, CSV and print parity
+PASS en/14 receipt-accruals bilingual values, snapshot, CSV and print parity
+PASS en/14 cash-flow bilingual values, snapshot, CSV and print parity
+PASS en/14 cash-flow-details bilingual values, snapshot, CSV and print parity
+PASS en/14 noncash bilingual values, snapshot, CSV and print parity
+PASS en/24 profit bilingual values, snapshot, CSV and print parity
+PASS en/24 balance-sheet bilingual values, snapshot, CSV and print parity
+PASS en/24 historical-stock bilingual values, snapshot, CSV and print parity
+PASS en/24 receipt-accruals bilingual values, snapshot, CSV and print parity
+PASS en/24 cash-flow bilingual values, snapshot, CSV and print parity
+PASS en/24 cash-flow-details bilingual values, snapshot, CSV and print parity
+PASS en/24 noncash bilingual values, snapshot, CSV and print parity

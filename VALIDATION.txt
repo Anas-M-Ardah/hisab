@@ -1,3 +1,8 @@
+Accounting integrity and reporting update (0.12.0)
+- 640 synthetic checks passed locally; 37 bilingual reporting/UI/export checks passed.
+- Schema 8; back up before upgrade. Packaged x64/x86 checks gate release publication.
+- See docs/audits and release-notes.md for evidence, limitations and remaining scope.
+
 Warranty and exchanges update (0.11.0)
 - Packaged Windows x64 executable: 390 checks passed, zero failures.
 - Covers free replacements, custody, repeat claims, expiry overrides, permissions, reservations, historical cost replay, undo, backup/restore and schema 6 migration.

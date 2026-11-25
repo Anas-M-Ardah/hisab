@@ -1,0 +1,42 @@
+[
+  {
+    "input": "123.456",
+    "actual": "123.456",
+    "accepted": true
+  },
+  {
+    "input": "١٢٣٫٤٥٦",
+    "actual": "123.456",
+    "accepted": true
+  },
+  {
+    "input": "-123.456",
+    "actual": "-123.456",
+    "accepted": true
+  },
+  {
+    "input": "-١٢٣٫٤٥٦",
+    "actual": "-123.456",
+    "accepted": true
+  },
+  {
+    "input": "1250.500",
+    "actual": "1250.500",
+    "accepted": true
+  },
+  {
+    "input": "١٢٥٠٫٥٠٠",
+    "actual": "1250.500",
+    "accepted": true
+  },
+  {
+    "input": "1,250.500",
+    "actual": "rejected",
+    "accepted": false
+  },
+  {
+    "input": "١٬٢٥٠٫٥٠٠",
+    "actual": "rejected",
+    "accepted": false
+  }
+]

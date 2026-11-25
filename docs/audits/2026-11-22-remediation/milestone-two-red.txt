@@ -1,0 +1,84 @@
+ENTRYPOINT Hisab.Audit.Program; synthetic fixtures: C:\Users\admin\AppData\Local\Temp\HisabAudit\b45b52d95f1c464baaa6a5fc7266ca6b
+PASS AR rejects reuse before revocation
+PASS AR historical positions reconcile
+PASS AR allows reuse on revocation day
+PASS AR rejects current over-allocation
+PASS AR checks future interval peak, not just start/current balance
+PASS AR partial allocations preserve cutoff
+PASS AR reversal preserves historical settlement
+PASS AP rejects reuse before revocation
+PASS AP historical positions reconcile
+PASS AP allows reuse on revocation day
+PASS AP rejects current over-allocation
+PASS AP checks future interval peak, not just start/current balance
+PASS AP partial allocations preserve cutoff
+PASS AP reversal preserves historical settlement
+PASS incoming pending generic reversal stays protected
+PASS incoming pending generic managed reversal still checks original closed period
+PASS incoming pending closed entries untouched
+PASS incoming pending debt restored only on bounce date
+PASS incoming pending allocation released on bounce date
+PASS incoming pending cheque and bank balances reconciled
+PASS incoming pending terminal state recorded
+PASS incoming pending duplicate bounce rejected
+PASS incoming pending duplicate creates no documents
+PASS incoming cleared generic reversal stays protected
+PASS incoming cleared generic managed reversal still checks original closed period
+PASS incoming cleared closed entries untouched
+PASS incoming cleared debt restored only on bounce date
+PASS incoming cleared allocation released on bounce date
+PASS incoming cleared cheque and bank balances reconciled
+PASS incoming cleared terminal state recorded
+PASS incoming cleared duplicate bounce rejected
+PASS incoming cleared duplicate creates no documents
+PASS outgoing pending generic reversal stays protected
+PASS outgoing pending generic managed reversal still checks original closed period
+PASS outgoing pending closed entries untouched
+PASS outgoing pending debt restored only on bounce date
+PASS outgoing pending allocation released on bounce date
+PASS outgoing pending cheque and bank balances reconciled
+PASS outgoing pending terminal state recorded
+PASS outgoing pending duplicate bounce rejected
+PASS outgoing pending duplicate creates no documents
+PASS outgoing cleared generic reversal stays protected
+PASS outgoing cleared generic managed reversal still checks original closed period
+PASS outgoing cleared closed entries untouched
+PASS outgoing cleared debt restored only on bounce date
+PASS outgoing cleared allocation released on bounce date
+PASS outgoing cleared cheque and bank balances reconciled
+PASS outgoing cleared terminal state recorded
+PASS outgoing cleared duplicate bounce rejected
+PASS outgoing cleared duplicate creates no documents
+PASS Allocation respects a historical return even when cancelled later
+PASS Return cancellation releases capacity only on its event date
+PASS Bounce cannot precede clearance
+PASS Bounce requires a reason
+PASS Future bounce rejected
+PASS Bounce event must be in an open period
+PASS Viewer cannot bounce a cheque
+PASS Rejected bounce leaves documents and state intact
+PASS Cheque failure rolls back both reversing entries
+PASS Cheque failure rolls back reversal metadata and state
+PASS Open-period cancellation remains supported
+FAIL return remainder: System.Exception: Three partial returns restore exactly 100.000 and zero COGS
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>g__Check|0(Boolean ok, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 10
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>b__3(Store s, AccountingService a, Int64 sup, Int64 cus, Int64 item) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 20
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`5 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 12
+FAIL closing gap: System.Exception: First close cannot silently exclude earlier activity
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>g__Check|0(Boolean ok, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 10
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>g__Reject|1(Action act, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 11
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>b__4(Store s, AccountingService a, Int64 sup, Int64 cus, Int64 item) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 27
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`5 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 12
+FAIL closed receipt equal-cost billing: System.InvalidOperationException: الفترة المالية مقفلة أو التاريخ يسبق آخر إقفال / Date is in or before the last closed period
+   at Hisab.AccountingService.EnsureOpen(DateTime date) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingV2.cs:line 14
+   at Hisab.AccountingService.BillReceipts(Int64 supplier, DateTime date, IReadOnlyList`1 inputs, Decimal vat) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\Purchasing.cs:line 55
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>b__5(Store s, AccountingService a, Int64 sup, Int64 cus, Int64 item) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 44
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`5 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 12
+PASS Late bill cannot rewrite a closed receipt through a price increase
+PASS Late bill cannot rewrite a closed receipt through a price decrease
+PASS Rejected price variance rolls back bill and receipt links
+FAIL grouped numeric input: System.InvalidOperationException: أدخل رقمًا صحيحًا، مثل 1250.500
+Enter a valid number, e.g. 1250.500
+   at Hisab.Store.Parse(String text) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\Store.cs:line 73
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>b__7(Store s, AccountingService a, Int64 sup, Int64 cus, Int64 item) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 63
+   at Hisab.ClosingStockTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`5 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\ClosingStockTests.cs:line 12

@@ -13,7 +13,7 @@ foreach($runtime in @('win-x64','win-x86','win-arm64')) {
     if($proc.ExitCode -ne 0){throw "Self-test failed: $runtime"}
     $results=Get-Content (Join-Path $tests 'test-results.txt')
     if(@($results | Where-Object {$_ -like 'FAIL *'}).Count -gt 0){throw "Self-test reported failed checks: $runtime"}
-    if(@($results | Where-Object {$_ -like 'PASS *'}).Count -ne 390){throw 'Expected 390 passed checks.'}
+    if(@($results | Where-Object {$_ -like 'PASS *'}).Count -ne 640){throw 'Expected 640 passed checks.'}
     $results | Out-File (Join-Path $package ('CHECKS-'+$runtime+'.txt')) -Encoding utf8
   }
 }

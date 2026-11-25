@@ -1,0 +1,22 @@
+[
+  {
+    "path": "source/AccountingV2.cs",
+    "sha256": "409FEDCBDAD4560C197B9DB9E6E265263EF52CE6CE7FF4B637B28D45FB723025"
+  },
+  {
+    "path": "source/AccountingIntegrityTests.cs",
+    "sha256": "2F073E1F76645F23311F35B39269D411CEA75887DE6DF503F008D509AD0FC924"
+  },
+  {
+    "path": "source/SelfTest.cs",
+    "sha256": "BF8010CBFFB43CE16F02587B97F69387B221FEC496C2B9519237D077B783C187"
+  },
+  {
+    "path": "tests/Hisab.Audit/Program.cs",
+    "sha256": "68FF58DAF09B68854B9B94A90C6B55389B5140A9709E88850453CB96EB323F31"
+  },
+  {
+    "path": "tests/Hisab.Audit/Hisab.Audit.csproj",
+    "sha256": "674842818DCA0E50CFDD6174CFDEED4A4EF55B7BA2AF39A7AB3826410BD3B9E0"
+  }
+]

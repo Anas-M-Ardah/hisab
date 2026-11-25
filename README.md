@@ -44,3 +44,7 @@ C# / .NET 10 / WPF, SQLite, encrypted local snapshots. The release includes `Sou
 تسجيل ضمان الأجهزة حسب التسلسلي والفاتورة، واستلام المطالبات ومتابعة المورد، مع استبدال مجاني وشهادة ضمان وإيصال قابلين للطباعة. الجهاز التالف يبقى خارج المخزون المتاح، والبديل يرث نهاية الضمان الأصلية. [دليل الضمان والاستبدال](WARRANTIES.md).
 
 Schema 7: back up before upgrading; older versions cannot open upgraded data.
+
+## 0.12.0 — Accounting integrity and reporting
+
+Comparative statements, cash-flow reporting, historical inventory/GRNI reconciliation, detailed opening balances, noncash disclosures and fixed report snapshots. See [release notes](release-notes.md) for upgrade instructions and scope.

@@ -1,0 +1,48 @@
+FAIL AR historical allocation: System.Exception: AR rejects reuse before revocation
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Check|0(Boolean ok, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 10
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Reject|1(Action action, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 11
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_1.<Run>b__9(Store s, AccountingService a) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 31
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`2 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 14
+FAIL AR invoice capacity: System.Exception: AR checks future interval peak, not just start/current balance
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Check|0(Boolean ok, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 10
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Reject|1(Action action, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 11
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_1.<Run>b__10(Store s, AccountingService a) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 42
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`2 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 14
+FAIL AP historical allocation: System.Exception: AP rejects reuse before revocation
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Check|0(Boolean ok, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 10
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Reject|1(Action action, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 11
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_1.<Run>b__9(Store s, AccountingService a) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 31
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`2 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 14
+FAIL AP invoice capacity: System.Exception: AP checks future interval peak, not just start/current balance
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Check|0(Boolean ok, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 10
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Reject|1(Action action, String name) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 11
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_1.<Run>b__10(Store s, AccountingService a) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 42
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`2 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 14
+PASS incoming pending generic reversal stays protected
+FAIL incoming pending closed cheque: System.InvalidOperationException: الفترة المالية مقفلة أو التاريخ يسبق آخر إقفال / Date is in or before the last closed period
+   at Hisab.AccountingService.EnsureOpen(DateTime date) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingV2.cs:line 14
+   at Hisab.AccountingService.Reverse(Int64 id, String reason, Nullable`1 reversalDate, Boolean managed) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingService.cs:line 111
+   at Hisab.AccountingService.SettleCheque(Int64 cheque, String state, Int64 bankAccount, DateTime date, String reason) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingV2.cs:line 149
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_5.<Run>b__17(Store s, AccountingService a) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 60
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`2 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 14
+PASS incoming cleared generic reversal stays protected
+FAIL incoming cleared closed cheque: System.InvalidOperationException: الفترة المالية مقفلة أو التاريخ يسبق آخر إقفال / Date is in or before the last closed period
+   at Hisab.AccountingService.EnsureOpen(DateTime date) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingV2.cs:line 14
+   at Hisab.AccountingService.Reverse(Int64 id, String reason, Nullable`1 reversalDate, Boolean managed) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingService.cs:line 111
+   at Hisab.AccountingService.SettleCheque(Int64 cheque, String state, Int64 bankAccount, DateTime date, String reason) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingV2.cs:line 149
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_5.<Run>b__17(Store s, AccountingService a) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 60
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`2 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 14
+PASS outgoing pending generic reversal stays protected
+FAIL outgoing pending closed cheque: System.InvalidOperationException: الفترة المالية مقفلة أو التاريخ يسبق آخر إقفال / Date is in or before the last closed period
+   at Hisab.AccountingService.EnsureOpen(DateTime date) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingV2.cs:line 14
+   at Hisab.AccountingService.Reverse(Int64 id, String reason, Nullable`1 reversalDate, Boolean managed) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingService.cs:line 111
+   at Hisab.AccountingService.SettleCheque(Int64 cheque, String state, Int64 bankAccount, DateTime date, String reason) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingV2.cs:line 149
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_5.<Run>b__17(Store s, AccountingService a) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 60
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`2 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 14
+PASS outgoing cleared generic reversal stays protected
+FAIL outgoing cleared closed cheque: System.InvalidOperationException: الفترة المالية مقفلة أو التاريخ يسبق آخر إقفال / Date is in or before the last closed period
+   at Hisab.AccountingService.EnsureOpen(DateTime date) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingV2.cs:line 14
+   at Hisab.AccountingService.Reverse(Int64 id, String reason, Nullable`1 reversalDate, Boolean managed) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingService.cs:line 111
+   at Hisab.AccountingService.SettleCheque(Int64 cheque, String state, Int64 bankAccount, DateTime date, String reason) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingV2.cs:line 149
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_5.<Run>b__17(Store s, AccountingService a) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 60
+   at Hisab.AccountingIntegrityTests.<>c__DisplayClass0_0.<Run>g__Case|2(String name, Action`2 test) in C:\Users\admin\Documents\Codex\2026-10-29\https-github-com-anas-m-ardah\work\hisab\source\AccountingIntegrityTests.cs:line 14

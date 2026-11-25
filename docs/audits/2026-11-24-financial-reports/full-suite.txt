@@ -1,0 +1,591 @@
+ENTRYPOINT Hisab.Audit.Program; synthetic fixtures: C:\Users\admin\AppData\Local\Temp\HisabAudit\9b2e29173ce1429193ce9b8aca5af321
+PASS 17 source item names imported
+PASS Source chat text not imported
+PASS Sample invoice not posted
+PASS Arabic numeral parsing
+PASS Purchase increases stock and value
+PASS Cash purchase does not create supplier liability
+PASS Sale deducts stock at weighted average
+PASS Part-paid invoice posts remaining customer balance
+PASS Receipt clears customer balance
+PASS Payment clears supplier balance
+PASS Overselling rejected
+PASS Failed invoice rolls back number, document and stock
+PASS Repeated-item oversell rejected
+PASS Multi-line invoice failure fully rolls back
+PASS Unbalanced journal rejected
+PASS Unbalanced journal rolls back document
+PASS Backdated stock transaction rejected
+PASS Same cash and counterpart rejected
+PASS Money beyond 3 decimals rejected
+PASS Used account cannot be reclassified
+PASS Inclusive tax uses 3-decimal JOD rounding
+PASS Discount applied before tax
+PASS Invoice reversal restores stock and cost
+PASS Reversal preserves later receipts as customer credit
+PASS Duplicate reversal rejected
+PASS Opening stock posts value
+PASS Duplicate opening stock rejected
+PASS Weighted average across different purchase costs
+PASS Cancelling older purchase recalculates later sale costs
+PASS Service sale does not move inventory
+PASS Older inventory document can reverse after newer documents are cancelled
+PASS All posted journals balance
+PASS Inventory ledger equals stock valuation
+PASS Restore recovers database snapshot
+PASS Restore first creates safety backup
+PASS Unrelated SQLite database rejected
+PASS Database integrity check
+PASS Foreign key check
+PASS AR rejects reuse before revocation
+PASS AR historical positions reconcile
+PASS AR allows reuse on revocation day
+PASS AR rejects current over-allocation
+PASS AR checks future interval peak, not just start/current balance
+PASS AR partial allocations preserve cutoff
+PASS AR reversal preserves historical settlement
+PASS AP rejects reuse before revocation
+PASS AP historical positions reconcile
+PASS AP allows reuse on revocation day
+PASS AP rejects current over-allocation
+PASS AP checks future interval peak, not just start/current balance
+PASS AP partial allocations preserve cutoff
+PASS AP reversal preserves historical settlement
+PASS incoming pending generic reversal stays protected
+PASS incoming pending generic managed reversal still checks original closed period
+PASS incoming pending closed entries untouched
+PASS incoming pending debt restored only on bounce date
+PASS incoming pending allocation released on bounce date
+PASS incoming pending cheque and bank balances reconciled
+PASS incoming pending terminal state recorded
+PASS incoming pending duplicate bounce rejected
+PASS incoming pending duplicate creates no documents
+PASS incoming cleared generic reversal stays protected
+PASS incoming cleared generic managed reversal still checks original closed period
+PASS incoming cleared closed entries untouched
+PASS incoming cleared debt restored only on bounce date
+PASS incoming cleared allocation released on bounce date
+PASS incoming cleared cheque and bank balances reconciled
+PASS incoming cleared terminal state recorded
+PASS incoming cleared duplicate bounce rejected
+PASS incoming cleared duplicate creates no documents
+PASS outgoing pending generic reversal stays protected
+PASS outgoing pending generic managed reversal still checks original closed period
+PASS outgoing pending closed entries untouched
+PASS outgoing pending debt restored only on bounce date
+PASS outgoing pending allocation released on bounce date
+PASS outgoing pending cheque and bank balances reconciled
+PASS outgoing pending terminal state recorded
+PASS outgoing pending duplicate bounce rejected
+PASS outgoing pending duplicate creates no documents
+PASS outgoing cleared generic reversal stays protected
+PASS outgoing cleared generic managed reversal still checks original closed period
+PASS outgoing cleared closed entries untouched
+PASS outgoing cleared debt restored only on bounce date
+PASS outgoing cleared allocation released on bounce date
+PASS outgoing cleared cheque and bank balances reconciled
+PASS outgoing cleared terminal state recorded
+PASS outgoing cleared duplicate bounce rejected
+PASS outgoing cleared duplicate creates no documents
+PASS Allocation respects a historical return even when cancelled later
+PASS Return cancellation releases capacity only on its event date
+PASS Bounce cannot precede clearance
+PASS Bounce requires a reason
+PASS Future bounce rejected
+PASS Bounce event must be in an open period
+PASS Viewer cannot bounce a cheque
+PASS Rejected bounce leaves documents and state intact
+PASS Cheque failure rolls back both reversing entries
+PASS Cheque failure rolls back reversal metadata and state
+PASS Open-period cancellation remains supported
+PASS Three partial returns restore exactly 100.000 and zero COGS
+PASS Return remainder replay is deterministic
+PASS Cancel and re-enter final return retains exact cost
+PASS First close cannot silently exclude earlier activity
+PASS Rejected close leaves periods unchanged
+PASS Subsequent close must start the day after the prior close
+PASS Contiguous closing transfers income exactly once
+PASS Reopening restores original period income
+PASS Reclosing reopened periods transfers profit without duplication
+PASS Partial late bill clears GRNI and posts current tax/AP
+PASS Late bill leaves closed entries and sold-stock costing untouched
+PASS Late bill reversal restores unbilled receipt without rewriting closed entries
+PASS Complete late billing settles GRNI exactly
+PASS Already billed quantity cannot be billed twice
+PASS Late bill cannot rewrite a closed receipt through a price increase
+PASS Late bill cannot rewrite a closed receipt through a price decrease
+PASS Rejected price variance rolls back bill and receipt links
+PASS Mixed closed receipt and open cost adjustment must be billed separately
+PASS Mixed bill rejection rolls back every receipt link
+PASS Final same-price fractional bill takes receipt remainder exactly
+PASS Closed return cost retained while later return receives remainder
+PASS Earlier return cancellation and re-return preserve total stock cost
+PASS Closed receipt zero-value final portion clears quantity without inventing cost
+PASS Valid grouped/Arabic input: 1,250.500
+PASS Valid grouped/Arabic input: ١٬٢٥٠٫٥٠٠
+PASS Valid grouped/Arabic input: ۱٬۲۵۰٫۵۰۰
+PASS Valid grouped/Arabic input: 1250.500
+PASS Malformed grouping rejected: 12,50.500
+PASS Malformed grouping rejected: 1,,250
+PASS Malformed grouping rejected: 1,250,50
+PASS Malformed grouping rejected: 1.250,500
+PASS Malformed grouping rejected: 1,250.5,0
+PASS Malformed grouping rejected: ,125
+PASS Malformed grouping rejected: 1,
+PASS Malformed grouping rejected: 1 250
+PASS Formatted signed amounts round-trip
+PASS Manual customer opening appears outside invoice aging
+PASS Manual supplier opening appears outside invoice aging with payable sign
+PASS Party reconciliation respects historical cutoff
+PASS Unallocated payment is included without duplicate opening posting
+PASS Invoice amount and non-invoice opening remain separate
+PASS Allocation reconciles without hiding outstanding opening balance
+PASS Attach mode cannot silently post when journal number is blank
+PASS Opening preview validates customer/supplier control totals
+PASS Opening preview persists no documents, journal or audit rows
+PASS Opening postings use AR/AP and opening equity only
+PASS Opening documents participate in receivable/payable positions
+PASS Opening aging retains original due date and system cutoff
+PASS Opening debt creates no sales, tax or inventory
+PASS Normal receipts and payments allocate to opening debt
+PASS Opening duplicate references reject case-insensitively
+PASS Opening debt cannot enter stock returns
+PASS Opening reversal preserves earlier aging and later payment credit
+PASS Preview detects combined source capacity without duplicate posting
+PASS Opening import rejects shared-source overrun
+PASS Failed opening batch rolls back its earlier valid rows
+PASS Existing journal detail mode adds no ledger entries
+PASS Opening source journal cannot reverse while details are active
+PASS Opening source journal cannot be amended behind active details
+PASS Reversing existing-journal detail leaves source balance intact
+PASS Reversed opening details still consume historical source capacity
+PASS Opening reference cannot be reused during its historical interval
+PASS Source reversal cannot precede linked detail reversal dates
+PASS Source amendment cannot erase historical detail backing
+PASS Source journal reverses after linked details are reversed
+PASS Duplicate references inside one preview are detected
+PASS Opening outstanding amount must be positive
+PASS Opening due date cannot precede original invoice date
+PASS Viewer cannot post opening balances
+PASS Opening details survive database reopening
+PASS Schema 7 upgrades safely to opening-balance schema 8
+PASS Schema 7 receipt bills gain both adjustment fields
+PASS Opening links survive backup and restore with valid references
+PASS Opening workbook preserves identifiers and parses grouped amount
+PASS Opening workbook rejects numeric identifiers that may lose zeros
+PASS Opening Excel template has valid workbook structure
+PASS Opening template reads with expected headers and no sample balances
+PASS Closed price difference requires explicit allocation
+PASS Inventory share must have the price difference sign
+PASS Inventory share cannot exceed total price difference
+PASS Price reduction cannot make remaining stock value negative
+PASS Invalid late price allocation rolls back document and links
+PASS Late price adjustment preserves closed entries and original sale cost
+PASS Late price allocation reconciles current inventory and GL
+PASS Late variance posts current COGS, AP and clears GRNI without clearing-account residue
+PASS Later sale uses adjusted average cost while closed entries remain frozen
+PASS Reversing open late bill replays only open costing and restores unbilled receipt
+PASS Depleted inventory cannot receive a capitalized price adjustment
+PASS Fully consumed stock takes all late price variance to current COGS
+PASS Closed price difference requires explicit allocation
+PASS Inventory share must have the price difference sign
+PASS Inventory share cannot exceed total price difference
+PASS Price reduction cannot make remaining stock value negative
+PASS Invalid late price allocation rolls back document and links
+PASS Late price adjustment preserves closed entries and original sale cost
+PASS Late price allocation reconciles current inventory and GL
+PASS Late variance posts current COGS, AP and clears GRNI without clearing-account residue
+PASS Later sale uses adjusted average cost while closed entries remain frozen
+PASS Reversing open late bill replays only open costing and restores unbilled receipt
+PASS Depleted inventory cannot receive a capitalized price adjustment
+PASS Fully consumed stock takes all late price variance to current COGS
+PASS Partial late invoice adjusts only billed cost and leaves remaining GRNI
+PASS Closed variance bill seeds later average cost without rewriting its journal
+PASS Repeated frozen replay preserves partial adjustment
+PASS Reopened adjustment period replays consistently with inventory GL
+PASS Classified P&L separates revenue, COGS, gross and net profit
+PASS Balance sheet reconciles stock, cash, receivables, payables and earnings
+PASS Customer credit balances present as liabilities instead of netting receivables
+PASS Supplier debit balances present as assets instead of netting liabilities
+PASS P&L compares the same date range one year earlier
+PASS Closing transfers profit without double-counting balance-sheet equity
+PASS P&L excludes profit-transfer closing journals
+PASS Reopening does not distort P&L or balance-sheet totals
+PASS Unmapped custom expense remains visible and included in net profit
+PASS Classifying a custom cost changes presentation without changing ledger
+PASS Unmapped asset is disclosed without disappearing from balance sheet
+PASS Mapped asset clears classification warning
+PASS Reporting mapping cannot change an asset into income
+PASS Balance sheet cutoff excludes future postings
+PASS Other income, expense and income tax affect net profit with correct signs
+PASS Expense credits remain negative expenses rather than hidden income
+PASS Loss periods show negative net profit
+PASS Prior-only unmapped income keeps comparison warning visible
+PASS Comparative customer sign change is shown in the proper section for each date
+PASS Historical reports exclude receipts after cutoff
+PASS Historical receipt stock reconciles quantity, location and GL
+PASS Unbilled receipt basis reconciles to GRNI
+PASS Historical transfers preserve company value and allocate location value
+PASS Historical sale cutoff reflects cost and original location
+PASS Historical reversal restores original remote location despite legacy reversal moves
+PASS Later reversal leaves earlier stock cutoff intact
+PASS Partial billing clears receipt basis without including invoice tax
+PASS Unbilled goods returns reduce quantity and GRNI basis
+PASS Return reversal affects accrual only from reversal date
+PASS Bill reversal restores unbilled basis at its effective date
+PASS Late price variance clears original GRNI without rewriting closed accrual report
+PASS Current price allocation changes stock only after closed cutoff
+PASS Direct inventory ledger posting is exposed as reconciliation difference
+PASS Zero company quantity retains opposing warehouse balances
+PASS Warranty lookup includes serialized posted sales
+PASS Cannot register an unsold device against a sale
+PASS Warranty expiry cannot precede sale
+PASS Future warranty intake is rejected
+PASS Warranty intake requires a reported fault
+PASS Warranty intake changes neither stock nor accounting
+PASS Duplicate open warranty claim is rejected
+PASS Coverage is locked after intake
+PASS Original invoice cannot be reversed while warranty is open
+PASS Customer return cannot duplicate a device in warranty custody
+PASS Supplier custody requires a valid supplier
+PASS Replacement requires faulty device in store
+PASS Supplier round trip retains off-stock custody
+PASS Warranty replacement protects reserved serials
+PASS Failed replacement rolls back claim, document and inventory
+PASS Faulty original cannot replace itself
+PASS Free replacement consumes exactly one device at cost
+PASS Warranty replacement leaves receivables, sales and tax unchanged
+PASS Warranty cost posts balanced expense against inventory
+PASS Neither faulty nor delivered replacement is sellable stock
+PASS Claim cannot be replaced twice
+PASS Replacement cancellation must use claim workflow
+PASS Already replaced original cannot be returned as customer stock
+PASS Already replaced original cannot create another claim
+PASS Replacement inherits original expiry
+PASS Undo replacement restores stock and expense atomically
+PASS Replacement with subsequent claim history cannot be undone
+PASS Replacement device can receive a linked subsequent free replacement
+PASS Faulty-device disposal never changes sellable stock
+PASS Unrecorded coverage requires explicit administrator reason
+PASS Goodwill exception retains administrator reason
+PASS Returned device cannot open a warranty claim
+PASS Warranty lifecycle keeps foreign keys and journals valid
+PASS Purchase cannot reintroduce a replaced device as available stock
+PASS Stock count cannot reintroduce warranty custody devices
+PASS Accountant cannot override unrecorded coverage
+PASS Viewer cannot change warranty custody
+PASS Viewer cannot post a warranty replacement
+PASS Viewer cannot change warranty registration
+PASS Warranty claims, replacement chain and custody history survive restore
+PASS Real schema 6 upgrade creates warranty tables while preserving inventory and documents
+PASS Expired coverage needs an explicit administrator exception
+PASS Historical purchase replays warranty replacement weighted-average cost
+PASS Warranty replacement appears in item history
+PASS Undo after cost replay reverses the recalculated warranty expense
+PASS Replacement cannot consume a serial from another location
+PASS Replacement cannot predate warranty intake
+PASS Schema upgrade is repeatable and preserves existing warranty records
+PASS Excel template and populated workbook conform to Open XML
+PASS Excel import preserves text identifiers Arabic and leading zeros
+PASS Excel preview is read only and reports exact opening value
+PASS Reviewed Excel batch imports successfully
+PASS Excel opening stock preserves valuation and serial identities
+PASS Excel import posts balanced inventory with valid relationships
+PASS A reviewed batch cannot be committed twice
+PASS Reimport defaults to skipping existing codes
+PASS Existing stock movements prevent a second opening balance
+PASS Existing unused items can explicitly receive opening stock
+PASS Existing item details stay unchanged during opening import
+PASS Duplicate file codes are rejected without case sensitivity
+PASS Duplicate file barcodes are rejected
+PASS Existing barcodes cannot be assigned to new products
+PASS Negative opening quantity is flagged in preview
+PASS Excess quantity precision is flagged in preview
+PASS Zero opening cost is flagged in preview
+PASS Service stock quantity is flagged in preview
+PASS Duplicate serials is flagged in preview
+PASS Fractional serialized quantity is flagged in preview
+PASS Serials without tracking is flagged in preview
+PASS Malformed price is flagged in preview
+PASS Unknown item type is flagged in preview
+PASS Future opening date is rejected in preview
+PASS Database changes invalidate stale import previews
+PASS Unexpected batch failure rolls back products stock journals and audit
+PASS Product-only and service imports need no opening stock
+PASS Excel reader handles shared strings sparse rows hidden rows and numeric exponents
+PASS Numeric identifiers require text conversion before import
+PASS Formula cells cannot silently import stale cached values
+PASS Multiple fields cannot use the same mapped column
+PASS Legacy Excel formats receive an explicit conversion message
+PASS Merged import cells are rejected instead of silently dropping values
+PASS Open stock counts block existing-item opening imports
+PASS Inactive locations cannot receive imported opening stock
+PASS Closed accounting periods are flagged before importing stock
+PASS Serialized item registration respects closed periods without opening stock
+PASS Excel date-formatted quantities cannot be mistaken for stock counts
+PASS Viewer cannot preview privileged item imports
+PASS Viewer cannot commit an item import
+PASS Item history groups duplicate lines without duplicating serial quantities
+PASS Item history shows both transfer locations without changing company stock
+PASS Item history includes customer returns
+PASS Item history reversal inherits original location and serials
+PASS Cancelled activity and reversals cannot inflate current stock
+PASS History effective quantities reconcile with each stock location
+PASS Reservations appear without physical stock movement
+PASS History uses current reservation status after release
+PASS Item history combines inclusive date location and activity filters
+PASS Item history serial search is case insensitive
+PASS Unmatched history filters produce an empty result
+PASS Invalid item history date range is rejected
+PASS Receipt billing appears without counting stock twice
+PASS Item history links landed costs without inventing quantities
+PASS Item history includes stock count losses
+PASS Reading item history does not mutate stock or audit data
+PASS Unused items have empty history
+PASS Reversed transfers retain both original locations and directions
+PASS History retains inactive stock locations
+PASS Service invoice history carries document quantity without stock movement
+PASS Item history includes supplier returns
+PASS Reservation reduces availability without posting stock or accounting
+PASS Reservation cannot exceed unreserved stock
+PASS Other sales cannot consume reserved quantities
+PASS Transfers protect reserved quantities at their location
+PASS Receipt reversal cannot remove stock backing reservations
+PASS Stock count shortage requires resolving conflicting reservations
+PASS Reservation fulfillment requires its customer
+PASS Full fulfillment requires every reserved quantity
+PASS Unreserved quantities remain sellable
+PASS Invalid due date rolls back reservation fulfillment
+PASS Failed fulfillment preserves reservation and physical stock
+PASS Fulfillment links one invoice and deducts stock exactly once
+PASS Reservation cannot be fulfilled twice
+PASS Invoice reversal restores stock without reactivating a fulfilled hold
+PASS Reservation release requires an audit reason
+PASS Released reservation restores availability and preserves history
+PASS New reservations cannot already be expired
+PASS Expiry automatically releases availability without a scheduled job
+PASS Expired reservations cannot fulfill
+PASS Specific reserved serial cannot be sold to another customer
+PASS Specific reserved serial cannot be moved away
+PASS Specific serial cannot belong to two active reservations
+PASS Fulfillment must include the specifically reserved device
+PASS Quantity reservation with optional fixed serials fulfills remaining serials at sale
+PASS Quote reservations require customer acceptance
+PASS An actively reserved quote cannot be changed before release
+PASS An actively reserved quote cannot be declined before release
+PASS Accepted quote conversion atomically fulfills its linked reservation
+PASS Replenishment accounts for reserved demand
+PASS Reservations and fulfillment links survive portable restore
+PASS Negative-stock preference cannot bypass active reservations
+PASS Zero reservation quantity is rejected
+PASS Duplicate reservation item/location lines are rejected
+PASS Reservation stays active through its expiry day
+PASS A new reservation cannot use stock currently being counted
+PASS Supplier returns cannot consume held stock
+PASS Failed quote fulfillment rolls back due-date validation
+PASS Failed quote fulfillment preserves both hold and quotation
+PASS Viewer cannot reserve stock
+PASS Viewer cannot release reservations
+PASS Quotation does not post accounting or reserve stock
+PASS Quotation preserves customer-facing company snapshot
+PASS Quotation rejects expiry before issue date
+PASS Quotation requires at least one priced line
+PASS Quotation tracks sent status
+PASS Stale quote edits cannot overwrite a newer revision
+PASS Editing a quotation resets status to draft with new revision
+PASS Expired quotation cannot convert to an invoice
+PASS Declined quotation cannot convert to an invoice
+PASS Conversion validates actual stock availability
+PASS Failed quote conversion rolls back invoice and quote state
+PASS Conversion cannot silently change quoted quantities or prices
+PASS Invalid invoice due date rolls back quote conversion
+PASS Conversion creates exactly one linked invoice with quoted tax and discount
+PASS A quotation cannot be converted twice
+PASS Invoice reversal retains quotation link and prevents duplicate conversion
+PASS Quotation and invoice link survive portable backup and restore
+PASS Quotation retains snapshots of saved revisions and status changes
+PASS Serialized quote conversion requires the actual device identity
+PASS Serialized quote converts after supplying the device serial
+PASS Quotation data survives reopening with schema protection
+PASS Viewer cannot create quotations
+PASS inventory migration creates locations
+PASS Serial receipt reconciles units and quantities
+PASS Duplicate serial rolls back receipt
+PASS Transfer preserves company valuation
+PASS Cannot sell serial from another location
+PASS Customer return restores original serial at location
+PASS Receipt reversal cannot orphan serial history
+PASS Inventory accounting matches transferred returned units
+PASS Inventory foreign keys hold
+PASS active count blocks stock movements
+PASS count loss reconciles serials and valuation
+PASS count reversal restores serial stock
+PASS partial goods receipt accrues liability without supplier invoice
+PASS partial billing changes cost without receiving stock twice
+PASS late freight replays sold and unsold inventory costs
+PASS replenishment accounts for open and cancelled orders
+PASS Completed count permits later same-day sales
+PASS Completed count permits reversal of later same-day stock
+PASS Completed count rejects earlier-dated inventory changes
+PASS Count locks survive reopening
+PASS Cancelled count releases movement locks
+PASS Serialized item cannot be changed into a service
+PASS Barcode matching ignores case and surrounding whitespace
+PASS Negative-stock setting cannot bypass serial availability
+PASS Draft order cannot receive stock
+PASS Overreceiving requires an order amendment
+PASS Unbilled goods return reduces stock and outstanding receipt count
+PASS Duplicate billing cannot exceed received quantity
+PASS Lower supplier price reduces receipt valuation
+PASS Billed receipt reversal explains its dependency
+PASS Billed purchase return checks receipt serials and removes the selected unit
+PASS Overdue incoming stock is visible separately from on-hand stock
+PASS Landed-cost rounding allocates every thousandth exactly
+PASS Existing freight payment is capitalized without a second payable or cash payment
+PASS Existing charge cannot be capitalized twice
+PASS Late freight cannot rewrite a closed period
+PASS Complex purchase and return workflow reconciles stock valuation
+PASS All inventory edge-case journals balance
+PASS Portable restore preserves devices, locations and purchasing relations
+PASS Serialized opening stock respects the chosen location
+PASS Viewer cannot create purchase orders
+PASS Viewer cannot lock stock using a count
+PASS Populated legacy location migration preserves stock and journals
+PASS Legacy sale returns accept an audited newly identified serial
+PASS Partially billed receipts permit returning the unbilled remainder
+PASS Final partial bill clears every thousandth of receipt accrual
+PASS Reversed landed allocation releases its source charge for correction
+PASS Reversing replaced goods return cannot overreceive the order
+PASS Historical invoice balance excludes later receipts
+PASS Partial receipt allocated to invoice
+PASS Voucher over-allocation rejected
+PASS Sales return reduces invoice outstanding
+PASS Excess returns rejected
+PASS Source with live returns cannot cancel
+PASS Past tax worksheet includes dated return despite later cancellation
+PASS Invoice amendment transfers allocations atomically
+PASS Amendments preserve reason and original snapshot
+PASS Backdated purchase replays subsequent weighted cost
+PASS Purchase returns reduce stock
+PASS Audited cost adjustment changes stock valuation
+PASS Bounced cheque releases allocations
+PASS Cheque reversal uses selected historical date
+PASS Terminal cheque cannot clear again
+PASS Optional negative stock supported
+PASS Receipt reconciles provisional negative-stock costing
+PASS Extended inventory ledger equals valuation
+PASS All extended journals balance
+PASS Closed period rejects posting
+PASS Closed invoice rejects amendment
+PASS Administrator reopens period with reversal
+PASS Attachment persisted within database
+PASS Editable bilingual account names
+PASS Incorrect password rejected
+PASS Viewer can authenticate
+PASS Viewer cannot post via accounting service
+PASS Viewer cannot change business settings
+PASS Administrator can authenticate
+PASS Wrong backup password rejected
+PASS Encrypted portable backup restores snapshot
+PASS Extended database integrity and foreign keys
+PASS Failed encrypted-file save rolls back in-memory change
+PASS Tampered encrypted backup rejected
+PASS Rejected backup preserves current data
+PASS Local data is encrypted at rest
+PASS Encrypted database survives process-style reopen
+PASS Portable backup restores under independent local encryption key
+PASS Legacy database migrates to current encrypted schema
+PASS App-owned legacy plaintext database and backups replaced with encrypted files
+PASS Fresh database does not silently select an account before setup
+PASS Personal setup requires no username or password
+PASS Personal profile creates exactly one internal owner
+PASS Repeated personal setup reuses the owner
+PASS Optional lock prevents direct opening
+PASS Four-character optional lock authenticates without a username
+PASS Optional lock enforces failed-attempt lockout
+PASS Removing optional lock restores direct opening
+PASS Shared sign-in cannot lock out the only personal owner
+PASS Explicit shared mode requires named user sign-in
+PASS Accountant cannot bypass shared sign-in
+PASS Administrator can enter shared mode
+PASS Personal access survives encrypted reopen
+PASS Hierarchy rolls up all descendants without posting to parent
+PASS Descendant cannot become parent
+PASS Self parent rejected
+PASS Cross-type account parent rejected
+PASS Parent type cannot conflict with children
+PASS Reparenting moves rollup without changing journals
+PASS Stock In and Out reconcile with available quantity
+PASS Stock reversal appears in opposite movement column
+PASS Multiple cheques post separately and allocate receipt total
+PASS Cheque due date retained on document
+PASS Cheque receipt description retained
+PASS Bouncing one cheque leaves sibling cleared and restores only its allocation
+PASS Mismatched receipt and cheque totals rejected
+PASS Previously recorded cheque rejected
+PASS Duplicate cheque within batch rejected
+PASS Cheque due date before receipt rejected
+PASS Cheque precision beyond three decimals rejected
+PASS Invalid invoice allocation rolls back entire batch
+PASS Rejected batch leaves no cheques or documents
+PASS Child can return to top level
+PASS Small font preference persisted
+PASS Feedback changes preserve foreign keys
+PASS Hierarchy persists after reopening
+PASS Font survives reopening
+PASS Existing accounts migrate as top-level accounts
+PASS Desktop shortcut created in isolated test directory
+PASS Shortcut targets app and embedded icon with correct working directory
+PASS Desktop shortcut refreshes to new portable version
+PASS Unrelated existing desktop shortcut preserved
+PASS Unsupported process cannot create Hisab shortcut
+PASS Valid drag target is accepted
+PASS Move updates parent directly
+PASS Moving parent retains its nested children
+PASS Move preserves original and translated names
+PASS Moved subtree updates group totals without changing own balances
+PASS Hierarchy move creates no accounting documents or postings
+PASS Drag onto self rejected
+PASS Drag onto descendant rejected
+PASS Drag onto different account type rejected
+PASS Move to top level retains subtree
+PASS Undo restores prior parent and no-op targets are rejected
+PASS Viewer cannot move accounts
+PASS Outline loads accounts, names and balances in one query
+PASS Snapshot totals include descendants without duplicating own balance
+PASS Outline respects both name translations
+PASS Account pickers load localized names in one query
+PASS Item lists load localized names in one query
+PASS Organizer saves parent, code and active-language name
+PASS Editor preserves original names, other translations and addresses
+PASS Organizer edits preserve postings and update group balances
+PASS Undo restores exact names, code and parent
+PASS Editor rejects hierarchy cycles
+PASS Editor rejects different account types
+PASS Editor rejects an empty name
+PASS Undo refuses to overwrite a later account change
+PASS Organizer respects core account code protection
+PASS Viewer cannot edit through the organizer
+PASS Workbook split payment posts each allocation and cash once
+PASS Split payment preserves line descriptions
+PASS Main trial rolls up families without double counting
+PASS Child trial retains direct parent opening balances outside period movements
+PASS Split voucher rejects excess precision
+PASS Split voucher rejects cash as its own counterpart
+PASS Split voucher requires each line description
+PASS Invalid split vouchers leave no partial documents
+PASS Split amendment reverses original and retains replacement link
+PASS Single account editor cannot flatten a split voucher
+PASS Order transfer moves accumulated cost into received stock
+PASS Order transfer reconciles inventory ledger and valuation
+PASS Order transfer cannot exceed available order cost
+PASS Order transfer requires an asset account
+PASS Sale after order transfer uses transferred unit cost
+PASS Consumed order transfer cannot reverse into negative stock
+PASS Failed transfer reversal rolls back atomically
+PASS Order transfer reversal restores order cost and stock
+PASS Workbook six-cheque receipt shares one reference and exact total
+PASS All workbook workflow documents remain balanced
+PASS Workbook workflow relationships preserve database integrity
+PASS Workflow data survives reopening with schema downgrade protection
+PASS Viewer cannot post split vouchers

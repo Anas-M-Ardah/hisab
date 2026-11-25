@@ -1,19 +1,28 @@
-# حساب 0.11.0 — الضمان والاستبدال المجاني
+# حساب 0.12.0 — سلامة الحسابات واكتمال التقارير
 
-- تسجيل ضمان الأجهزة حسب التسلسلي وفاتورة البيع، مع شهادة ضمان قابلة للطباعة.
-- استلام المطالبات وتسجيل العطل والحالة والملحقات وطباعة إيصال للعميل.
-- متابعة عهدة الأجهزة وإرسالها للمورد واستلامها برقم مرجعي، بدون تكامل خارجي.
-- استبدال مجاني من المخزون المتاح مع حماية الحجوزات، واحتساب تكلفة الضمان دون تغيير الفاتورة أو رصيد العميل.
-- يرث الجهاز البديل نهاية الضمان الأصلية، مع سجل للمطالبات المتتابعة والاستثناءات والإلغاء والإتلاف.
+- إصلاح التخصيصات التاريخية وعكس الشيكات وحدود الإقفال وتقريب تكلفة المرتجعات.
+- أرصدة افتتاحية تفصيلية للعملاء والموردين مع استيراد ومعاينة، دون تكرار أرصدة الأستاذ.
+- معالجة فروق فواتير الاستلام بعد الإقفال بتوزيع صريح على المخزون وتكلفة المبيعات في الفترة الحالية.
+- قائمة دخل مقارنة، مركز مالي، تدفقات نقدية، وتقييم مخزون وتسوية استلامات غير مفوترة حتى تاريخ.
+- إفصاحات غير نقدية مرتبطة بالقيود، ونسخ تقارير ثابتة، وتطابق الترتيب والقيم بين الشاشة والطباعة والتصدير.
 
 ## English
 
-Adds a bilingual Warranties & exchanges workspace for serialized hardware. Register coverage against the sold serial and invoice, print a certificate, receive a claim, record condition/accessories, and track supplier custody locally.
+This release strengthens accounting correctness and adds a coherent bilingual reporting set:
 
-Free replacements remove an available device at weighted-average cost and post warranty expense. Original sales, customer balances and taxes stay unchanged. Faulty units stay outside available stock. Replacement coverage inherits the original expiry; expired/unrecorded coverage requires an administrator's recorded exception.
+- Historical payment allocation, cheque reversal, closing-period and return-cost rounding fixes.
+- Detailed customer/supplier opening balances, including Excel preview and attachment to existing opening journals without duplicate posting.
+- Explicit current-period allocation of late receipt price differences while preserving closed-period costs.
+- Comparative income statement, balance sheet, direct cash-flow statement, historical inventory valuation, and GRNI reconciliation.
+- Cash-flow split classifications, noncash journal-linked disclosures, and immutable report-content snapshots with integrity checks.
+- Arabic/English screen, snapshot, print and CSV value/order consistency. CSV reports now include metadata before the report-table header.
 
-Includes safe exchange undo, repeat claims on replacement hardware, original-invoice links, printable claim receipts, reservation/count/period protections and backup persistence. Paid upgrades, supplier reimbursements and refurbishment stock are not included.
+## Upgrade and scope
 
-## Compatibility and validation
+Schema 8. Back up before upgrading; older versions cannot open upgraded databases. Noncash disclosures and business cash-flow categories require explicit classification and review. Report snapshots preserve saved content; they are not full historical database snapshots or external digital signatures.
 
-Schema 7; back up before upgrading. Older versions cannot open upgraded databases. See WARRANTIES.md for the workflow and rules. Release checks cover 390 accounting/storage scenarios plus Arabic/English interface previews at normal and large text sizes. Physical printing and native ARM64 execution remain manual checks.
+Local bank reconciliation, managed fixed-asset/accrual/prepayment schedules and full business-month acceptance remain roadmap work. No external accounting or tax-system integration is included.
+
+## Validation
+
+640 automated synthetic checks; 37 bilingual reporting/UI/export checks passed locally. The Windows release workflow runs the full 640-check suite against the packaged x64 and x86 executables before publishing. ARM64 is built but not executed natively. Physical printing and target-device DPI remain manual checks.

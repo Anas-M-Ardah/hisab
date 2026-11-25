@@ -1,0 +1,19 @@
+CASE warranty-reservation-location
+PASS reserved replacement rejected
+Replacement stock expected=100000 actual=100000 GL=100000 expense=100000 customer=150000 available=0
+Undo expected stock=200000 actual=200000 GL=200000 expense=0
+PASS reserved transfer rejected
+Transfer main=1000 other=1000 totalValue=200000 GL=200000
+SCHEMA 7
+CASE return-rounding
+Expected qty=3000 value=100000 COGS=0; actual qty=3000 value=99999 GL1301=99999 COGS=1
+SCHEMA 7
+CASE closed-receipt-bill
+BILL REJECTED الفترة المالية مقفلة أو التاريخ يسبق آخر إقفال / Date is in or before the last closed period
+Expected unbilled=0 GRNI=0 AP=-200000; actual unbilled=2000 GRNI=-200000 AP=0
+SCHEMA 7
+CASE late-cost-cutoff
+BEFORE cutoff stock=100000 sale-cost=100000
+AFTER cutoff stock=110000 sale-cost=110000 clearing-at-cutoff=-20000
+Current stock=110000 GL=110000
+SCHEMA 7

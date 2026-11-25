@@ -56,6 +56,12 @@ public sealed partial class Store
         UpgradeQuotes();
         UpgradeReservations();
         UpgradeWarranties();
+        Exec("CREATE TABLE IF NOT EXISTS account_reporting(account INTEGER PRIMARY KEY REFERENCES accounts(id),section TEXT NOT NULL);");
+        Exec("CREATE TABLE IF NOT EXISTS cash_flow_classifications(doc INTEGER NOT NULL REFERENCES documents(id),account INTEGER NOT NULL REFERENCES accounts(id),direction INTEGER NOT NULL,basis INTEGER NOT NULL,operating INTEGER NOT NULL,investing INTEGER NOT NULL,financing INTEGER NOT NULL,transfer INTEGER NOT NULL,PRIMARY KEY(doc,account,direction));");
+        Exec("CREATE TABLE IF NOT EXISTS report_snapshots(id INTEGER PRIMARY KEY,created TEXT NOT NULL,username TEXT NOT NULL,title TEXT NOT NULL,payload TEXT NOT NULL,hash TEXT NOT NULL); CREATE TRIGGER IF NOT EXISTS report_snapshots_no_update BEFORE UPDATE ON report_snapshots BEGIN SELECT RAISE(ABORT,'Report snapshots are immutable'); END; CREATE TRIGGER IF NOT EXISTS report_snapshots_no_delete BEFORE DELETE ON report_snapshots BEGIN SELECT RAISE(ABORT,'Report snapshots are immutable'); END;");
+        Exec("CREATE TABLE IF NOT EXISTS noncash_disclosures(doc INTEGER NOT NULL REFERENCES documents(id),debit_account INTEGER NOT NULL REFERENCES accounts(id),credit_account INTEGER NOT NULL REFERENCES accounts(id),category TEXT NOT NULL,amount INTEGER NOT NULL,note TEXT NOT NULL,debit_basis INTEGER NOT NULL,credit_basis INTEGER NOT NULL,PRIMARY KEY(doc,debit_account,credit_account,category));");
+        Column("receipt_bills","current_variance","INTEGER NOT NULL DEFAULT 0");Column("receipt_bills","inventory_adjustment","INTEGER NOT NULL DEFAULT 0");
+        Exec("CREATE TABLE IF NOT EXISTS opening_balances(doc INTEGER PRIMARY KEY REFERENCES documents(id),reference TEXT NOT NULL,original_date TEXT NOT NULL,source_doc INTEGER REFERENCES documents(id)); CREATE INDEX IF NOT EXISTS ix_opening_source ON opening_balances(source_doc);");
         Exec("UPDATE documents SET due_date=date WHERE due_date=''");
         Exec("UPDATE documents SET reversal_date=(SELECT date FROM documents rv WHERE rv.original=documents.id AND rv.kind='RV' LIMIT 1) WHERE reversed=1 AND reversal_date IS NULL");
         Exec("INSERT OR IGNORE INTO accounts(code,name,kind,system) VALUES('2190','شيكات صادرة','Liability',1),('3301','أرباح محتجزة','Equity',1)");

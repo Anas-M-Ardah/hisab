@@ -25,7 +25,7 @@ public sealed partial class AccountingService
     public List<InvoicePosition> Positions(DateTime asOf,long? party=null,string? kind=null)
     {
         string date=asOf.ToString("yyyy-MM-dd");var result=new List<InvoicePosition>();
-        foreach(DataRow d in Table("SELECT d.*,a.name party_name FROM documents d JOIN accounts a ON a.id=d.party WHERE d.kind IN ('SI','PI') AND d.date<=@p0 AND (d.reversal_date IS NULL OR d.reversal_date>@p0) AND (@p1 IS NULL OR d.party=@p1) AND (@p2 IS NULL OR d.kind=@p2) ORDER BY d.due_date,d.id",date,party,kind).Rows){
+        foreach(DataRow d in Table("SELECT d.*,a.name party_name FROM documents d JOIN accounts a ON a.id=d.party WHERE d.kind IN ('SI','PI','OC','OS') AND d.date<=@p0 AND (d.reversal_date IS NULL OR d.reversal_date>@p0) AND (@p1 IS NULL OR d.party=@p1) AND (@p2 IS NULL OR d.kind=@p2 OR (@p2='SI' AND d.kind='OC') OR (@p2='PI' AND d.kind='OS')) ORDER BY d.due_date,d.id",date,party,kind).Rows){
             long id=(long)d["id"],returned=Convert.ToInt64(Scalar("SELECT coalesce(sum(total),0) FROM documents WHERE original=@p0 AND kind IN ('SR','PR') AND date<=@p1 AND (reversal_date IS NULL OR reversal_date>@p1)",id,date));
             long allocated=Convert.ToInt64(Scalar("SELECT coalesce(sum(x.amount),0) FROM allocations x JOIN documents v ON v.id=x.voucher WHERE x.invoice=@p0 AND x.date<=@p1 AND (x.revoked IS NULL OR x.revoked>@p1) AND (v.reversal_date IS NULL OR v.reversal_date>@p1)",id,date));
             long paid=(long)d["paid"]+allocated;result.Add(new(id,(string)d["number"],(string)d["party_name"],(string)d["kind"],(string)d["date"],string.IsNullOrEmpty((string)d["due_date"])?(string)d["date"]:(string)d["due_date"],(long)d["total"],paid,returned,(long)d["total"]-paid-returned));
@@ -39,10 +39,23 @@ public sealed partial class AccountingService
     void AllocateInternal(long voucher,long invoice,long amount,DateTime date)
     {
         var v=Table("SELECT * FROM documents WHERE id=@p0",voucher).Rows[0];var inv=Table("SELECT * FROM documents WHERE id=@p0",invoice).Rows[0];
-        if(amount<=0||(long)v["reversed"]==1||(long)inv["reversed"]==1||!((v["kind"].ToString() is "RC" or "CR"&&inv["kind"].ToString()=="SI")||(v["kind"].ToString() is "PV" or "CP"&&inv["kind"].ToString()=="PI"))||v["party"].ToString()!=inv["party"].ToString()||date.Date<DateTime.Parse((string)v["date"])||date.Date<DateTime.Parse((string)inv["date"])||date>DateTime.Today)throw new InvalidOperationException("تحقق من نوع السند والفاتورة والحساب والتاريخ / Check voucher, invoice, party and allocation date");
-        long available=(long)v["total"]-Convert.ToInt64(Scalar("SELECT coalesce(sum(amount),0) FROM allocations WHERE voucher=@p0 AND revoked IS NULL",voucher));
-        var position=Positions(DateTime.Today).Single(p=>p.Invoice==invoice);
-        if(amount>available||amount>position.Outstanding)throw new InvalidOperationException("المبلغ يتجاوز المتاح في السند أو المتبقي على الفاتورة / Allocation exceeds voucher funds or invoice balance");
+        if(amount<=0||(long)v["reversed"]==1||(long)inv["reversed"]==1||!((v["kind"].ToString() is "RC" or "CR"&&(inv["kind"].ToString() is "SI" or "OC"))||(v["kind"].ToString() is "PV" or "CP"&&(inv["kind"].ToString() is "PI" or "OS")))||v["party"].ToString()!=inv["party"].ToString()||date.Date<DateTime.Parse((string)v["date"])||date.Date<DateTime.Parse((string)inv["date"])||date>DateTime.Today)throw new InvalidOperationException("تحقق من نوع السند والفاتورة والحساب والتاريخ / Check voucher, invoice, party and allocation date");
+        // Allocations use [date, revoked) intervals. A backdated allocation must fit
+        // at every later change, including commitments that have since been revoked.
+        var boundaries=new SortedSet<string>(StringComparer.Ordinal){date.ToString("yyyy-MM-dd")};
+        var allocations=Table("SELECT x.*,v.reversal_date voucher_reversal FROM allocations x JOIN documents v ON v.id=x.voucher WHERE x.voucher=@p0 OR x.invoice=@p1",voucher,invoice);
+        var returns=Table("SELECT date,reversal_date,total FROM documents WHERE original=@p0 AND kind IN ('SR','PR')",invoice);
+        foreach(DataRow row in allocations.Rows)foreach(string field in new[]{"date","revoked","voucher_reversal"})if(row[field] is string value)boundaries.Add(value);
+        foreach(DataRow row in returns.Rows)foreach(string field in new[]{"date","reversal_date"})if(row[field] is string value)boundaries.Add(value);
+        foreach(string cutoff in boundaries.Where(x=>string.CompareOrdinal(x,date.ToString("yyyy-MM-dd"))>=0)){
+            bool Active(DataRow row,string end)=>string.CompareOrdinal((string)row["date"],cutoff)<=0&&(row[end] is not string last||string.CompareOrdinal(last,cutoff)>0);
+            var active=allocations.Rows.Cast<DataRow>().Where(r=>Active(r,"revoked")&&(r["voucher_reversal"] is not string last||string.CompareOrdinal(last,cutoff)>0)).ToList();
+            long used=active.Where(r=>(long)r["voucher"]==voucher).Sum(r=>(long)r["amount"]);
+            long paid=active.Where(r=>(long)r["invoice"]==invoice).Sum(r=>(long)r["amount"]);
+            long returned=returns.Rows.Cast<DataRow>().Where(r=>Active(r,"reversal_date")).Sum(r=>(long)r["total"]);
+            if(amount>(long)v["total"]-used||amount>(long)inv["total"]-(long)inv["paid"]-paid-returned)
+                throw new InvalidOperationException("المبلغ يتجاوز المتاح في السند أو المتبقي على الفاتورة في التاريخ المحدد أو بعده / Allocation exceeds voucher funds or invoice balance at or after the selected date");
+        }
         Exec("INSERT INTO allocations(voucher,invoice,amount,date) VALUES(@p0,@p1,@p2,@p3)",voucher,invoice,amount,date.ToString("yyyy-MM-dd"));Audit("allocate",voucher+" → "+invoice+": "+Money(amount));
     }
     public void RemoveAllocation(long id,DateTime date)
@@ -75,9 +88,18 @@ public sealed partial class AccountingService
     {
         if(deferredRebuild>0)return;
         var states=Items().Where(i=>i.Stock).ToDictionary(i=>i.Id,i=>new StockState());
+        var returnedCosts=new Dictionary<long,(long Qty,long Cost)>();
+        string? lockedThrough=Scalar("SELECT max(end) FROM periods") as string;
         var docs=Table("SELECT * FROM documents WHERE kind IN ('SI','PI','SR','PR','OB','VA','OT','IA','GR','GU','WX') AND reversed=0 ORDER BY date,id");
         foreach(DataRow doc in docs.Rows){long id=(long)doc["id"];string kind=(string)doc["kind"];long goods=0,services=0,cost=0,variance=0,extra=0,oldCost=Convert.ToInt64(Scalar("SELECT coalesce(sum(cost),0) FROM invoice_lines WHERE doc=@p0",id));
-            if(kind=="PI"&&IsReceiptBill(id)){ReplayReceiptBill(doc);continue;}
+            if(lockedThrough!=null&&string.CompareOrdinal((string)doc["date"],lockedThrough)<=0){
+                // A close freezes its recorded stock values and journal entries.
+                // Use those values as replay's starting state without rewriting them.
+                foreach(DataRow move in Table("SELECT * FROM stock_moves WHERE doc=@p0",id).Rows){var st=states[(long)move["item"]];st.Qty+=(long)move["qty"];st.Value+=(long)move["value"];if(st.Qty>0)st.LastCost=D(st.Value)*1000/st.Qty;}
+                if(kind=="SR")foreach(DataRow line in Table("SELECT source_line,qty,cost FROM invoice_lines WHERE doc=@p0",id).Rows){long source=(long)line["source_line"];var previous=returnedCosts.GetValueOrDefault(source);returnedCosts[source]=(previous.Qty+(long)line["qty"],previous.Cost+(long)line["cost"]);}
+                continue;
+            }
+            if(kind=="PI"&&IsReceiptBill(id)){ReplayReceiptBill(doc,states);continue;}
             if(kind=="IA"){ReplayCount(doc,states);continue;}
             if(kind=="WX"){ReplayWarranty(doc,states);continue;}
             if(kind is "OB" or "VA" or "OT"){
@@ -88,7 +110,15 @@ public sealed partial class AccountingService
                 if(stock){
                     bool incoming=kind is "PI" or "GR" or "SR";
                     if(incoming){
-                        if(kind is "PI" or "GR"){long added=ReceiptExtra((long)line["id"]);lc=n+added;extra+=added;}else{var source=Table("SELECT qty,cost FROM invoice_lines WHERE id=@p0",line["source_line"]).Rows[0];lc=M(D((long)source["cost"])*q/(long)source["qty"]);}
+                        if(kind is "PI" or "GR"){long added=ReceiptExtra((long)line["id"]);lc=n+added;extra+=added;}else{
+                            long sourceLine=(long)line["source_line"];var source=Table("SELECT qty,cost FROM invoice_lines WHERE id=@p0",sourceLine).Rows[0];
+                            var returned=returnedCosts.GetValueOrDefault(sourceLine);long remainingQty=(long)source["qty"]-returned.Qty,remainingCost=(long)source["cost"]-returned.Cost;
+                            // Keep closed return costs; allocate any rounding remainder to
+                            // the final open return in chronological replay order.
+                            lc=lockedThrough!=null&&string.CompareOrdinal((string)doc["date"],lockedThrough)<=0?(long)line["cost"]:
+                                q==remainingQty?remainingCost:Math.Min(remainingCost,M(D((long)source["cost"])*q/(long)source["qty"]));
+                            returnedCosts[sourceLine]=(returned.Qty+q,returned.Cost+lc);
+                        }
                         long beforeQty=st!.Qty,beforeValue=st.Value;st.Qty+=q;st.Value+=lc;
                         if(beforeQty<0){long cover=Math.Min(q,-beforeQty);long provisional=cover==-beforeQty?-beforeValue:M(D(-beforeValue)*cover/-beforeQty);long actual=M(D(lc)*cover/q);long adjustment=actual-provisional;st.Value-=adjustment;variance+=adjustment;}
                         if(st.Qty>0)st.LastCost=D(st.Value)*1000/st.Qty;else if(st.Qty==0){variance+=st.Value;st.Value=0;}
@@ -146,17 +176,40 @@ public sealed partial class AccountingService
             if(Accounts().Single(a=>a.Id==bankAccount).Kind!="Cash")throw new InvalidOperationException("Choose a bank account");doc=NewDoc("CC",date,(long)c["party"],bankAccount,reason,new(amount,0,amount));Journal(doc,incoming?[new(bankAccount,amount,0),new(AccountId("1104"),0,amount)]:[new(AccountId("2190"),amount,0),new(bankAccount,0,amount)]);
         }else{
             if(string.IsNullOrWhiteSpace(reason))throw new InvalidOperationException("سبب الإرجاع أو الإلغاء مطلوب / Reason required");
-            if(previous=="Cleared")Reverse((long)c["settlement_doc"],reason,date,true);doc=Reverse((long)c["issue_doc"],reason,date,true);
+            if(previous=="Cleared")ReverseChequeEntry((long)c["settlement_doc"],reason,date);doc=ReverseChequeEntry((long)c["issue_doc"],reason,date);
         }
         Exec("UPDATE cheques SET state=@p0,settlement_doc=@p1 WHERE id=@p2",state,doc,cheque);Audit("cheque-state",cheque+" "+state);tx.Commit();return doc;
+    }
+    // Only the cheque state machine may reverse these non-stock entries across
+    // a closed period. Original entries stay intact; the new event is open-dated.
+    long ReverseChequeEntry(long original,string reason,DateTime date)
+    {
+        var doc=Table("SELECT * FROM documents WHERE id=@p0",original).Rows[0];
+        if(doc["kind"].ToString() is not("CR" or "CP" or "CC")||(long)doc["reversed"]!=0||date.Date<DateTime.Parse((string)doc["date"]))
+            throw new InvalidOperationException("تاريخ أو مستند الشيك غير صالح للإرجاع / Invalid cheque document or reversal date");
+        long reversal=NewDoc("RV",date,null,null,reason,new((long)doc["total"],0,(long)doc["total"]));
+        Exec("UPDATE documents SET original=@p0 WHERE id=@p1",original,reversal);
+        Journal(reversal,Table("SELECT * FROM entries WHERE doc=@p0",original).Rows.Cast<DataRow>().Select(r=>new EntryLine((long)r["account"],(long)r["credit"],(long)r["debit"],(string)r["description"])));
+        Exec("UPDATE documents SET reversed=1,reversal_date=@p0 WHERE id=@p1",date.ToString("yyyy-MM-dd"),original);
+        Exec("UPDATE allocations SET revoked=@p0 WHERE voucher=@p1 AND (revoked IS NULL OR revoked>@p0)",date.ToString("yyyy-MM-dd"),original);
+        Audit("reverse",$"{doc["number"]}: {reason}");
+        return reversal;
     }
     public long CloseYear(DateTime start,DateTime end)
     {
         store.Require("period");if(start>end||end.Date>=DateTime.Today||Convert.ToInt64(Scalar("SELECT count(*) FROM periods WHERE NOT(end<@p0 OR start>@p1)",start.ToString("yyyy-MM-dd"),end.ToString("yyyy-MM-dd")))>0)throw new InvalidOperationException("الفترة غير صالحة أو تتداخل مع فترة مقفلة / Invalid or overlapping period");
+        string? previousEnd=Scalar("SELECT max(end) FROM periods") as string;
+        if(previousEnd!=null?start.Date!=DateTime.Parse(previousEnd).AddDays(1):Convert.ToInt64(Scalar("SELECT count(*) FROM documents WHERE date<@p0",start.ToString("yyyy-MM-dd")))>0)
+            throw new InvalidOperationException("ابدأ بعد آخر إقفال مباشرة، أو من أول حركة عند الإقفال الأول / Start immediately after the last close, or include all earlier activity for the first close");
         using var tx=store.BeginTransaction();var lines=new List<EntryLine>();long net=0;
         foreach(DataRow r in Table("SELECT a.id,sum(e.debit-e.credit) balance FROM accounts a JOIN entries e ON e.account=a.id JOIN documents d ON d.id=e.doc WHERE a.kind IN ('Income','Expense') AND d.date BETWEEN @p0 AND @p1 GROUP BY a.id",start.ToString("yyyy-MM-dd"),end.ToString("yyyy-MM-dd")).Rows){long b=(long)r["balance"];net+=b;if(b>0)lines.Add(new((long)r["id"],0,b));else if(b<0)lines.Add(new((long)r["id"],-b,0));}
         if(net>0)lines.Add(new(AccountId("3301"),net,0));else if(net<0)lines.Add(new(AccountId("3301"),0,-net));
         long id=NewDoc("CL",end,null,null,"Year closing",new(lines.Sum(l=>l.Debit),0,lines.Sum(l=>l.Debit)));if(lines.Count>0)Journal(id,lines);Exec("INSERT INTO periods(start,end,closing_doc) VALUES(@p0,@p1,@p2)",start.ToString("yyyy-MM-dd"),end.ToString("yyyy-MM-dd"),id);Audit("close-period",start+" → "+end);tx.Commit();return id;
+    }
+    public DateTime SuggestedCloseStart()
+    {
+        if(Scalar("SELECT max(end) FROM periods") is string last)return DateTime.Parse(last).AddDays(1);
+        return Scalar("SELECT min(date) FROM documents") is string first?DateTime.Parse(first):new DateTime(DateTime.Today.Year,1,1);
     }
     public long AmendSimple(long original,DateTime date,long? party,long? cash,decimal amount,string note,List<EntryLine>? lines,string reason)
     {

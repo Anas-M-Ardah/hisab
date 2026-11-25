@@ -1,0 +1,10 @@
+Baseline a2899dd; probe 2026-11-19T13:36:50.7904959+03:00
+A1 AR asof2026-02-01 ExpectedOutstanding=100000 ActualOutstanding=0 Ledger=100000 Allocated=200000
+A1 AP asof2026-02-01 ExpectedOutstanding=100000 ActualOutstanding=0 Ledger=-100000 Allocated=200000
+A2 Expected=February reversal allowed; Actual=الفترة المالية مقفلة أو التاريخ يسبق آخر إقفال / Date is in or before the last closed period
+A2 ExpectedAR=100000 ActualAR=0 ChequeState=Pending
+G1 Opening ledger=100000 Positions=0
+A3 Close gap accepted; IncomeResidual=-100000 Retained=0
+A3 Earlier adjustment blocked=الفترة المالية مقفلة أو التاريخ يسبق آخر إقفال / Date is in or before the last closed period
+C1 Tax expectedJan=16000 actualJan=16000 expectedFeb=-16000 actualFeb=-16000; JanAR=116000 FebAR=0
+C2 Reopen expectedJanIncome=-100000 actual=-100000 expectedRetained=0 actual=0

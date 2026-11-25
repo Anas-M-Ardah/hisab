@@ -1,0 +1,62 @@
+ENTRYPOINT Hisab.Audit.Program; synthetic fixtures: C:\Users\admin\AppData\Local\Temp\HisabAudit\e8815f61f2c44915a5827cecbe325735
+PASS AR rejects reuse before revocation
+PASS AR historical positions reconcile
+PASS AR allows reuse on revocation day
+PASS AR rejects current over-allocation
+PASS AR checks future interval peak, not just start/current balance
+PASS AR partial allocations preserve cutoff
+PASS AR reversal preserves historical settlement
+PASS AP rejects reuse before revocation
+PASS AP historical positions reconcile
+PASS AP allows reuse on revocation day
+PASS AP rejects current over-allocation
+PASS AP checks future interval peak, not just start/current balance
+PASS AP partial allocations preserve cutoff
+PASS AP reversal preserves historical settlement
+PASS incoming pending generic reversal stays protected
+PASS incoming pending generic managed reversal still checks original closed period
+PASS incoming pending closed entries untouched
+PASS incoming pending debt restored only on bounce date
+PASS incoming pending allocation released on bounce date
+PASS incoming pending cheque and bank balances reconciled
+PASS incoming pending terminal state recorded
+PASS incoming pending duplicate bounce rejected
+PASS incoming pending duplicate creates no documents
+PASS incoming cleared generic reversal stays protected
+PASS incoming cleared generic managed reversal still checks original closed period
+PASS incoming cleared closed entries untouched
+PASS incoming cleared debt restored only on bounce date
+PASS incoming cleared allocation released on bounce date
+PASS incoming cleared cheque and bank balances reconciled
+PASS incoming cleared terminal state recorded
+PASS incoming cleared duplicate bounce rejected
+PASS incoming cleared duplicate creates no documents
+PASS outgoing pending generic reversal stays protected
+PASS outgoing pending generic managed reversal still checks original closed period
+PASS outgoing pending closed entries untouched
+PASS outgoing pending debt restored only on bounce date
+PASS outgoing pending allocation released on bounce date
+PASS outgoing pending cheque and bank balances reconciled
+PASS outgoing pending terminal state recorded
+PASS outgoing pending duplicate bounce rejected
+PASS outgoing pending duplicate creates no documents
+PASS outgoing cleared generic reversal stays protected
+PASS outgoing cleared generic managed reversal still checks original closed period
+PASS outgoing cleared closed entries untouched
+PASS outgoing cleared debt restored only on bounce date
+PASS outgoing cleared allocation released on bounce date
+PASS outgoing cleared cheque and bank balances reconciled
+PASS outgoing cleared terminal state recorded
+PASS outgoing cleared duplicate bounce rejected
+PASS outgoing cleared duplicate creates no documents
+PASS Allocation respects a historical return even when cancelled later
+PASS Return cancellation releases capacity only on its event date
+PASS Bounce cannot precede clearance
+PASS Bounce requires a reason
+PASS Future bounce rejected
+PASS Bounce event must be in an open period
+PASS Viewer cannot bounce a cheque
+PASS Rejected bounce leaves documents and state intact
+PASS Cheque failure rolls back both reversing entries
+PASS Cheque failure rolls back reversal metadata and state
+PASS Open-period cancellation remains supported

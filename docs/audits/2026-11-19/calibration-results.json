@@ -1,0 +1,54 @@
+{
+  "scope": "Eight preliminary synthetic cases. Not professional certification. A01 truth assumes Hisab documented moving weighted average.",
+  "defects_detected": 4,
+  "defects_total": 4,
+  "clean_accepted": 2,
+  "clean_total": 3,
+  "clean_flagged_as_defect": 0,
+  "insufficient_evidence_correctly_identified": true,
+  "exact_classification_matches": 7,
+  "total_cases": 8,
+  "caveat": "A01 calculations are correct but reviewer requested explicit costing policy despite Hisab context; record this qualification rather than declaring 8/8.",
+  "predictions": [
+    {
+      "id": "A01",
+      "classification": "undetermined",
+      "reason": "الأرقام صحيحة إذا كانت السياسة المتوسط المرجح: التكلفة 2400÷20=120؛ تكلفة المبيع 600 والمخزون 1800 والربح 400. لكن الحالة لم تحدد طريقة التسعير؛ FIFO يعطي تكلفة 500 ومخزون 1900، فلا يمكن الجزم دون السياسة."
+    },
+    {
+      "id": "A02",
+      "classification": "incorrect",
+      "reason": "في الجرد المستمر يجب مدين المخزون 200 ودائن المورد 200؛ تحميل كامل الشراء غير المباع على المصروف يترك المخزون العام صفراً مقابل مخزون تفصيلي 200. في نظام دوري يلزم قيد تسوية نهائي؛ لا تظهر تسوية هنا."
+    },
+    {
+      "id": "A03",
+      "classification": "correct",
+      "reason": "رد البيع المدفوع ينشئ رصيداً دائناً للعميل 200 حتى صرف المبلغ، ويعكس الإيراد 200 وتكلفة المبيع 120 ويعيد المخزون 120؛ عدم صرف النقد بعد لا يبطل القيد."
+    },
+    {
+      "id": "A04",
+      "classification": "incorrect",
+      "reason": "رصيد 31 أكتوبر يجب أن يبقى 10 وحدات بقيمة 1000؛ بيع نوفمبر لا يخفض تقييم أكتوبر إلى 8 و800."
+    },
+    {
+      "id": "A05",
+      "classification": "incorrect",
+      "reason": "الحجز فقط يبقي الفعلي 10 والمحجوز 3 والمتاح 7، ولا يستدعي تكلفة مبيع أو خفض مخزون بالقيد."
+    },
+    {
+      "id": "A06",
+      "classification": "correct",
+      "reason": "على افتراض سياسة تحميل الضمان عند الاستبدال وعدم وجود مخصص سابق: يصرف البديل بكلفة 80 على مصروف الضمان دون مبيعات أو ذمة جديدة، ويبقى جهاز العميل بالعهدة غير قابل للبيع والبديل المسلم غير متاح. وجود مخصص سابق يستدعي مراجعة الحساب المدين."
+    },
+    {
+      "id": "A07",
+      "classification": "incorrect",
+      "reason": "النقل الداخلي يحافظ على كمية الشركة وحدة واحدة؛ يجب ألا يبقى الرقم التسلسلي متاحاً في المستودعين في الوقت نفسه."
+    },
+    {
+      "id": "A08",
+      "classification": "undetermined",
+      "reason": "مكان الشركة لا يكفي لتحديد الضريبة القانونية لكل بند. التسجيل والتصنيف والإعفاءات غير متاحة؛ القول بوجوب 16% على الجميع غير مسند، ولا يمكن تحديد النسبة الصحيحة من المعطيات."
+    }
+  ]
+}

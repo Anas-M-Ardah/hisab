@@ -1,0 +1,25 @@
+ENTRYPOINT Hisab.Audit.Program; synthetic fixtures: C:\Users\admin\AppData\Local\Temp\HisabAudit\b6ce30df2c8c4d3f9f3c9b2907f48ce4
+PASS ar/14 reconciliation labels, totals and print rendering
+PASS ar/24 reconciliation labels, totals and print rendering
+PASS en/14 reconciliation labels, totals and print rendering
+PASS en/24 reconciliation labels, totals and print rendering
+PASS ar/14 opening forms, preview, allocation, print and late-billing form
+PASS ar/24 opening forms, preview, allocation, print and late-billing form
+PASS en/14 opening forms, preview, allocation, print and late-billing form
+PASS en/24 opening forms, preview, allocation, print and late-billing form
+PASS ar/14 profit report and print rendering
+PASS ar/14 balance-sheet report and print rendering
+PASS ar/14 historical-stock report and print rendering
+PASS ar/14 receipt-accruals report and print rendering
+PASS ar/24 profit report and print rendering
+PASS ar/24 balance-sheet report and print rendering
+PASS ar/24 historical-stock report and print rendering
+PASS ar/24 receipt-accruals report and print rendering
+PASS en/14 profit report and print rendering
+PASS en/14 balance-sheet report and print rendering
+PASS en/14 historical-stock report and print rendering
+PASS en/14 receipt-accruals report and print rendering
+PASS en/24 profit report and print rendering
+PASS en/24 balance-sheet report and print rendering
+PASS en/24 historical-stock report and print rendering
+PASS en/24 receipt-accruals report and print rendering

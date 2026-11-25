@@ -1,0 +1,358 @@
+[
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\AccountHierarchyScreen.cs",
+    "Hash": "7C1F41C7B13DA9DC755FABE6893A759EDD7869C716AAD709B26C73DC5FF9ECB3"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\AccountingIntegrityTests.cs",
+    "Hash": "2F073E1F76645F23311F35B39269D411CEA75887DE6DF503F008D509AD0FC924"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\AccountingService.cs",
+    "Hash": "2BA691E80D12609087ADA065FF86094A720DEF1147DF3B8B23D54F1D45D85E05"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\AccountingV2.cs",
+    "Hash": "7C5E2D466745E0F442CF43468F04CC9854268BB7ED04795CE606273AC8228AD6"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\AccountLayoutChecks.cs",
+    "Hash": "46CF0C08BC4B07898B9974F60B416DD4F0A2F8C72C0D5BC579E0EEEE943B916E"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\AccountOrganizer.cs",
+    "Hash": "140104694DDEC902F54BDD1E6D903CE8AC9F86F3AD301F474B23E302C1EF37A6"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\AccountOrganizerTests.cs",
+    "Hash": "35E9FDEC983C72681A40502889A8F2812FE38902F1DDE7701C561899A947AF1D"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\AccountOutline.cs",
+    "Hash": "087729BBFEC1A4000B9BBCCCF2DE1D82B103E85E6C17B61E4EFC60132646A39A"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\AmendScreens.cs",
+    "Hash": "147DA6CE2A404A93600FB1C0FD1E45B9744A9EF5B1988DBE680009799C078A15"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\App.cs",
+    "Hash": "DE83D45F9E68F20B4BB0097334BC461BC66D7FD2BD51B62BA0BF78151CB93A18"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ChequeReceiptScreen.cs",
+    "Hash": "2ACC8560B6DA971DD08BAA5416A12C9CE12797B18B01433EFC2C4E5DEAAC588A"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ClientFeedback.cs",
+    "Hash": "AA702FE841FF5BD6E244528211B301EEFE01097FF45B3D62EF8807F1AAB7277C"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ClientFeedbackTests.cs",
+    "Hash": "7890936C8084C7EAF10484A14F65421FBBA6C359146A483C4829B754AF565D8F"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ClosingStockTests.cs",
+    "Hash": "8689A915A28140254D43A72F92B861AFF1107F0EE7A011157B0D401B8004EC59"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\DesktopIntegration.cs",
+    "Hash": "8A7716332FA04C9640F3F248E3092DC004E6583128A7D0685703B8074AFEF0A2"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\DesktopIntegrationTests.cs",
+    "Hash": "4C18F642B9E5FEDBB87AD116B83162C575BF512ED85356425B3EB965C0BDA108"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\Diagnostics.cs",
+    "Hash": "47B333422A1FD4CB42FF4688447F92D877D21469269690C36A9C850E1871CB0F"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\DocumentTranslations.cs",
+    "Hash": "8460AA2DF8177FD26BD4067F3A2780B88A72E6CCB2090E742DBE55E619C7EC80"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\DropdownSearch.cs",
+    "Hash": "0273970ECD7EF1DB862809E690783D988245C8BF24627D7CBE6EF3D74D02CA49"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\EncryptedStorage.cs",
+    "Hash": "1757429A9183D486D2C0CB204C7C57D08C6E75E27A15C69C571C7DC4CE09DB66"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ExcelWorkbook.cs",
+    "Hash": "C8C9546535311C6DCCC1EDCE34199D170CC8089C33A03A092C1A158B2C39A745"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ExtendedScreens.cs",
+    "Hash": "92EDBFE2777D277C5535E1DE00BC79C725BDE7976D87EA43C6B7EFBF4B657794"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\FinancialReportScreens.cs",
+    "Hash": "DB71F48223A31B03B29D799444BDC70AC39E168DCCA150FAB12D9F564E4E037D"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\FinancialStatements.cs",
+    "Hash": "8FB60B10BE2C9F368440113E4BE2D806087965E8FD2721970ED34B4E30545108"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\FinancialStatementTests.cs",
+    "Hash": "FE22400791C1191D327AED08402D11A88E7EA57F6ED4A26883D5622EA9682894"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\HierarchyMoveTests.cs",
+    "Hash": "8DE1D709BAF6D1F8167EA5164BDEC5A33E54C4FE3A5113E5818F061A0A5FFBD1"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\HierarchyPreviewChecks.cs",
+    "Hash": "22A2CF647466D2A6232966C7033D942B9FD337DAC8E2F4FDC3513F13C4284241"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryCounts.cs",
+    "Hash": "6008E2CE96FE9959F2E8E2190C0536F2FC70D9A53FD650ECF75222E6259098B3"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryEdgeTests.cs",
+    "Hash": "AD0940F35C51402B7E1FC014A4B4464FAA7DCC18E742F0077A9CC3E96E8554A1"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryPreviewChecks.cs",
+    "Hash": "9DAAB663526C1EA402DC09E07C5B59C921B21C04C61289CB8498665B528182E7"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryReconciliation.cs",
+    "Hash": "789AEF53E6C64AE1DEC8F659B38710EC60A7CF62C38EEA2C166D6E3AD88FEFD9"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryReconciliationTests.cs",
+    "Hash": "65F3D6B4B2A8C00056D3A48AEC486DC3748EC8B2DEA5A42C7EAF372DD982CC34"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryReviewTests.cs",
+    "Hash": "AB36BFD71C5360ED135B7B3A9A6AE790F5A085427FE6CF87456EC346CCFE48CD"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryScreens.cs",
+    "Hash": "5191EE31B8EBD6C69E340529B5F09029C552D57AA309A09654867E03F1696F63"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryService.cs",
+    "Hash": "5BC1468B38842B13CF99243584A378053785652AAD0511630582EDFC0BEFDE16"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryStore.cs",
+    "Hash": "A6BD39530BAA77315491399384A9676CF5987AD58D82B825D63F71FFACF03693"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\InventoryTests.cs",
+    "Hash": "A76AAF568B267DB4D7D5A369CDAA25D241F7FB7E3B8597EA5B16F368841DC58F"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ItemHistory.cs",
+    "Hash": "248FE678A17D7832482ED9125D5B93BABAC17225E317452F9FB253C054982017"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ItemHistoryPreviewChecks.cs",
+    "Hash": "6A80DAD5618733BC3C5F9ABB281DB85A516AA57A966CD11F907C6EDCCF44BD8C"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ItemHistoryScreens.cs",
+    "Hash": "568C0FAADCFBE2EE934EE50296F70A5868DE91E894022DDF07E10F5B2109DD8B"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ItemHistoryTests.cs",
+    "Hash": "0C6B7F8AF2C45E4178E4B180C2EBFFB3D50ECB24B17921051B19CF6FECE21A79"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ItemImport.cs",
+    "Hash": "F52E4906E96487FAA28737F3AD2DA0FEAE8E7CC79E99A9943FBF14EEF22BE86C"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ItemImportPreviewChecks.cs",
+    "Hash": "3B40029CD91ED322DEEFE54B4C958B8FC824A5803176E199B8F55A137B4909A1"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ItemImportScreens.cs",
+    "Hash": "D2E1C993DB69E3A08818645EE9F1D7009749F0160C9A969DB5F9D1B7C3A2F078"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ItemImportTests.cs",
+    "Hash": "2C4C9F14EF4CBF0A5780BCBD3F72F01970B105A2ACF2CFA52253ECEC8B47C0EA"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\LandedCosts.cs",
+    "Hash": "9C2C53CF8F330C575A26677A4E6ED890707161709E8B298394238401B8142DDE"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\LateBillingTests.cs",
+    "Hash": "024D15A775CA518EFD5AEC1D611E361222A2E454137D29846844E2D511DB25CC"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\LoginWindow.cs",
+    "Hash": "8E5A540618E4266B16881B5124900B4A67D8A4C133583E79376505FF76A419BF"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\MainViewModel.cs",
+    "Hash": "6D61D040D3CAFE95CC2ACBD609BE79DAE2688CB9A589785AC7EE0A27FC4BB439"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\MainWindow.cs",
+    "Hash": "77B84BFDBE1847CD949060F7174C4C4F71CD9440D27541D6DB14BFF701E39364"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ModernScreens.cs",
+    "Hash": "F090D314277C7F1C79B1D3C12857C39378449EB5ED29A4DC484E0B5977A0531F"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\OpeningBalances.cs",
+    "Hash": "2714E376716B550F415504C7705EB4E62A8CFA7DE082F2D9E3DE9125D1297FA5"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\OpeningBalanceScreens.cs",
+    "Hash": "7A67F067C99E89CE671042B3A2FA5E00392C1BED3B87884D743AA0AD9F776380"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\OpeningBalanceTests.cs",
+    "Hash": "A96C00A1B7F6DDC30285D05D0242ABC0D39A4886B4228EBBCDD8CAAA71C78029"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\PartyReconciliation.cs",
+    "Hash": "6C2D1AB0511349DAABBA47F97A644C77674804CCE55C075F7AE3EE05B9CEEBE5"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\PersonalMode.cs",
+    "Hash": "6AEA15F65CD95FB40EE47E07984A97EB9466E392FD56B93362DD2A56B4F37A96"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\PersonalModeTests.cs",
+    "Hash": "A443CA88BEDDF73E78E5F456CB3808F97FB9D7418086DD33B9B15C715A341B7A"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\PreviewChecks.cs",
+    "Hash": "5245C3CC567F0709D2C6B41E53C2FDB93F7D0EEC42E4461F19BB5CD3C9004EE3"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\PreviewData.cs",
+    "Hash": "2B74C9D89B9055E46F4C36EDD86A4A6A11059FEF1A4E26C30BDDD41DDF8650C2"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\Purchasing.cs",
+    "Hash": "58B0977CF001090E755E3E9F1580BE8B3DC3C1A149FF9E728FB14248C1A18D18"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\PurchasingScreens.cs",
+    "Hash": "87B2118D67F5F25D4BD7286AA384AB3F825A38405D0F465254EED577CE242881"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\QuotePreviewChecks.cs",
+    "Hash": "DD1997B751D1A2041B3A9D48B0C1599A4C40CA4C31DBFC470652B28599E61D18"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\Quotes.cs",
+    "Hash": "5C458EE7371D56DB8E715CB0DE85EF4F3DA2EFB30AF3A3F8C35201452D0D5CB0"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\QuoteScreens.cs",
+    "Hash": "7641B3A372B04F137D9C3E8D77BF75225140DE4B3A0CD22044FCF5439761CD9D"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\QuoteTests.cs",
+    "Hash": "8A04FE3E3F51CA5FE23017319BE2A48C493F3BA8325529B03F1279C800118150"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ReconciliationPreviewChecks.cs",
+    "Hash": "AA7C5DD43B7D1CC5DF9A9D795B8D5A7F623C4C42FE370837909579BD7229F28D"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\RedesignPreviewChecks.cs",
+    "Hash": "2E7EF861A9E7BBBF85694CFA74FBE75BA6135768F86EE9EBD2709F4E02B3CC93"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\Replenishment.cs",
+    "Hash": "514702A92E0E3B9E0260CCFBD03FCFCC1745C2CF48CB0386A16D68768F33E98F"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ReportsAndPrint.cs",
+    "Hash": "D63017B59CC011733EFAD514C09A2602EAABD92B90AE38D3B54CCE541B7A2A3D"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ReservationPreviewChecks.cs",
+    "Hash": "729A20719D02D7339D7E032DBD03C6D3EDB65A2A89BA17565C32734C148F5D7C"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\Reservations.cs",
+    "Hash": "287FC1D82139517291498B94868C80EC63D724ADADF94664A87B27BA74797191"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ReservationScreens.cs",
+    "Hash": "CE07B6841E9335F0B93052302B477D09C7B668461723B711759D072B2CEF96E6"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\ReservationTests.cs",
+    "Hash": "A90EE321BFE63316BEBEA456CCC2ED36F5942E3272EFB65B8DFDE96D1C9D1393"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\SelfTest.cs",
+    "Hash": "CCBD6B6FC118F6727C35D3E93E15FAE2DF5E55DBBB413CF15ED62533EEC1B48D"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\Store.cs",
+    "Hash": "21C53EEF836A2F1B017D3D35B0E0B3F2948B31F2E44093912F26E3774EDD40CA"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\StoreV2.cs",
+    "Hash": "65AFA5225233AAF4D6A759A60ABDEDAA0C4147A1592A3C9187F9831565080447"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\TablePreviewChecks.cs",
+    "Hash": "DEAF0E3E04CB354B50E67085697E2E0C16D15BDE43AF31A0CBCA138466C76BAC"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\UiTheme.cs",
+    "Hash": "7E238306A2D664DB40690CA4F4F5984E7B03A6E897BBD7229CBE66CD27D94C5B"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\V2Tests.cs",
+    "Hash": "607459D22639F580D1716D8CC9C875FAC665000CDEFC217A3A869CA37C480387"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\Warranties.cs",
+    "Hash": "E17645691BFAD9496151A4ADB8AB2123564906CEDB1A42C0B19B4F66B2D59120"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\WarrantyPreviewChecks.cs",
+    "Hash": "F22E766ED0E28FBD26EDDB717ABFD7481840B482B1287F75880B08B8DB7F3E9D"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\WarrantyScreens.cs",
+    "Hash": "AC23FF92CBEF8C4ADC82DA55702B4BD52367E6AA2C16914696637FBC8FBEAC24"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\WarrantyTests.cs",
+    "Hash": "BC85B35FC4B528DE6FBA7AF9CF84C0122D8007DB5B21DD3ED7296E8DF617C13F"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\WelcomeWindow.cs",
+    "Hash": "B4761B1AA39876DC708F260F21353CAD74090C1332445022D551F2E46803DA69"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\WorkbookPreviewChecks.cs",
+    "Hash": "C8CA87B533ACBDDF8DEF77F4670C03E6224C1DFB80CDDCF145DE638A5C95D990"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\WorkbookScreens.cs",
+    "Hash": "A5C8E579DD9EC6EFEA4D85145EA9A9AB2890FF8611679FF8A509B73182178457"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\WorkbookWorkflows.cs",
+    "Hash": "F7BED7E84CAB525C6514D0DFBE9732B4745A76C94D5B219AEFDE7907D0229843"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\WorkbookWorkflowTests.cs",
+    "Hash": "A3FEAEE6EC3489CD44CEE4F03C997F51096C4626E168C1785B9FF400C7063DFC"
+  },
+  {
+    "Path": "C:\\Users\\admin\\Documents\\Codex\\2026-10-29\\https-github-com-anas-m-ardah\\work\\hisab\\source\\WorkspaceLayout.cs",
+    "Hash": "9C4F3EFF39F35C6401132AB8D5C45EF55E40E3AEB22978556DDD1BA4B1F42861"
+  }
+]

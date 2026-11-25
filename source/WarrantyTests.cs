@@ -86,6 +86,6 @@ public static class WarrantyTests
         long location=s.SaveLocation(null,"Other warehouse");Reject(()=>a.ReplaceWarranty(claim,today,item,location,"E2","Goodwill"),"Replacement cannot consume a serial from another location");
         Reject(()=>a.ReplaceWarranty(claim,today.AddDays(-1),item,1,"E2","Goodwill"),"Replacement cannot predate warranty intake");
         a.UpdateWarrantyCustody(claim,"Close","Customer collected original");s.Exec("PRAGMA user_version=6");
-        string migration=Path.Combine(directory,"warranty-schema6.db");s.Backup(migration);using var reopened=new Store(migration);Check(Convert.ToInt64(reopened.Scalar("PRAGMA user_version"))==7&&reopened.WarrantyClaims().Rows.Count==1,"Schema upgrade is repeatable and preserves existing warranty records");
+        string migration=Path.Combine(directory,"warranty-schema6.db");s.Backup(migration);using var reopened=new Store(migration);Check(Convert.ToInt64(reopened.Scalar("PRAGMA user_version"))==Store.SchemaVersion&&reopened.WarrantyClaims().Rows.Count==1,"Schema upgrade is repeatable and preserves existing warranty records");
     }
 }

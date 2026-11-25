@@ -100,7 +100,7 @@ public sealed partial class AccountingService(Store store)
     }
     public long Reverse(long id,string reason,DateTime? reversalDate=null,bool managed=false)
     {
-        CheckInventoryReversal(id);CheckPurchasingReversal(id);CheckWarrantyReversal(id);
+        CheckOpeningReversal(id,reversalDate??DateTime.Today);CheckInventoryReversal(id);CheckPurchasingReversal(id);CheckWarrantyReversal(id);
         if(string.IsNullOrWhiteSpace(reason)) throw new InvalidOperationException("اكتب سبب الإلغاء / Enter a cancellation reason");
         using var tx=store.BeginTransaction();var effectiveDate=reversalDate??DateTime.Today; var doc=Table("SELECT * FROM documents WHERE id=@p0",id).Rows[0];
         if((long)doc["reversed"]==1||doc["kind"].ToString()=="RV") throw new InvalidOperationException("المستند ملغى بالفعل / Document already cancelled");
@@ -113,7 +113,7 @@ public sealed partial class AccountingService(Store store)
         Exec("UPDATE documents SET original=@p0 WHERE id=@p1",id,reversal);
         Exec("UPDATE stock_counts SET state='Reversed' WHERE posted_doc=@p0",id);
         var original=Table("SELECT * FROM entries WHERE doc=@p0",id).Rows.Cast<DataRow>().Select(r=>new EntryLine((long)r["account"],(long)r["credit"],(long)r["debit"],(string)r["description"])); if(original.Any())Journal(reversal,original);
-        Exec("UPDATE documents SET reversed=1,reversal_date=@p0 WHERE id=@p1",effectiveDate.ToString("yyyy-MM-dd"),id);Exec("UPDATE allocations SET revoked=@p0 WHERE (invoice=@p1 OR voucher=@p1) AND revoked IS NULL",effectiveDate.ToString("yyyy-MM-dd"),id);foreach(DataRow m in moves.Rows)Exec("INSERT INTO stock_moves(doc,item,qty,value) VALUES(@p0,@p1,@p2,@p3)",reversal,m["item"],-(long)m["qty"],-(long)m["value"]);RebuildInventory("reverse "+id);Audit("reverse",$"{doc["number"]}: {reason}");tx.Commit();return reversal;
+        Exec("UPDATE documents SET reversed=1,reversal_date=@p0 WHERE id=@p1",effectiveDate.ToString("yyyy-MM-dd"),id);Exec("UPDATE allocations SET revoked=@p0 WHERE (invoice=@p1 OR voucher=@p1) AND revoked IS NULL",effectiveDate.ToString("yyyy-MM-dd"),id);foreach(DataRow m in moves.Rows)Exec("INSERT INTO stock_moves(doc,item,qty,value) VALUES(@p0,@p1,@p2,@p3)",reversal,m["item"],-(long)m["qty"],-(long)m["value"]);if(doc["kind"].ToString() is not("OC" or "OS")&&(!IsReceiptBill(id)||ReceiptBillChangesCost(id)||ReceiptBillCurrentAdjustment(id)))RebuildInventory("reverse "+id);Audit("reverse",$"{doc["number"]}: {reason}");tx.Commit();return reversal;
     }
 }
 

@@ -17,7 +17,7 @@ public record Totals(long Net, long Tax, long Total);
 
 public sealed partial class Store : IDisposable
 {
-    public const int SchemaVersion = 7;
+    public const int SchemaVersion = 8;
     public string Path { get; }
     public SqliteConnection Db { get; }
     internal long CommandCount { get; private set; }
@@ -70,7 +70,12 @@ public sealed partial class Store : IDisposable
     public static decimal Parse(string text)
     {
         var cleaned=new string(text.Trim().Select(c => c>='٠'&&c<='٩'?(char)('0'+c-'٠'):c>='۰'&&c<='۹'?(char)('0'+c-'۰'):c=='٫'?'.':c=='٬'?',':c).ToArray());
-        if (!decimal.TryParse(cleaned,NumberStyles.AllowDecimalPoint|NumberStyles.AllowLeadingSign,CultureInfo.InvariantCulture,out var n)) throw new InvalidOperationException("أدخل رقمًا صحيحًا، مثل 1250.500\nEnter a valid number, e.g. 1250.500");
+        // Validate thousands groups before allowing separators; TryParse alone
+        // accepts malformed group sizes such as 12,50.
+        bool grouped=cleaned.Contains(',');
+        if(grouped&&!System.Text.RegularExpressions.Regex.IsMatch(cleaned,@"\A[+-]?[0-9]{1,3}(,[0-9]{3})+(\.[0-9]+)?\z"))
+            throw new InvalidOperationException("تنسيق فواصل الآلاف غير صالح، مثال: 1,250.500 / Invalid thousands grouping, e.g. 1,250.500");
+        if (!decimal.TryParse(cleaned,NumberStyles.AllowDecimalPoint|NumberStyles.AllowLeadingSign|(grouped?NumberStyles.AllowThousands:0),CultureInfo.InvariantCulture,out var n)) throw new InvalidOperationException("أدخل قيمة رقمية صالحة، مثل 1250.500\nEnter a valid numeric value, e.g. 1250.500");
         return n;
     }
     static string[] Resource(string name)

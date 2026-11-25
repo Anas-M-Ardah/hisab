@@ -1,0 +1,8 @@
+PASS ar/14 reconciliation labels, totals and print rendering
+PASS ar/24 reconciliation labels, totals and print rendering
+PASS en/14 reconciliation labels, totals and print rendering
+PASS en/24 reconciliation labels, totals and print rendering
+PASS ar/14 opening forms, preview, allocation, print and late-billing form
+PASS ar/24 opening forms, preview, allocation, print and late-billing form
+PASS en/14 opening forms, preview, allocation, print and late-billing form
+PASS en/24 opening forms, preview, allocation, print and late-billing form

@@ -1,0 +1,108 @@
+[
+  {
+    "id": "A01",
+    "business": "No tax. Open 10 units at 100 JOD; purchase 10 at 140 JOD on credit; sell 5 at 200 JOD on credit.",
+    "observed": {
+      "ending_qty": 15,
+      "ending_stock_value": 1800,
+      "COGS": 600,
+      "sales": 1000,
+      "gross_profit": 400
+    }
+  },
+  {
+    "id": "A02",
+    "business": "No tax. Purchase 4 stock units at 50 JOD each on credit. All remain unsold.",
+    "observed": {
+      "journal": [
+        {
+          "account": "Purchases expense",
+          "debit": 200,
+          "credit": 0
+        },
+        {
+          "account": "Supplier payable",
+          "debit": 0,
+          "credit": 200
+        }
+      ],
+      "stock_qty": 4,
+      "stock_value": 200,
+      "inventory_GL": 0
+    }
+  },
+  {
+    "id": "A03",
+    "business": "Two units were sold to a customer and fully paid. Accept a full customer return of 200 JOD including the original invoice amount; original COGS was 120 JOD. No refund issued yet.",
+    "observed": {
+      "sales_return_debit": 200,
+      "customer_credit": 200,
+      "inventory_debit": 120,
+      "COGS_credit": 120,
+      "customer_credit_still_unrefunded": 200
+    }
+  },
+  {
+    "id": "A04",
+    "business": "On Oct 31 stock is 10 units at 100 JOD. On Nov 5 sell 2. User requests Oct 31 inventory valuation.",
+    "observed": {
+      "report_date": "Oct 31",
+      "report_qty": 8,
+      "report_value": 800
+    }
+  },
+  {
+    "id": "A05",
+    "business": "Available physical stock is 10 units. Reserve 3 units for a customer; no delivery or invoice.",
+    "observed": {
+      "on_hand": 7,
+      "reserved": 3,
+      "available": 7,
+      "journal_inventory_credit": 300,
+      "journal_COGS_debit": 300
+    }
+  },
+  {
+    "id": "A06",
+    "business": "Sold serial SN-1 was received into warranty custody. Free replacement SN-2 delivered. Each original stock unit cost 80 JOD.",
+    "observed": {
+      "replacement_journal": [
+        {
+          "account": "Warranty expense",
+          "debit": 80,
+          "credit": 0
+        },
+        {
+          "account": "Inventory",
+          "debit": 0,
+          "credit": 80
+        }
+      ],
+      "customer_balance_change": 0,
+      "sale_revenue_change": 0,
+      "SN-1_saleable": false,
+      "SN-2_saleable": false
+    }
+  },
+  {
+    "id": "A07",
+    "business": "Warehouse A transfers serial SN-9 to warehouse B.",
+    "observed": {
+      "warehouse_A_available_serials": [
+        "SN-9"
+      ],
+      "warehouse_B_available_serials": [
+        "SN-9"
+      ],
+      "company_qty": 2,
+      "inventory_GL_change": 0
+    }
+  },
+  {
+    "id": "A08",
+    "business": "Company location is Jordan. An invoice has a laptop and service line. No company registration, product classification or applicable exemption evidence is supplied.",
+    "observed": {
+      "reviewer_statement": "All lines must legally use 16% sales tax because the company is in Jordan."
+    }
+  }
+]

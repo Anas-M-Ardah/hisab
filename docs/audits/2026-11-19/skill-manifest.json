@@ -1,0 +1,119 @@
+[
+  {
+    "name": "journal-entry-prep",
+    "path": "C:\\Users\\admin\\.codex\\skills\\journal-entry-prep",
+    "skill_sha256": "a82c078f6cef310b8e7e6fe150000cd9ad7f9461ec39ecff7061d1c5abe21059",
+    "structural_validation": "passed 2026-11-19",
+    "source": {
+      "repository": "anthropics/knowledge-work-plugins",
+      "revision": "e91a134584eb798bac7fb0379358006a2b63b965",
+      "path": "finance/skills/journal-entry-prep",
+      "retrieved": "2026-11-18",
+      "original_skill_sha256": "122715fb18246c2f04d31a5f7c07584ecbfc5c0b46ee09b4c0f4557767d7351e",
+      "installed_skill_sha256": "a82c078f6cef310b8e7e6fe150000cd9ad7f9461ec39ecff7061d1c5abe21059",
+      "changes": [
+        "Codex frontmatter compatibility",
+        "Hisab offline/jurisdiction adaptation notice"
+      ]
+    }
+  },
+  {
+    "name": "reconciliation",
+    "path": "C:\\Users\\admin\\.codex\\skills\\reconciliation",
+    "skill_sha256": "c45bdd1ea67ca2ebc6e4fb44b45af858c613db03946ccb8e672b8c3d867ecc66",
+    "structural_validation": "passed 2026-11-19",
+    "source": {
+      "repository": "anthropics/knowledge-work-plugins",
+      "revision": "e91a134584eb798bac7fb0379358006a2b63b965",
+      "path": "finance/skills/reconciliation",
+      "retrieved": "2026-11-18",
+      "original_skill_sha256": "aa17e90539f4d4d84130c910c7f527236bfaa71977c4c03493c8e8e515ddeea6",
+      "installed_skill_sha256": "c45bdd1ea67ca2ebc6e4fb44b45af858c613db03946ccb8e672b8c3d867ecc66",
+      "changes": [
+        "Codex frontmatter compatibility",
+        "Hisab offline/jurisdiction adaptation notice"
+      ]
+    }
+  },
+  {
+    "name": "financial-statements",
+    "path": "C:\\Users\\admin\\.codex\\skills\\financial-statements",
+    "skill_sha256": "857fd37826cbe3478167dcfcf525e87ad825cf8d83283e0d5162f8eba81ad1d7",
+    "structural_validation": "passed 2026-11-19",
+    "source": {
+      "repository": "anthropics/knowledge-work-plugins",
+      "revision": "e91a134584eb798bac7fb0379358006a2b63b965",
+      "path": "finance/skills/financial-statements",
+      "retrieved": "2026-11-18",
+      "original_skill_sha256": "1a9ba1cc85495eef32fa250b8a4c05e4854430af574a290b855f919dbb557dfc",
+      "installed_skill_sha256": "857fd37826cbe3478167dcfcf525e87ad825cf8d83283e0d5162f8eba81ad1d7",
+      "changes": [
+        "Codex frontmatter compatibility",
+        "Hisab offline/jurisdiction adaptation notice"
+      ]
+    }
+  },
+  {
+    "name": "close-management",
+    "path": "C:\\Users\\admin\\.codex\\skills\\close-management",
+    "skill_sha256": "93cb114597205774043b0076f3fc773b08efc041697a731cc4a663ea9d302eb1",
+    "structural_validation": "passed 2026-11-19",
+    "source": {
+      "repository": "anthropics/knowledge-work-plugins",
+      "revision": "e91a134584eb798bac7fb0379358006a2b63b965",
+      "path": "finance/skills/close-management",
+      "retrieved": "2026-11-18",
+      "original_skill_sha256": "6c2df93bcd15eddf65017445fa44f3eb0b16a755711a5e0602d73ca595e73732",
+      "installed_skill_sha256": "93cb114597205774043b0076f3fc773b08efc041697a731cc4a663ea9d302eb1",
+      "changes": [
+        "Codex frontmatter compatibility",
+        "Hisab offline/jurisdiction adaptation notice"
+      ]
+    }
+  },
+  {
+    "name": "requesting-code-review",
+    "path": "C:\\Users\\admin\\.codex\\skills\\requesting-code-review",
+    "skill_sha256": "3e2049c7bee55ad87b88f145b4a8f3e7d1fe1e510638ec5296d547f20ae6a211",
+    "structural_validation": "passed 2026-11-19",
+    "source": {
+      "repository": "obra/superpowers",
+      "revision": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "path": "skills/requesting-code-review",
+      "retrieved": "2026-11-18",
+      "original_skill_sha256": "2180e14a448e9410bec88e6646a2d1f0ce7fdd58de27388c1e052e929679d2bc",
+      "installed_skill_sha256": "3e2049c7bee55ad87b88f145b4a8f3e7d1fe1e510638ec5296d547f20ae6a211",
+      "changes": [
+        "Codex frontmatter compatibility",
+        "Hisab offline/jurisdiction adaptation notice"
+      ]
+    }
+  },
+  {
+    "name": "verification-before-completion",
+    "path": "C:\\Users\\admin\\.codex\\skills\\verification-before-completion",
+    "skill_sha256": "b159ce5339ae609352a0ae086c1d7f053c0c531da95ff90e21fa4e32ac4cc31e",
+    "structural_validation": "passed 2026-11-19",
+    "source": {
+      "repository": "obra/superpowers",
+      "revision": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "path": "skills/verification-before-completion",
+      "retrieved": "2026-11-18",
+      "original_skill_sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+      "installed_skill_sha256": "b159ce5339ae609352a0ae086c1d7f053c0c531da95ff90e21fa4e32ac4cc31e",
+      "changes": [
+        "Codex frontmatter compatibility",
+        "Hisab offline/jurisdiction adaptation notice"
+      ]
+    }
+  },
+  {
+    "name": "hisab-accounting-inventory-auditor",
+    "path": "C:\\Users\\admin\\.codex\\skills\\hisab-accounting-inventory-auditor",
+    "skill_sha256": "a0fb0194a0a41ab868261975f2a28a51da1024f94b258b18dfa3a7f5de571dd4",
+    "structural_validation": "passed 2026-11-19",
+    "source": {
+      "type": "locally-authored"
+    }
+  }
+]
